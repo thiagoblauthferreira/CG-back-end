@@ -18,7 +18,7 @@ export const dataSourceConfig = (): DataSourceOptions => {
           username: process.env.USER_DB,
           password: process.env.PASSWORD_DB,
           database: process.env.NAME_DB,
-          synchronize: false,
+          synchronize: true,
         }),
     entities: [
       User
