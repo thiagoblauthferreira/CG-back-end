@@ -28,4 +28,16 @@ export class User {
 
   @Column()
   isVolunteer: boolean;
+
+  @Column("simple-array")
+  roles: string[];
+
+  @Column()
+  personType: string;
+
+  @Column()
+  hasVehicle: boolean;
+
+  @Column({ nullable: true })
+  vehicleType: string;
 }
