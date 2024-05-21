@@ -79,8 +79,8 @@ Discord: https://discord.gg/uCDNmkYz
 ## Stay in touch
 
 - Idealizador - [Thiago Blauth Ferreira](https://kamilmysliwiec.com) (Site ou linkedin)
-- Website - [https://nestjs.com](https://nestjs.com/) (Muda mais tarde)
-- Twitter - [@nestframework](https://twitter.com/nestframework) (Muda mais tarde)
+- Website - [http://www.coletivogloma.com.br](http://www.coletivogloma.com.br)
+- Twitter - [https://x.com/coletivogloma](https://x.com/coletivogloma)
 
 ## License
 
