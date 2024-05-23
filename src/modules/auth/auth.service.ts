@@ -12,6 +12,17 @@ export class AuthService {
   ) {}
 
   async register(user: User) {
+    user.roles = [];
+    if (user.isDonor) {
+      user.roles.push('donor');
+    }
+    if (user.isCoordinator) {
+      user.roles.push('coordinator');
+    }
+    if (user.isDonor && user.isCoordinator) {
+      user.roles = ['both'];
+    }
+
     user.password = await hash(user.password, 10);
 
     const newUser = await this.usersRepository.save(user);
@@ -20,6 +31,8 @@ export class AuthService {
 
     return newUser;
   }
+
+  
 /*
   async sendConfirmationEmail(user: User) {
     
