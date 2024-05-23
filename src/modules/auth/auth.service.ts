@@ -11,7 +11,7 @@ export class AuthService {
     private usersRepository: Repository<User>,
   ) {}
 
-  async register(user: User) {
+  public async register(user: User) {
     user.roles = [];
     if (user.isDonor) {
       user.roles.push('donor');
@@ -32,13 +32,49 @@ export class AuthService {
     return newUser;
   }
 
+  public async deleteAccount(userId: string, password: string) {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+  
+    if (!user) {
+      throw new Error('Usuário não encontrado');
+    }
+  
+    const passwordMatches = await compare(password, user.password);
+  
+    if (!passwordMatches) {
+      throw new Error('Senha inválida');
+    }
+  
+    await this.usersRepository.delete(userId);
+  
+    return { message: 'Conta deletada com sucesso' };
+  }
+
+  
+public async updateAccount(userId: string, updates: Partial<User>) {
+  const user = await this.usersRepository.findOne({ where: { id: userId } });
+
+  if (!user) {
+    throw new Error('Usuário não encontrado');
+  }
+
+  if (updates.password) {
+    updates.password = await hash(updates.password, 10);
+  }
+
+  const updatedUser = await this.usersRepository.save({ ...user, ...updates });
+
+  delete updatedUser.password;
+
+  return updatedUser;
+}
   
 /*
   async sendConfirmationEmail(user: User) {
     
   }
 */
-async authenticate(email: string, password: string) {
+public async authenticate(email: string, password: string) {
   const user = await this.usersRepository.findOne({ where: { email } });
 
   if (!user) {
