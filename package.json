@@ -30,6 +30,7 @@
     "@nestjs/typeorm": "^10.0.2",
     "bcrypt": "^5.1.1",
     "class-validator": "^0.14.1",
+    "opencage-api-client": "^1.0.5",
     "pg": "^8.11.5",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",

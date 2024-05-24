@@ -15,6 +15,9 @@ export class User {
   name: string
 
   @Column()
+  username: string
+
+  @Column()
   email: string;
 
   @Column()
@@ -39,7 +42,7 @@ export class User {
   @Column("simple-array")
   roles: string[];
 
-  @Column()
+  @Column({ nullable: true })
   hasVehicle: boolean;
 
   @Column({ nullable: true })
