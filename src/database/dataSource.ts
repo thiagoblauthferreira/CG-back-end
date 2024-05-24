@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { DataSource, DataSourceOptions } from "typeorm";
 import { User } from "src/modules/auth/entities/auth.enity";
-
+import { Address } from "src/modules/auth/entities/adress.enity";
 const env = String(process.env.ENV);
 
 export const dataSourceConfig = (): DataSourceOptions => {
@@ -21,7 +21,8 @@ export const dataSourceConfig = (): DataSourceOptions => {
           synchronize: true,
         }),
     entities: [
-      User
+      User,
+      Address
     ],
   };
 };
