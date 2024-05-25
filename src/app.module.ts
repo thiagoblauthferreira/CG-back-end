@@ -4,11 +4,15 @@ import { dataSourceConfig } from './database/dataSource';
 import { AuthModule } from './modules/auth/auth.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { NeedModule } from './modules/need/need.module';
+
+
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(dataSourceConfig() as TypeOrmModuleOptions),
-    AuthModule
+    AuthModule,
+    NeedModule
   ],
   controllers: [AppController],
   providers: [AppService],

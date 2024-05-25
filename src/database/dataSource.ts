@@ -2,6 +2,10 @@ import "dotenv/config";
 import { DataSource, DataSourceOptions } from "typeorm";
 import { User } from "src/modules/auth/entities/auth.enity";
 import { Address } from "src/modules/auth/entities/adress.enity";
+import { NeedItem } from "src/modules/need/entities/needItems.entity";
+import { NeedVolunteers } from "src/modules/need/entities/needVolunteers.entity";
+
+
 const env = String(process.env.ENV);
 
 export const dataSourceConfig = (): DataSourceOptions => {
@@ -22,13 +26,16 @@ export const dataSourceConfig = (): DataSourceOptions => {
           password: process.env.PASSWORD_DB,
           database: process.env.NAME_DB,
           synchronize: true,
-          ssl: {
-            rejectUnauthorized: false, 
-          },
+          ssl: false,
+          /*ssl: {
+            rejectUnauthorized: true, 
+          },*/
         }),
     entities: [
       User,
-      Address
+      Address,
+      NeedItem,
+      NeedVolunteers
     ],
   };
 };
