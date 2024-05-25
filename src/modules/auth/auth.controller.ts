@@ -1,11 +1,10 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Param, Delete, Get, Patch} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/auth.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
-
 
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {
@@ -14,8 +13,24 @@ export class AuthController {
     return registeredUser;
   }
 
+  @Patch('update/:userId')
+  async update(@Param('userId') userId: string, @Body() updates: CreateUserDto) {
+    return this.authService.updateAccount(userId, updates);
+  }
+
+  @Delete('delete/:userId')
+  async delete(@Param('userId') userId: string, @Body('password') password: string) {
+    return this.authService.deleteAccount(userId, password);
+  }
+
   @Post('login')
   async login(@Body('email') email: string, @Body('password') password: string) {
     return this.authService.authenticate(email, password);
+  }
+
+  @Get('nearby-users/:userId')
+  async findNearbyUsers(@Param('userId') userId: string) {
+    const nearbyUsers = await this.authService.findNearbyUsers(userId, 20);
+    return nearbyUsers;
   }
 }

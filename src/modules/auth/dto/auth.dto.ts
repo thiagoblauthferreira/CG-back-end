@@ -1,6 +1,11 @@
-import { IsEmail, IsString, MinLength, IsBoolean, IsDate, IsOptional, IsEmpty, IsArray, IsIn } from 'class-validator';
+import { IsEmail, IsString, MinLength, IsBoolean, IsDate, IsOptional, IsEmpty, IsArray, IsIn, IsEnum } from 'class-validator';
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
-
+import { CreateAddressDto } from './adress.dto';
+export enum Status {
+  WAITING = 'waiting',
+  APPROVED = 'approved',
+  REJECTED = 'rejected'
+}
 export class CreateUserDto {
   @ApiHideProperty()
   @IsEmpty()
@@ -16,13 +21,16 @@ export class CreateUserDto {
 
   @ApiProperty()
   @IsString()
-  @MinLength(8)
-  password: string;
+  @IsOptional()
+  username: string;
 
   @ApiProperty()
   @IsString()
-  @IsOptional()
-  address: string;
+  @MinLength(8)
+  password: string;
+
+  @ApiProperty({ type: () => CreateAddressDto })
+  address: CreateAddressDto;
 
   @ApiProperty()
   @IsString()
@@ -42,18 +50,13 @@ export class CreateUserDto {
   @ApiProperty()
   @IsBoolean()
   @IsOptional()
-  isVolunteer: boolean;
+  isCoordinator: boolean;
 
   @ApiProperty()
   @IsArray()
   @IsOptional()
+  @IsIn(['donor', 'coordinator', 'both', 'admin'], { each: true })
   roles: string[];
-
-  @ApiProperty()
-  @IsString()
-  @IsIn(['doador', 'coordenador'])
-  @IsOptional()
-  personType: string;
 
   @ApiProperty()
   @IsBoolean()
@@ -64,4 +67,10 @@ export class CreateUserDto {
   @IsString()
   @IsOptional()
   vehicleType: string;
+
+  
+  @ApiProperty({ enum: Status, default: Status.APPROVED })
+  @IsEnum(Status)
+  @IsOptional()
+  status: Status;
 }
