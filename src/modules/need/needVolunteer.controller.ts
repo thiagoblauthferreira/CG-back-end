@@ -13,7 +13,7 @@ export class NeedVolunteerController {
     @Post('register')
     async register(@Body() createVolunteerDTO: CreateVolunteerDTO) {
         return new ResponseNeedVolunteerDTO( await this.needVolunteerService.create(createVolunteerDTO));
-      }
+    }
 
     @Patch('update/:id')
     async update(@Param('id') id:string, @Body() update: CreateVolunteerDTO) {
