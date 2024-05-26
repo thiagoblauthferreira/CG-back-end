@@ -29,7 +29,7 @@ export class NeedItemService {
 
     const need = this.needItemFactory.toItemEntity(coordinator, createNeedItemDTO);
     
-    return this.needItemRepository.save(need)
+    return await this.needItemRepository.save(need)
         
   }
 
@@ -42,8 +42,7 @@ export class NeedItemService {
  }
 
   async update(id: string, update: Partial<NeedItem>) {
-
-    const need = await this.findById(id);
+      const need = await this.findById(id);
     if(!need){
       throw new HttpException("Need not found.", HttpStatus.BAD_REQUEST);
     }
@@ -53,9 +52,9 @@ export class NeedItemService {
  async delete(id: string) {
 
   const need = await this.findById(id);
-  if(need){
-    await this.needItemRepository.remove(need);
-    return true;
+    if(need){
+      await this.needItemRepository.remove(need);
+      return true;
+    }
   }
-}
 }

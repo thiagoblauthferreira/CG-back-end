@@ -8,11 +8,12 @@ import { NeedItemService } from './needItem.service';
 import { User } from '../auth/entities/auth.enity';
 import { NeedItemController } from './needItem.controller';
 import { NeedItemFactory } from './factory/needItem.factory';
+import NeedVolunteerFactory from './factory/needVolunteerFactory';
 
 @Module({
   imports: [TypeOrmModule.forFeature([NeedVolunteers, NeedItem, User])
 ], 
-  providers: [NeedVolunteerService, NeedItemService, NeedItemFactory],
+  providers: [NeedVolunteerService, NeedItemService, NeedItemFactory, NeedVolunteerFactory],
   controllers: [NeedVolunteerController, NeedItemController],
 })
 export class NeedModule {}

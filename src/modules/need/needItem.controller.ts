@@ -1,7 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
 import { NeedItemService } from "./needItem.service";
 import { CreateNeedItemDTO } from "./dto/request/createNeedItemDTO";
-import { ResponseNeedItemDTO } from "./dto/response/reponseNeedItemDTO";
+import { ResponseNeedItemDTO } from "./dto/response/responseNeedItemDTO";
+import { ResponseNeedItemUpdateDTO } from "./dto/response/responseNeedItemUpdateDTO";
 
 @Controller('needs-item')
 export class NeedItemController {
@@ -16,14 +17,14 @@ export class NeedItemController {
        return new ResponseNeedItemDTO(await this.needItemService.create(createNeedItemDTO))
     }
 
-    @Get(':id')
+    @Get('need/:id')
     async findById(@Param('id') id: string) {
-        return new ResponseNeedItemDTO(await this.needItemService.findById(id))
+        return new ResponseNeedItemUpdateDTO(await this.needItemService.findById(id))
     }
 
     @Patch('update/:id')
     async update(@Param('id') id: string, @Body() update: CreateNeedItemDTO) {
-        return new ResponseNeedItemDTO(await this.needItemService.update(id, update));
+        return new ResponseNeedItemUpdateDTO(await this.needItemService.update(id, update));
     }
     @Delete('delete/:id')
     async delete(@Param('id') id: string) {
