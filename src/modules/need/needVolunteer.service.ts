@@ -8,21 +8,31 @@ import { VerifyIfUserExits } from "./validator/user/verifyIfUserExits";
 import { ValidationIfUserIsCoordinator } from "./validator/user/validationIfUserIsCoordinator";
 import { ValidationIfUserIsApproved } from "./validator/user/validationIfUserIsAproved";
 import { validatorUser } from "./validator/user/userValidador";
+import { HasSuspectChars } from "./validator/generics/hasSuspectChars";
+import { validatorGeneric } from "./validator/generics/genericValidador";
+import { VerifyIfDateIsBefore } from "./validator/need/updateValidator/verifyIfDateIsBefore";
+import { VerifyIfNeedIsComplete } from "./validator/need/updateValidator/verifyIfNeedIsComplete";
+import { validatorNeedsUpdate } from "./validator/need/updateValidator/needValidador";
 
 @Injectable()
 export class NeedVolunteerService {
   constructor(
   @InjectRepository(NeedVolunteers)
-  private readonly needVolunteerRepository: Repository<NeedVolunteers>,
-  private readonly verifyIfUserExits: VerifyIfUserExits,
-  private readonly needVolunteerFactory: NeedVolunteerFactory,
+  private needVolunteerRepository: Repository<NeedVolunteers>,
+  private verifyIfUserExits: VerifyIfUserExits,
+  private needVolunteerFactory: NeedVolunteerFactory,
   private validationIfUserIsCoordinator: ValidationIfUserIsCoordinator,
   private validationIfUserIsApproved: ValidationIfUserIsApproved,
+  private validationChars: HasSuspectChars,
+  private verifyIfLimitDateIsBefore: VerifyIfDateIsBefore,
+  private verifyIfNeedIsComplete: VerifyIfNeedIsComplete
   )
   {}
 
 
   async create (createVolunteerDTO: CreateVolunteerDTO){
+
+    validatorGeneric(createVolunteerDTO, this.validationChars)
 
     const coordinator = await this.verifyIfUserExits.verifyIfUserExits(createVolunteerDTO.coordinatorId);
     
@@ -35,12 +45,17 @@ export class NeedVolunteerService {
   }
 
   async update (id: string, update: Partial<NeedVolunteers>){
+
+    validatorGeneric(update, this.validationChars)
     
     const need = await this.find(id);
 
     validatorUser(need.coordinator, this.validationIfUserIsApproved, this.validationIfUserIsCoordinator);
 
-    return await this.needVolunteerRepository.save({...need, ...update});
+    const updateNeed = Object.assign(need, update)
+    validatorNeedsUpdate(updateNeed, this.verifyIfLimitDateIsBefore, this.verifyIfNeedIsComplete)
+
+    return await this.needVolunteerRepository.save(updateNeed);
 
   }
 
