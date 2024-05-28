@@ -1,3 +1,4 @@
+import { Address } from 'src/modules/auth/entities/adress.enity';
 import { User } from 'src/modules/auth/entities/auth.enity';
 import {
   Column,
@@ -5,6 +6,8 @@ import {
   DeleteDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -19,14 +22,25 @@ export class Shelter {
   name: string;
 
   @Column()
-  address: string;
-
-  @Column()
   phone: string;
 
-  @OneToOne(() => User)
+  @OneToOne(() => User, (user) => user, {
+    eager: true,
+  })
   @JoinColumn()
   user: User;
+
+  @OneToOne(() => Address, (address) => address, {
+    eager: true,
+  })
+  @JoinColumn()
+  address: Address;
+
+  @ManyToMany(() => User, (user) => user, {
+    eager: true,
+  })
+  @JoinTable()
+  coordinators: User[];
 
   @CreateDateColumn()
   createdAt: Date;

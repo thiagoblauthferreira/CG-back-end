@@ -22,12 +22,12 @@ export class ShelterController {
     return await this.shelterService.create(createShelter);
   }
 
-  @Patch('/:id')
+  @Patch('/:shelterId')
   async update(
-    @Param('id') id: string,
+    @Param('shelterId') shelterId: string,
     @Body() updateShelter: UpdateShelterDto,
   ) {
-    return await this.shelterService.update(updateShelter, id);
+    return await this.shelterService.update(updateShelter, shelterId);
   }
 
   @Get('/')
@@ -35,14 +35,22 @@ export class ShelterController {
     return await this.shelterService.listAll();
   }
 
-  @Get('/:id')
-  async finOne(@Param('id') id: string) {
-    return await this.shelterService.findOne(id);
+  @Get('/:shelterId')
+  async finOne(@Param('shelterId') shelterId: string) {
+    return await this.shelterService.findOne(shelterId);
   }
 
-  @Delete('/:id')
+  @Delete('/:shelterId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('id') id: string) {
-    return await this.shelterService.remove(id);
+  async remove(@Param('shelterId') shelterId: string) {
+    return await this.shelterService.remove(shelterId);
+  }
+
+  @Patch('/:shelterId/coordinator/:coordinatorId')
+  async addCoordinator(
+    @Param('coordinatorId') coordinatorId: string,
+    @Param('shelterId') shelterId: string,
+  ) {
+    return await this.shelterService.addCoordinator(shelterId, coordinatorId);
   }
 }
