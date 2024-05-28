@@ -3,6 +3,7 @@ import { NeedVolunteerService } from "./needVolunteer.service";
 import { CreateVolunteerDTO } from "./dto/request/createNeedVolunteerDTO";
 import { ResponseNeedVolunteerDTO } from "./dto/response/responseVolunteer";
 import { ResponseNeedVolunteerUpdateDTO } from "./dto/response/responseUpdateVolunteers";
+import { NeedVolunteers } from "./entities/needVolunteers.entity";
 
 @Controller('needs-volunteer')
 export class NeedVolunteerController {
@@ -31,6 +32,13 @@ export class NeedVolunteerController {
     @Get('need/:id')
     async findById(@Param('id') id:string ) {
         return new ResponseNeedVolunteerUpdateDTO( await this.needVolunteerService.find(id))
+    }
+
+    @Get('need-all')
+    async findByAll() {
+        const needVolunteers: NeedVolunteers[] = await this.needVolunteerService.findAll();
+        const responseItems = needVolunteers.map(need => new ResponseNeedVolunteerUpdateDTO(need));
+        return responseItems;
     }
 
 }

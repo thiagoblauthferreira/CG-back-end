@@ -14,6 +14,7 @@ import { validatorNeedsUpdate } from "./validator/need/updateValidator/needValid
 import { VerifyIfDateIsBeforeCreate } from "./validator/need/createValidator/verifyIfDateIsBeforeCreate";
 import { validatorNeedsCreate } from "./validator/need/createValidator/needValidadorCreate";
 
+
 @Injectable()
 export class NeedVolunteerService {
   constructor(
@@ -86,5 +87,11 @@ export class NeedVolunteerService {
     return false;
 
   }
+
+    async findAll(): Promise<NeedVolunteers[]>{
+      return await this.needVolunteerRepository.find({
+        relations: ['coordinator']
+      })
+    }
 
 }

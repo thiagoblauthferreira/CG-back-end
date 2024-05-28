@@ -3,6 +3,7 @@ import { NeedItemService } from "./needItem.service";
 import { CreateNeedItemDTO } from "./dto/request/createNeedItemDTO";
 import { ResponseNeedItemDTO } from "./dto/response/responseNeedItemDTO";
 import { ResponseNeedItemUpdateDTO } from "./dto/response/responseNeedItemUpdateDTO";
+import { NeedItem } from "./entities/needItems.entity";
 
 @Controller('needs-item')
 export class NeedItemController {
@@ -35,6 +36,12 @@ export class NeedItemController {
       return { success: false }
     }
 
+    @Get('need-all')
+    async findByAll() {
+        const needVolunteers: NeedItem[] = await this.needItemService.findAll();
+        const responseItems = needVolunteers.map(need => new ResponseNeedItemDTO(need));
+        return responseItems;
+    }
    
 
 }

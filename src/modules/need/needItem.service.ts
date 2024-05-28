@@ -75,11 +75,18 @@ export class NeedItemService {
   async delete(id: string) {
 
   const need = await this.findById(id);
-  validatorUser(need.coordinator, this.validationIfUserIsApproved, this.validationIfUserIsCoordinator);
+    validatorUser(need.coordinator, this.validationIfUserIsApproved, this.validationIfUserIsCoordinator);
+    
     if(need){
       await this.needItemRepository.remove(need);
       return true;
     }
+  }
+
+  async findAll(): Promise<NeedItem[]>{
+    return await this.needItemRepository.find({
+      relations: ['coordinator']
+    })
   }
 }
 
