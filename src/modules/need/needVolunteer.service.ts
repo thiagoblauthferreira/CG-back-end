@@ -47,19 +47,18 @@ export class NeedVolunteerService {
 
   async update (id: string, update: Partial<NeedVolunteers>){
 
-  
+
+     //ficaram dois código, um para verificar o update e outro para verificar a própria need
+     validatorNeedsUpdate(update, this.verifyIfLimitDateIsBefore)
+
     const need = await this.find(id);
 
     validatorUser(need.coordinator, this.validationIfUserIsApproved, this.validationIfUserIsCoordinator);
 
-    //ficaram dois código, um para verificar o update e outro para verificar a própria need
-    validatorNeedsUpdate(update, this.verifyIfLimitDateIsBefore)
-
-   //verificação da need
+    //verificação da need
     validatorNeedsUpdate(need, this.verifyIfNeedIsComplete)
     const updateNeed = Object.assign(need, update)
   
-
     return await this.needVolunteerRepository.save(updateNeed);
 
   }
