@@ -9,9 +9,10 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 export class VerifyIfNeedIsComplete implements INeedValidate<NeedItem | NeedVolunteers>{
   
   validate(need: NeedItem | NeedVolunteers): void {
-
-    if(need.status = Status.COMPLETED)
-      throw new HttpException("Invalid characters", HttpStatus.BAD_REQUEST);
+      if(need.status == Status.COMPLETED){
+       
+      throw new HttpException("The need can't be update.", HttpStatus.BAD_REQUEST);
+    }
   }
 
 }

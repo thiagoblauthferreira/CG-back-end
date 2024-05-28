@@ -8,11 +8,11 @@ import { VerifyIfUserExits } from "./validator/user/verifyIfUserExits";
 import { ValidationIfUserIsCoordinator } from "./validator/user/validationIfUserIsCoordinator";
 import { ValidationIfUserIsApproved } from "./validator/user/validationIfUserIsAproved";
 import { validatorUser } from "./validator/user/userValidador";
-import { validatorGeneric } from "./validator/generics/genericValidador";
-import { HasSuspectChars } from "./validator/generics/hasSuspectChars";
 import { VerifyIfDateIsBefore } from "./validator/need/updateValidator/verifyIfDateIsBefore";
 import { VerifyIfNeedIsComplete } from "./validator/need/updateValidator/verifyIfNeedIsComplete";
 import { validatorNeedsUpdate } from "./validator/need/updateValidator/needValidador";
+import { validatorNeedsCreate } from "./validator/need/createValidator/needValidadorCreate";
+import { VerifyIfDateIsBeforeCreate } from "./validator/need/createValidator/verifyIfDateIsBeforeCreate";
 
 @Injectable()
 export class NeedItemService {
@@ -23,15 +23,15 @@ export class NeedItemService {
   private needItemFactory: NeedItemFactory,
   private validationIfUserIsCoordinator: ValidationIfUserIsCoordinator,
   private validationIfUserIsApproved: ValidationIfUserIsApproved,
-  private validationChars: HasSuspectChars,
   private verifyIfLimitDateIsBefore: VerifyIfDateIsBefore,
-  private verifyIfNeedIsComplete: VerifyIfNeedIsComplete
+  private verifyIfNeedIsComplete: VerifyIfNeedIsComplete,
+  private verifyIfLimitDateIsBeforeCreate: VerifyIfDateIsBeforeCreate
   )
   {}
 
   async create (createNeedItemDTO: CreateNeedItemDTO): Promise<NeedItem>{
 
-    validatorGeneric(createNeedItemDTO, this.validationChars)
+    validatorNeedsCreate(createNeedItemDTO, this.verifyIfLimitDateIsBeforeCreate)
 
     const coordinator = await this.verifyIfUserExits.verifyIfUserExits(createNeedItemDTO.coordinatorId);
 
@@ -56,20 +56,23 @@ export class NeedItemService {
 
   async update(id: string, update: Partial<NeedItem>) {
 
-    validatorGeneric(update, this.validationChars)
-
     const need = await this.findById(id);
 
-    validatorUser(need.coordinator, this.validationIfUserIsApproved, this.validationIfUserIsCoordinator);
+    
    
-    const updateNeed = Object.assign(need, update)
-    validatorNeedsUpdate(updateNeed, this.verifyIfLimitDateIsBefore, this.verifyIfNeedIsComplete)
+    await validatorUser(need.coordinator, this.validationIfUserIsApproved, this.validationIfUserIsCoordinator);
+    //ficaram dois código, um para verificar o update e outro para verificar a própria need
+    validatorNeedsUpdate(update, this.verifyIfLimitDateIsBefore)
 
+   //verificação da need
+    validatorNeedsUpdate(need, this.verifyIfNeedIsComplete)
+
+    const updateNeed = Object.assign(need, update)
 
     return await this.needItemRepository.save(updateNeed)
   }
 
- async delete(id: string) {
+  async delete(id: string) {
 
   const need = await this.findById(id);
   validatorUser(need.coordinator, this.validationIfUserIsApproved, this.validationIfUserIsCoordinator);

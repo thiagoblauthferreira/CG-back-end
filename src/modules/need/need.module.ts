@@ -12,15 +12,16 @@ import NeedVolunteerFactory from './factory/needVolunteerFactory';
 import { VerifyIfUserExits } from './validator/user/verifyIfUserExits';
 import { ValidationIfUserIsCoordinator } from './validator/user/validationIfUserIsCoordinator';
 import { ValidationIfUserIsApproved } from './validator/user/validationIfUserIsAproved';
-import { HasSuspectChars } from './validator/generics/hasSuspectChars';
 import { VerifyIfDateIsBefore } from './validator/need/updateValidator/verifyIfDateIsBefore';
 import { VerifyIfNeedIsComplete } from './validator/need/updateValidator/verifyIfNeedIsComplete';
+import { VerifyIfDateIsBeforeCreate } from './validator/need/createValidator/verifyIfDateIsBeforeCreate';
+
 
 @Module({
   imports: [TypeOrmModule.forFeature([NeedVolunteers, NeedItem, User])
 ], 
   providers: [NeedVolunteerService, NeedItemService, NeedItemFactory, NeedVolunteerFactory, VerifyIfUserExits, ValidationIfUserIsCoordinator,
-    ValidationIfUserIsApproved, HasSuspectChars, VerifyIfDateIsBefore, VerifyIfNeedIsComplete],
+    ValidationIfUserIsApproved, VerifyIfDateIsBefore, VerifyIfNeedIsComplete, VerifyIfDateIsBeforeCreate],
   controllers: [NeedVolunteerController, NeedItemController],
 })
 export class NeedModule {}

@@ -9,8 +9,12 @@ export class VerifyIfDateIsBefore implements INeedValidate<NeedItem | NeedVolunt
   
   validate(need: NeedItem | NeedVolunteers): void {
 
-    if(need.limitDate <= need.created)
-      throw new HttpException("The limit date can't be before the need creation.", HttpStatus.BAD_REQUEST);
+    const now = new Date();
+    const limitDate = new Date(need.limitDate)
+  
+    if (limitDate < now) {
+     throw new HttpException("The limit date can't be before the need creation.", HttpStatus.BAD_REQUEST);
+    }
   }
 
 }

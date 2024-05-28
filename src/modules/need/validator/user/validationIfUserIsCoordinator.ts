@@ -12,13 +12,10 @@ export class ValidationIfUserIsCoordinator implements IUserValidate {
     private readonly userRepository: Repository<User>,
   ){}
 
-  async validate(user: User): Promise<void> {
+   validate(user: User) {
 
-    const coordinator = await this.userRepository.findOne({
-      where: { id: user.id }
-    });
-   
-    if(coordinator.isCoordinator != false){
+     
+    if(user.isCoordinator == false){
       throw new HttpException("User is not permission to create needs.", HttpStatus.FORBIDDEN);
     }
    

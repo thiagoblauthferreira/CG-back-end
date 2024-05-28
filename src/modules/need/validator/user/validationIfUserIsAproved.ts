@@ -17,7 +17,7 @@ export class ValidationIfUserIsApproved implements IUserValidate {
     const coordinator = await this.userRepository.findOne({
       where: { id: user.id }
     });
-   
+
     if(coordinator.status != Status.APPROVED){
       throw new HttpException("User is not permission to create needs.", HttpStatus.FORBIDDEN);
     }
