@@ -27,6 +27,7 @@ export class NeedItemController {
     async update(@Param('id') id: string, @Body() update: CreateNeedItemDTO) {
         return new ResponseNeedItemUpdateDTO(await this.needItemService.update(id, update));
     }
+    
     @Delete('delete/:id')
     async delete(@Param('id') id: string) {
       const remove = this.needItemService.delete(id);

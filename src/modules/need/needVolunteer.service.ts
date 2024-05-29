@@ -3,16 +3,11 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { NeedVolunteers } from "./entities/needVolunteers.entity";
 import { CreateVolunteerDTO } from "./dto/request/createNeedVolunteerDTO";
-import NeedVolunteerFactory from "./factory/needVolunteerFactory";
 import { VerifyIfUserExits } from "./validator/user/verifyIfUserExits";
-import { ValidationIfUserIsCoordinator } from "./validator/user/validationIfUserIsCoordinator";
-import { ValidationIfUserIsApproved } from "./validator/user/validationIfUserIsAproved";
-import { validatorUser } from "./validator/user/userValidador";
-import { VerifyIfDateIsBefore } from "./validator/need/updateValidator/verifyIfDateIsBefore";
-import { VerifyIfNeedIsComplete } from "./validator/need/updateValidator/verifyIfNeedIsComplete";
-import { validatorNeedsUpdate } from "./validator/need/updateValidator/needValidador";
-import { VerifyIfDateIsBeforeCreate } from "./validator/need/createValidator/verifyIfDateIsBeforeCreate";
-import { validatorNeedsCreate } from "./validator/need/createValidator/needValidadorCreate";
+import { toNeedVolunteerEntity } from "./factory/needVolunteerFactory";
+import { userValidations } from "./validator/user/userValidations";
+import { validateCreate } from "./validator/need/createValidator/createVerifications";
+import { validateUpdate } from "./validator/need/updateValidator/updateValidations";
 
 
 @Injectable()
@@ -21,12 +16,6 @@ export class NeedVolunteerService {
   @InjectRepository(NeedVolunteers)
   private needVolunteerRepository: Repository<NeedVolunteers>,
   private verifyIfUserExits: VerifyIfUserExits,
-  private needVolunteerFactory: NeedVolunteerFactory,
-  private validationIfUserIsCoordinator: ValidationIfUserIsCoordinator,
-  private validationIfUserIsApproved: ValidationIfUserIsApproved,
-  private verifyIfLimitDateIsBefore: VerifyIfDateIsBefore,
-  private verifyIfNeedIsComplete: VerifyIfNeedIsComplete,
-  private verifyIfLimitDateIsBeforeCreate: VerifyIfDateIsBeforeCreate
   )
   {}
 
@@ -34,13 +23,13 @@ export class NeedVolunteerService {
   async create (createVolunteerDTO: CreateVolunteerDTO){
     
 
-    await validatorNeedsCreate(createVolunteerDTO, this.verifyIfLimitDateIsBeforeCreate)
+    validateCreate(createVolunteerDTO)
 
     const coordinator = await this.verifyIfUserExits.verifyIfUserExits(createVolunteerDTO.coordinatorId);
     
-    validatorUser(coordinator, this.validationIfUserIsApproved, this.validationIfUserIsCoordinator);
+    userValidations(coordinator);
 
-    const need  = this.needVolunteerFactory.toNeedVolunteerEntity(coordinator, createVolunteerDTO);
+    const need  = toNeedVolunteerEntity(coordinator, createVolunteerDTO);
 
     return await this.needVolunteerRepository.save(need);
 
@@ -49,15 +38,14 @@ export class NeedVolunteerService {
   async update (id: string, update: Partial<NeedVolunteers>){
 
 
-     //ficaram dois código, um para verificar o update e outro para verificar a própria need
-     validatorNeedsUpdate(update, this.verifyIfLimitDateIsBefore)
-
+    //ficaram dois código, um para verificar o update e outro para verificar a própria need
+    validateUpdate(update)
+    
     const need = await this.find(id);
 
-    validatorUser(need.coordinator, this.validationIfUserIsApproved, this.validationIfUserIsCoordinator);
-
+    userValidations(need.coordinator);
     //verificação da need
-    validatorNeedsUpdate(need, this.verifyIfNeedIsComplete)
+    validateUpdate(need)
     const updateNeed = Object.assign(need, update)
   
     return await this.needVolunteerRepository.save(updateNeed);
@@ -78,13 +66,13 @@ export class NeedVolunteerService {
 
   async delete(id: string): Promise<boolean> {
    
-    const need = await this.find(id);
-    validatorUser(need.coordinator, this.validationIfUserIsApproved, this.validationIfUserIsCoordinator);
-    if (need){
-      await this.needVolunteerRepository.remove(need);
-      return true
-    }
-    return false;
+   const need = await this.find(id);
+   userValidations(need.coordinator);
+    
+   await this.needVolunteerRepository.remove(need);
+   
+   return true
+    
 
   }
 

@@ -2,17 +2,12 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { CreateNeedItemDTO } from "./dto/request/createNeedItemDTO";
-import { NeedItemFactory } from "./factory/needItem.factory";
 import { NeedItem } from "./entities/needItems.entity";
 import { VerifyIfUserExits } from "./validator/user/verifyIfUserExits";
-import { ValidationIfUserIsCoordinator } from "./validator/user/validationIfUserIsCoordinator";
-import { ValidationIfUserIsApproved } from "./validator/user/validationIfUserIsAproved";
-import { validatorUser } from "./validator/user/userValidador";
-import { VerifyIfDateIsBefore } from "./validator/need/updateValidator/verifyIfDateIsBefore";
-import { VerifyIfNeedIsComplete } from "./validator/need/updateValidator/verifyIfNeedIsComplete";
-import { validatorNeedsUpdate } from "./validator/need/updateValidator/needValidador";
-import { validatorNeedsCreate } from "./validator/need/createValidator/needValidadorCreate";
-import { VerifyIfDateIsBeforeCreate } from "./validator/need/createValidator/verifyIfDateIsBeforeCreate";
+import { toItemEntity } from "./factory/needItem.factory";
+import { userValidations } from "./validator/user/userValidations";
+import { validateCreate } from "./validator/need/createValidator/createVerifications";
+import { validateUpdate } from "./validator/need/updateValidator/updateValidations";
 
 @Injectable()
 export class NeedItemService {
@@ -20,24 +15,18 @@ export class NeedItemService {
   @InjectRepository(NeedItem)
   private needItemRepository: Repository<NeedItem>,
   private verifyIfUserExits: VerifyIfUserExits,
-  private needItemFactory: NeedItemFactory,
-  private validationIfUserIsCoordinator: ValidationIfUserIsCoordinator,
-  private validationIfUserIsApproved: ValidationIfUserIsApproved,
-  private verifyIfLimitDateIsBefore: VerifyIfDateIsBefore,
-  private verifyIfNeedIsComplete: VerifyIfNeedIsComplete,
-  private verifyIfLimitDateIsBeforeCreate: VerifyIfDateIsBeforeCreate
   )
   {}
 
   async create (createNeedItemDTO: CreateNeedItemDTO): Promise<NeedItem>{
 
-    validatorNeedsCreate(createNeedItemDTO, this.verifyIfLimitDateIsBeforeCreate)
+    validateCreate(createNeedItemDTO)
 
     const coordinator = await this.verifyIfUserExits.verifyIfUserExits(createNeedItemDTO.coordinatorId);
 
-    validatorUser(coordinator, this.validationIfUserIsApproved, this.validationIfUserIsCoordinator);
+    userValidations(coordinator);
 
-    const need = this.needItemFactory.toItemEntity(coordinator, createNeedItemDTO);
+    const need = toItemEntity(coordinator, createNeedItemDTO);
     
     return await this.needItemRepository.save(need)
         
@@ -60,12 +49,12 @@ export class NeedItemService {
 
     
    
-    await validatorUser(need.coordinator, this.validationIfUserIsApproved, this.validationIfUserIsCoordinator);
+    userValidations(need.coordinator);
     //ficaram dois código, um para verificar o update e outro para verificar a própria need
-    validatorNeedsUpdate(update, this.verifyIfLimitDateIsBefore)
+    validateUpdate(update)
 
-   //verificação da need
-    validatorNeedsUpdate(need, this.verifyIfNeedIsComplete)
+    //verificação da need
+    validateUpdate(need)
 
     const updateNeed = Object.assign(need, update)
 
@@ -75,11 +64,11 @@ export class NeedItemService {
   async delete(id: string) {
 
   const need = await this.findById(id);
-    validatorUser(need.coordinator, this.validationIfUserIsApproved, this.validationIfUserIsCoordinator);
+  userValidations(need.coordinator);
     
-    if(need){
-      await this.needItemRepository.remove(need);
-      return true;
+  if(need){
+    await this.needItemRepository.remove(need);
+    return true;
     }
   }
 

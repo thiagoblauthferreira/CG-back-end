@@ -1,13 +1,9 @@
-import { INeedValidate } from "./INeedValidatorCreate";
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus } from "@nestjs/common";
 import { CreateNeedItemDTO } from "src/modules/need/dto/request/createNeedItemDTO";
 import { CreateVolunteerDTO } from "src/modules/need/dto/request/createNeedVolunteerDTO";
 
 
-@Injectable()
-export class VerifyIfDateIsBeforeCreate implements INeedValidate<CreateNeedItemDTO | CreateVolunteerDTO> {
-  
-  validate(need: CreateNeedItemDTO | CreateVolunteerDTO): void {
+  export function validateCreate(need: CreateNeedItemDTO | CreateVolunteerDTO): void {
     const now = new Date();
     const limitDate = new Date(need.limitDate)
   
@@ -16,4 +12,3 @@ export class VerifyIfDateIsBeforeCreate implements INeedValidate<CreateNeedItemD
     }
   }
 
-}

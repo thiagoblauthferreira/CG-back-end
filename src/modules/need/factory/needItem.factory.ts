@@ -2,12 +2,8 @@ import { User } from "src/modules/auth/entities/auth.enity";
 import { CreateNeedItemDTO} from "../dto/request/createNeedItemDTO"
 import { NeedItem } from "../entities/needItems.entity";
 
-export class NeedItemFactory {
-
-
-  toItemEntity(user: User, createNeedItemDTO: CreateNeedItemDTO): NeedItem{
+ export function toItemEntity(user: User, createNeedItemDTO: CreateNeedItemDTO): NeedItem{
   
-
     return new NeedItem (
       user,
       createNeedItemDTO.title,
@@ -20,4 +16,3 @@ export class NeedItemFactory {
     )
     
   }
-}
