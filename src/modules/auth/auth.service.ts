@@ -7,6 +7,7 @@ import { Address } from './entities/adress.enity';
 import { CreateUserDto } from './dto/auth.dto';
 import * as opencage from 'opencage-api-client';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { EnvConfig } from 'src/config';
 @Injectable()
 export class AuthService {
   constructor(
@@ -46,7 +47,7 @@ export class AuthService {
       user.roles = ['both'];
     }
     const addressString = `${newAddress.logradouro}, ${newAddress.numero}, ${newAddress.bairro}, ${newAddress.municipio}, ${newAddress.estado}, ${newAddress.pais}`;
-    const geocodeResult = await opencage.geocode({ q: addressString, key: process.env.OPENCAGE_API_KEY });
+    const geocodeResult = await opencage.geocode({ q: addressString, key: EnvConfig.OPENCAGE.API_KEY });
     
     if (geocodeResult.results.length > 0) {
       const { lat, lng } = geocodeResult.results[0].geometry;
