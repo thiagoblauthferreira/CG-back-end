@@ -8,6 +8,7 @@ import { CreateUserDto } from './dto/auth.dto';
 import * as opencage from 'opencage-api-client';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { EnvConfig } from 'src/config';
+
 @Injectable()
 export class AuthService {
   constructor(
