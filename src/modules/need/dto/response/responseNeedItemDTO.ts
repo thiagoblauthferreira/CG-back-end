@@ -13,6 +13,7 @@ export class ResponseNeedItemDTO {
   limitDate: Date;
   item: { [key: string]: number};
   created: Date;
+  donor: string;
 
 
   constructor(needItem: NeedItem){
@@ -23,7 +24,8 @@ export class ResponseNeedItemDTO {
     this.status = needItem.status,
     this.limitDate = needItem.limitDate,
     this.item = needItem.item
-    this.created = needItem.created
+    this.created = needItem.created,
+    this.donor = needItem.donor?.name
   }
   
 }

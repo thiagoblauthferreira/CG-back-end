@@ -43,6 +43,10 @@ export class NeedItem {
   @UpdateDateColumn()
   updated: Date;
 
+  @ManyToOne(() => User)
+  @JoinColumn({ name: "donorId"})
+  donor?: User;
+
   constructor(
     coordinator: User,
     title: string,
@@ -61,6 +65,7 @@ export class NeedItem {
     this.priority = priority;
     this.limitDate = limitDate;
     this.item = item;
+    this.donor = null;
   }
 
  }

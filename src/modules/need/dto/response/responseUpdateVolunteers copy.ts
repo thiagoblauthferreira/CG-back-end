@@ -2,8 +2,9 @@ import { NeedVolunteers } from "../../entities/needVolunteers.entity";
 import { Priority } from "../../enums/enumPriority";
 import { Status } from "../../enums/enumsStatus";
 
-export class ResponseNeedVolunteerUpdateDTO {
+export class ResponseNeedVolunteerUpdateDTOToList{
   
+  id: string;
   coordinator: string;
   title: string;
   description: string;
@@ -19,6 +20,7 @@ export class ResponseNeedVolunteerUpdateDTO {
 
 
   constructor(needVolunteer: NeedVolunteers){
+    this.id = needVolunteer.id
     this.coordinator = needVolunteer.coordinator.name,
     this.title = needVolunteer.title,
     this.description = needVolunteer.description,

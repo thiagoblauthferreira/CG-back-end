@@ -3,7 +3,7 @@ import { HttpException, HttpStatus } from "@nestjs/common";
 
 export function userValidations(user: User){
 
-  if(user.isCoordinator == false){
+  if(user.isCoordinator === false){
     throw new HttpException("User is not permission to create needs.", HttpStatus.FORBIDDEN);
   }
 

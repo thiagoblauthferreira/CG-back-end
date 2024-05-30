@@ -8,6 +8,9 @@ import { toNeedVolunteerEntity } from "./factory/needVolunteerFactory";
 import { userValidations } from "./validator/user/userValidations";
 import { validateCreate } from "./validator/need/createValidator/createVerifications";
 import { validateUpdate } from "./validator/need/updateValidator/updateValidations";
+import { validateUpdateDTO } from "./validator/need/updateValidator/updateValidationsDTO";
+import { userValidationsToAccepted } from "./validator/user/userValidationsToAccepted";
+import { acceptedValidate } from "./validator/need/accepted/acceptedValidations";
 
 
 @Injectable()
@@ -35,11 +38,11 @@ export class NeedVolunteerService {
 
   }
 
-  async update (id: string, update: Partial<NeedVolunteers>){
+  async update(id: string, update: Partial<NeedVolunteers>){
 
 
     //ficaram dois código, um para verificar o update e outro para verificar a própria need
-    validateUpdate(update)
+    validateUpdateDTO(update)
     
     const need = await this.find(id);
 
@@ -68,18 +71,26 @@ export class NeedVolunteerService {
    
    const need = await this.find(id);
    userValidations(need.coordinator);
-    
    await this.needVolunteerRepository.remove(need);
-   
    return true
-    
-
+  
   }
 
-    async findAll(): Promise<NeedVolunteers[]>{
-      return await this.needVolunteerRepository.find({
-        relations: ['coordinator']
-      })
-    }
+  async findAll(): Promise<NeedVolunteers[]>{
+    return await this.needVolunteerRepository.find({
+     relations: ['coordinator']
+     })
+   }
+
+    async accepted(id: string, userId: string): Promise<NeedVolunteers> {
+      const volunteer = await this.verifyIfUserExits.verifyIfUserExits(userId)
+      userValidationsToAccepted(volunteer);
+      const need = await this.find(id);
+      acceptedValidate(need);
+      need.volunteers.push(volunteer.id);
+      await this.needVolunteerRepository.save(need)
+      return need
+          
+     }
 
 }

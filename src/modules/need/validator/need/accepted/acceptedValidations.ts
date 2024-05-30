@@ -4,7 +4,7 @@ import { NeedVolunteers } from "src/modules/need/entities/needVolunteers.entity"
 import { Status } from "src/modules/need/enums/enumsStatus";
 
 
-  export function validateUpdate(need: NeedItem | NeedVolunteers): void {
+  export function acceptedValidate(need: NeedItem | NeedVolunteers): void {
 
     const now = new Date();
     const limitDate = new Date(need.limitDate)

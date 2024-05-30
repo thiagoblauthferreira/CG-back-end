@@ -2,7 +2,7 @@ import { ApiHideProperty, ApiProperty } from "@nestjs/swagger";
 import { Priority } from "../../enums/enumPriority";
 import { Status } from "../../enums/enumsStatus";
 import { IsDateString, IsEmpty, IsISO8601, IsInt, IsString, Validate } from "class-validator";
-import { User } from "src/modules/auth/entities/auth.enity";
+
 
 export class CreateVolunteerDTO {
   
@@ -16,7 +16,7 @@ export class CreateVolunteerDTO {
 
   @ApiProperty()
   @IsString()
-  volunteers: User[];
+  volunteers: string[];
 
   @ApiProperty()
   @IsString()

@@ -2,9 +2,9 @@ import { NeedItem } from "../../entities/needItems.entity";
 import { Priority } from "../../enums/enumPriority";
 import { Status } from "../../enums/enumsStatus";
 
-export class ResponseNeedItemUpdateDTO {
-  
-  coordinator: string;
+export class ResponseNeedItemUpdateDTOToList {
+
+  id: string;
   title: string;
   description: string;
   shelter: string;
@@ -16,8 +16,9 @@ export class ResponseNeedItemUpdateDTO {
   update: Date;
   donor: string;
 
+
   constructor(needItem: NeedItem){
-    this.coordinator = needItem.coordinator.name,
+    this.id = needItem.id    
     this.title = needItem.title,
     this.description = needItem.description,
     this.shelter = needItem.shelter,
@@ -26,7 +27,7 @@ export class ResponseNeedItemUpdateDTO {
     this.item = needItem.item
     this.created = needItem.created,
     this.update = needItem.updated,
-    this.donor = needItem.donor?.name
+    this.donor = needItem.donor?.name || '';
   }
   
 }

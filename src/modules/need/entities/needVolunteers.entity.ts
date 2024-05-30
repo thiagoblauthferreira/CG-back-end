@@ -14,10 +14,6 @@ export class NeedVolunteers {
   @JoinColumn({ name: "coordinatorId"})
   coordinator: User;
 
-  //tem que fazer a relação com o voluntário
-  @Column("simple-array", { nullable: true })
-  volunteers: User[];
-  
   @Column()
   title: string;
 
@@ -49,6 +45,10 @@ export class NeedVolunteers {
   @UpdateDateColumn()
   updated: Date;
 
+  //tem que fazer a relação com o voluntário, como se trata de muitos para muitos e depende de outro módulo, não farei
+  @Column("simple-array", { nullable: true })
+  volunteers?: string[] = []
+
   constructor(
     coordinator: User,
     title: string,
@@ -59,6 +59,7 @@ export class NeedVolunteers {
     priority: Priority,
     workHours: number,
     limitDate: Date,
+    volunteers?: string[]
   ) {
     this.coordinator = coordinator;
     this.title = title;
@@ -69,6 +70,7 @@ export class NeedVolunteers {
     this.priority = priority;
     this.workHours = workHours;
     this.limitDate = limitDate;
+    this.volunteers = volunteers ?? [];
   }
   
 }

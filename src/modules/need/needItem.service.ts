@@ -8,6 +8,9 @@ import { toItemEntity } from "./factory/needItem.factory";
 import { userValidations } from "./validator/user/userValidations";
 import { validateCreate } from "./validator/need/createValidator/createVerifications";
 import { validateUpdate } from "./validator/need/updateValidator/updateValidations";
+import { validateUpdateDTO } from "./validator/need/updateValidator/updateValidationsDTO";
+import { userValidationsToAccepted } from "./validator/user/userValidationsToAccepted";
+import { acceptedValidate } from "./validator/need/accepted/acceptedValidations";
 
 @Injectable()
 export class NeedItemService {
@@ -47,11 +50,9 @@ export class NeedItemService {
 
     const need = await this.findById(id);
 
-    
-   
     userValidations(need.coordinator);
     //ficaram dois código, um para verificar o update e outro para verificar a própria need
-    validateUpdate(update)
+    validateUpdateDTO(update)
 
     //verificação da need
     validateUpdate(need)
@@ -74,9 +75,19 @@ export class NeedItemService {
 
   async findAll(): Promise<NeedItem[]>{
     return await this.needItemRepository.find({
-      relations: ['coordinator']
+      relations: ['coordinator', 'donor']
     })
   }
+
+  async accepted(id: string, userId: string): Promise<NeedItem> {
+    const donor = await this.verifyIfUserExits.verifyIfUserExits(userId)
+    userValidationsToAccepted(donor);
+    const need = await this.findById(id);
+    acceptedValidate(need);
+    need.donor = donor;
+    return await this.needItemRepository.save(need)
+              
+   }
 }
 
 
