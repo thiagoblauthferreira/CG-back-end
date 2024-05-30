@@ -26,10 +26,9 @@ export const dataSourceConfig = (): DataSourceOptions => {
           password: process.env.PASSWORD_DB,
           database: process.env.NAME_DB,
           synchronize: true,
-          ssl: false,
-          /*ssl: {
+          ssl: {
             rejectUnauthorized: true, 
-          },*/
+          },
         }),
     entities: [
       User,
