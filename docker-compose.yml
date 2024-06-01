@@ -1,0 +1,51 @@
+version: '3.7'
+
+services:
+  nestjs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nestjs-app
+    ports:
+      - "80:80"  # Porta do host : Porta do contêiner
+    environment:
+      - HOST_DB=coletivoglomabd.cd0om4aos0ly.us-east-1.rds.amazonaws.com
+      - PORT_DB=5432
+      - USER_DB=coletivoglomabd
+      - PASSWORD_DB=wp1le60NYeTA09GH9Qw2
+      - NAME_DB=coletivoglomabd
+    volumes:
+      - logs:/app/logs
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.13.4
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.13.4
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:7.13.4
+    container_name: filebeat
+    user: root
+    volumes:
+      - type: bind
+        source: ./filebeat.yml
+        target: /usr/share/filebeat/filebeat.yml
+      - logs:/app/logs
+    depends_on:
+      - elasticsearch
+
+volumes:
+  logs:

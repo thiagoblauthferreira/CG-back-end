@@ -8,7 +8,7 @@ import { AppService } from './app.service';
 @Module({
   imports: [
     TypeOrmModule.forRoot(dataSourceConfig() as TypeOrmModuleOptions),
-    AuthModule
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
