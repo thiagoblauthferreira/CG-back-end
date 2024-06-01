@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: nestjs-app
+    container_name: coletivogloma-backend
     ports:
       - "80:80"  # Porta do host : Porta do contêiner
     environment:
@@ -14,6 +14,7 @@ services:
       - USER_DB=coletivoglomabd
       - PASSWORD_DB=wp1le60NYeTA09GH9Qw2
       - NAME_DB=coletivoglomabd
+      - OPENCAGE_API_KEY=292f183f3ba14202894adc3efbc1ad1c
     volumes:
       - logs:/app/logs
 
