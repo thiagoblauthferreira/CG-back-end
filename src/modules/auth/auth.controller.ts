@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/auth.dto';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -39,10 +40,9 @@ export class AuthController {
 
   @Post('login')
   async login(
-    @Body('email') email: string,
-    @Body('password') password: string,
+    @Body() loginDto: LoginDto
   ) {
-    return this.authService.authenticate(email, password);
+    return this.authService.authenticate(loginDto.email, loginDto.password);
   }
 
   @Get('nearby-users/:userId')
