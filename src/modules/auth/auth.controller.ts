@@ -1,4 +1,12 @@
-import { Controller, Post, Body, Param, Delete, Get, Patch} from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Get,
+  Patch,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/auth.dto';
 
@@ -14,17 +22,26 @@ export class AuthController {
   }
 
   @Patch('update/:userId')
-  async update(@Param('userId') userId: string, @Body() updates: CreateUserDto) {
+  async update(
+    @Param('userId') userId: string,
+    @Body() updates: CreateUserDto,
+  ) {
     return this.authService.updateAccount(userId, updates);
   }
 
   @Delete('delete/:userId')
-  async delete(@Param('userId') userId: string, @Body('password') password: string) {
+  async delete(
+    @Param('userId') userId: string,
+    @Body('password') password: string,
+  ) {
     return this.authService.deleteAccount(userId, password);
   }
 
   @Post('login')
-  async login(@Body('email') email: string, @Body('password') password: string) {
+  async login(
+    @Body('email') email: string,
+    @Body('password') password: string,
+  ) {
     return this.authService.authenticate(email, password);
   }
 
