@@ -17,12 +17,14 @@ export const dataSourceConfig = (): DataSourceOptions => {
         }
       : {
           host: EnvConfig.database.HOST_DB,
-          port: +EnvConfig.database.PORT_DB,
+          port: EnvConfig.database.PORT_DB,
           username: EnvConfig.database.USER_DB,
           password: EnvConfig.database.PASSWORD_DB,
           database: EnvConfig.database.NAME_DB,
           synchronize: true,
-          ssl: false
+          ssl: {
+            rejectUnauthorized: false, 
+          },
         }),
     entities: [
       User,
