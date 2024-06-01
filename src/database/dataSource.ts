@@ -2,6 +2,7 @@ import { DataSource, DataSourceOptions } from "typeorm";
 import { User } from "src/modules/auth/entities/auth.enity";
 import { Address } from "src/modules/auth/entities/adress.enity";
 import { EnvConfig } from "src/config";
+import { Shelter } from "src/modules/shelter/entities/shelter.entity";
 
 export const dataSourceConfig = (): DataSourceOptions => {
   return {
@@ -21,13 +22,13 @@ export const dataSourceConfig = (): DataSourceOptions => {
           password: EnvConfig.database.PASSWORD_DB,
           database: EnvConfig.database.NAME_DB,
           synchronize: true,
-          ssl: {
-            rejectUnauthorized: false, 
-          },
+          ssl: false
         }),
     entities: [
       User,
-      Address
+      Address, 
+      
+      Shelter
     ],
   };
 };
