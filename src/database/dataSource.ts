@@ -22,13 +22,12 @@ export const dataSourceConfig = (): DataSourceOptions => {
           password: EnvConfig.database.PASSWORD_DB,
           database: EnvConfig.database.NAME_DB,
           synchronize: true,
-          ssl: {
-            rejectUnauthorized: false, 
-          },
+          ssl: false
         }),
     entities: [
       User,
       Address, 
+      
       Shelter
     ],
   };
