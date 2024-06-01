@@ -2,7 +2,7 @@ import { ApiHideProperty, ApiProperty } from "@nestjs/swagger";
 import { IsEmpty, IsString } from "class-validator";
 
 export class LoginDto {
-    @ApiHideProperty()
+    @ApiProperty()
     @IsEmpty()
     email: string;
   
