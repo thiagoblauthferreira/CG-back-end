@@ -1,0 +1,22 @@
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - /app/**
+  recursive_glob.enabled: true
+
+setup.template.name: "coletivogloma"
+setup.template.pattern: "coletivogloma-*"
+
+setup.kibana:
+  host: "http://kibana:5601"
+
+output.elasticsearch:
+  hosts: ["elasticsearch:9200"]
+  username: "elastic"
+  password: "ac15a861a18945ceb1ea08fcffc1b3c9"
+  index: "coletivogloma-%{+yyyy.MM.dd}"
+
+
+
+  
