@@ -8,6 +8,8 @@ RUN npm install
 
 COPY . .
 
+COPY certificados ./certificados
+
 RUN npm run build
 
 EXPOSE 3000

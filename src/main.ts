@@ -17,12 +17,16 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  const certPath = './certificados/certificado.pem';
+  const certPath = './certificados/certificado.crt';
   const keyPath = './certificados/chave-privada.pem';
   const cert = fs.readFileSync(certPath);
   const key = fs.readFileSync(keyPath);
 
-  const httpsOptions = { cert, key };
+  const httpsOptions = {
+    cert: cert,
+    key: key,
+    passphrase: 'gloma' // Insira sua senha aqui
+  };
   const server = https.createServer(httpsOptions, app.getHttpAdapter().getInstance());
   server.listen(443);
 }
