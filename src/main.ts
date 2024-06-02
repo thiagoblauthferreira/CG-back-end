@@ -26,12 +26,12 @@ async function bootstrap() {
   const httpsOptions = {
     cert: cert,
     key: key,
-    passphrase: 'gloma' // Insira sua senha aqui
+    passphrase: 'gloma'
   };
   const server = https.createServer(httpsOptions, app.getHttpAdapter().getInstance());
   server.listen(443);
   http.createServer((req, res) => {
-    // Redireciona todas as solicitações HTTP para HTTPS
+
     res.writeHead(301, { Location: `https://${req.headers.host}${req.url}` });
     res.end();
   }).listen(80);
