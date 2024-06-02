@@ -9,12 +9,12 @@ services:
     ports:
       - "80:80"  # Porta do host : Porta do contêiner
     environment:
-      - HOST_DB=coletivoglomabd.cd0om4aos0ly.us-east-1.rds.amazonaws.com
-      - PORT_DB=5432
-      - USER_DB=coletivoglomabd
-      - PASSWORD_DB=wp1le60NYeTA09GH9Qw2
-      - NAME_DB=coletivoglomabd
-      - OPENCAGE_API_KEY=292f183f3ba14202894adc3efbc1ad1c
+      - HOST_DB=${HOST_DB}
+      - PORT_DB=${PORT_DB}
+      - USER_DB=${USER_DB}
+      - PASSWORD_DB=${PASSWORD_DB}
+      - NAME_DB=${NAME_DB}
+      - OPENCAGE_API_KEY=${OPENCAGE_API_KEY}
     volumes:
       - logs:/app/logs
 
