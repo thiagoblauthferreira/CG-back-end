@@ -7,7 +7,8 @@ services:
       dockerfile: Dockerfile
     container_name: coletivogloma-backend
     ports:
-      - "80:80"  # Porta do host : Porta do contêiner
+      - "80:80"
+      - "443:443"  # Porta do host : Porta do contêiner
     environment:
       - HOST_DB=${HOST_DB}
       - PORT_DB=${PORT_DB}
