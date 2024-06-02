@@ -55,7 +55,7 @@ export class CreateUserDto {
   @ApiProperty()
   @IsArray()
   @IsOptional()
-  @IsIn(['donor', 'coordinator', 'both', 'admin'], { each: true })
+  @IsIn(['donor', 'coordinator', 'user', 'admin'], { each: true })
   roles: string[];
 
   @ApiProperty({nullable: true})

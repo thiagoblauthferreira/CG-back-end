@@ -6,10 +6,15 @@ import {
   Delete,
   Get,
   Patch,
+  Request,
+  UseGuards
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/auth.dto';
-
+import { HttpStatus } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from './guards/roles.guard';
+import { Roles } from './decorators/roles.decorator';
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -19,6 +24,14 @@ export class AuthController {
     const registeredUser = await this.authService.register(createUserDto);
     // await this.authService.sendConfirmationEmail(registeredUser);
     return registeredUser;
+  }
+
+  @Get('/me')
+  @UseGuards(AuthGuard('jwt'))
+ 
+  async getProfile(@Request() req) {
+    const user = await this.authService.getProfile(req.user.sub);
+    return { status: HttpStatus.OK, data: user };
   }
 
   @Patch('update/:userId')
