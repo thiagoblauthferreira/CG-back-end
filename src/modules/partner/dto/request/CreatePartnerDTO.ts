@@ -1,6 +1,6 @@
 import { ApiHideProperty, ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsEmpty,  IsString, Matches } from "class-validator";
-import { CreateAddressDto } from "src/modules/auth/dto/adress.dto";
+import { IsEmail, IsEmpty,  IsNumber,  IsOptional,  IsString, Matches, MinLength } from "class-validator";
+
 
 export class CreatePartnerDTO {
   @ApiHideProperty()
@@ -21,12 +21,58 @@ export class CreatePartnerDTO {
 
   @ApiProperty()
   @IsString()
+  @MinLength(8)
+  password: string;
+
+  @ApiProperty()
+  @IsString()
   @Matches(/^\d{2}\.\d{3}\.\d{3}\/\d{4}\-\d{2}$/, {
     message: 'CNPJ must be in the format XX.XXX.XXX/XXXX-XX',
   })
   cnpj: string;
 
-  @ApiProperty({ type: () => CreateAddressDto })
-  address: CreateAddressDto;
+  @ApiProperty()
+  @IsString()
+  cep: string;
+
+  @ApiProperty()
+  @IsString()
+  estado: string;
+
+  @ApiProperty()
+  @IsString()
+  pais: string;
+
+  @ApiProperty()
+  @IsString()
+  municipio: string;
+
+  @ApiProperty()
+  @IsString()
+  bairro: string;
+
+  @ApiProperty()
+  @IsString()
+  logradouro: string;
+
+  @ApiProperty()
+  @IsString()
+  numero: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  complemento: string;
+
+  
+  @ApiProperty()
+  @IsNumber()
+  @IsOptional()
+  latitude: number;
+
+  @ApiProperty()
+  @IsNumber()
+  @IsOptional()
+  longitude: number;
 
 }

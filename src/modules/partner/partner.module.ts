@@ -5,11 +5,13 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { Partner } from "./entities/partner.entity";
 import { Address } from "../auth/entities/adress.enity";
 import { AuthModule } from "../auth/auth.module";
+import { FileEntity } from "./entities/file.entity";
+import { FilesService } from "./utils/file.service";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Partner, Address]),
+  imports: [TypeOrmModule.forFeature([Partner, Address, FileEntity]),
   forwardRef(() => AuthModule)],
-  providers: [PartnerService],
+  providers: [PartnerService, FilesService],
   controllers: [PartnerController]
 })
 

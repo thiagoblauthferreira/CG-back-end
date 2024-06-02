@@ -7,10 +7,18 @@ export const EnvConfig = {
         USER_DB: process.env.USER_DB,
         PASSWORD_DB: process.env.PASSWORD_DB,
         NAME_DB: process.env.NAME_DB,
-        URL: process.env.URL_DATABASE,
+        URL: process.env.URL_DATABASE,        
+
     },
     OPENCAGE: {
         API_KEY: process.env.OPENCAGE_API_KEY
+    },
+    S3: {
+        REGION: process.env.REGION,
+        ACCESS_KEY_ID: process.env.ACCESSKEYID,
+        SECRET_ACCESS_KEY: process.env.SECRETACCESSKEY,
+        BUCKET: process.env.BUCKET,
+        ACL: process.env.ACL
     },
     ENV: process.env.ENV,
 }

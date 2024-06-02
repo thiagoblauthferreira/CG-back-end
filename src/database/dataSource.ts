@@ -3,6 +3,7 @@ import { User } from "src/modules/auth/entities/auth.enity";
 import { Address } from "src/modules/auth/entities/adress.enity";
 import { EnvConfig } from "src/config";
 import { Partner } from "src/modules/partner/entities/partner.entity";
+import { FileEntity } from "src/modules/partner/entities/file.entity"
 
 export const dataSourceConfig = (): DataSourceOptions => {
   return {
@@ -30,7 +31,8 @@ export const dataSourceConfig = (): DataSourceOptions => {
     entities: [
       User,
       Address,
-      Partner
+      Partner,
+      FileEntity
     ],
   };
 };
