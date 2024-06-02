@@ -6,7 +6,6 @@ import * as fs from 'fs';
 import * as https from 'https';
 import * as http from 'http';
 
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: corsOptions });
 
@@ -29,9 +28,8 @@ async function bootstrap() {
     key: key,
     passphrase: 'gloma' // Insira sua senha aqui
   };
-  https.createServer(httpsOptions, app.getHttpServer()).listen(443);
-
-  // Cria o servidor HTTP e o escuta na porta 80
+  const server = https.createServer(httpsOptions, app.getHttpAdapter().getInstance());
+  server.listen(443);
   http.createServer((req, res) => {
     // Redireciona todas as solicitações HTTP para HTTPS
     res.writeHead(301, { Location: `https://${req.headers.host}${req.url}` });
