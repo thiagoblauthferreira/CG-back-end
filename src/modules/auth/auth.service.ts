@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/auth.enity';
@@ -8,6 +8,8 @@ import { CreateUserDto } from './dto/auth.dto';
 import * as opencage from 'opencage-api-client';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { EnvConfig } from 'src/config';
+import { JwtPayload } from './payload/jwt.payload';
+import { JwtService } from '@nestjs/jwt';
 @Injectable()
 export class AuthService {
   constructor(
@@ -15,7 +17,36 @@ export class AuthService {
     private usersRepository: Repository<User>,
     @InjectRepository(Address)
     private addressRepository: Repository<Address>,
+    private jwtService: JwtService,
   ) {}
+
+
+  async validateUser(payload: JwtPayload) {
+
+    const user = await this.usersRepository.findOne({ where: { id: payload.sub } });
+
+    if (!user || user.username !== payload.username) {
+      throw new UnauthorizedException();
+    }
+    return user;
+  }
+
+  public async getProfile(userId: string) {
+    const user = await this.usersRepository.findOne({ 
+        where: { id: userId },
+        relations: ['address'] 
+    });
+
+    if (!user) {
+        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+
+    // Remover a senha do objeto do usuário antes de retorná-lo
+    const result = { ...user };
+    delete result.password;
+    return result;
+  }
+
 
   public async register(createUserDto: CreateUserDto) {
     const existingUser = await this.usersRepository.findOne({
@@ -44,7 +75,7 @@ export class AuthService {
         user.roles.push('coordinator');
     }
     if (user.isDonor && user.isCoordinator) {
-      user.roles = ['both'];
+      user.roles = ['user'];
     }
     const addressString = `${newAddress.logradouro}, ${newAddress.numero}, ${newAddress.bairro}, ${newAddress.municipio}, ${newAddress.estado}, ${newAddress.pais}`;
     const geocodeResult = await opencage.geocode({ q: addressString, key: EnvConfig.OPENCAGE.API_KEY });
@@ -62,9 +93,10 @@ export class AuthService {
     
     const newUser = await this.usersRepository.save(user);
 
-    delete newUser.password;
+    const payload = { username: newUser.username, sub: newUser.id, roles: newUser.roles };
+    const token = this.jwtService.sign(payload);
 
-    return newUser;
+    return { token };
   }
   
   public async deleteAccount(userId: string, password: string) {
@@ -109,23 +141,24 @@ export class AuthService {
     
   }
 */
-  public async authenticate(email: string, password: string) {
-    const user = await this.usersRepository.findOne({ where: { email: email.toLowerCase() } });
+public async authenticate(email: string, password: string) {
+  const user = await this.usersRepository.findOne({ where: { email: email.toLowerCase() } });
 
-    if (!user) {
-      throw new Error('Usuário não encontrado');
-    }
-
-    const passwordMatches = await compare(password, user.password);
-
-    if (!passwordMatches) {
-      throw new Error('Senha inválida');
-    }
-
-    delete user.password;
-
-    return user;
+  if (!user) {
+    throw new Error('Usuário não encontrado');
   }
+
+  const passwordMatches = await compare(password, user.password);
+
+  if (!passwordMatches) {
+    throw new Error('Senha inválida');
+  }
+
+  const payload = { username: user.username, sub: user.id, roles: user.roles };
+  const token = this.jwtService.sign(payload);
+
+  return { token };
+}
   public async findNearbyUsers(userId: string, radius: number) {
     const user = await this.usersRepository.findOne({ 
       where: { id: userId },
