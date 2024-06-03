@@ -13,8 +13,8 @@ import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/auth.dto';
 import { HttpStatus } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { RolesGuard } from './guards/roles.guard';
-import { Roles } from './decorators/roles.decorator';
+import { LoginDto } from './dto/login.dto';
+
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -52,10 +52,9 @@ export class AuthController {
 
   @Post('login')
   async login(
-    @Body('email') email: string,
-    @Body('password') password: string,
+    @Body() loginDto: LoginDto
   ) {
-    return this.authService.authenticate(email, password);
+    return this.authService.authenticate(loginDto.email, loginDto.password);
   }
 
   @Get('nearby-users/:userId')
