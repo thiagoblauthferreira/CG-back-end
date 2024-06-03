@@ -12,5 +12,8 @@ export const EnvConfig = {
     OPENCAGE: {
         API_KEY: process.env.OPENCAGE_API_KEY
     },
+    JWT_SECRET:{
+        JWT_SECRET: process.env.JWT_SECRET
+    },
     ENV: process.env.ENV,
 }
