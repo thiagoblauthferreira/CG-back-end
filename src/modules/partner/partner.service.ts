@@ -6,9 +6,9 @@ import { Repository } from "typeorm";
 import { Partner } from "./entities/partner.entity";
 import { CreatePartnerDTO } from "./dto/request/CreatePartnerDTO";
 import { FilesService } from "./utils/file.service";
-import * as opencage from 'opencage-api-client';
-import { EnvConfig } from 'src/config';
 import { hash, compare } from 'bcrypt';
+import { geoResult } from "./utils/geoResult";
+import { deleteFile } from "./utils/deleteFIle";
 
 
 @Injectable()
@@ -29,34 +29,45 @@ export class PartnerService {
     
     partner.password = await hash(partner.password, 10);
 
-    const newAddress = await this.addressRepository.save(partner.address);
-    const addressString = `${newAddress.logradouro}, ${newAddress.numero}, ${newAddress.bairro}, ${newAddress.municipio}, ${newAddress.estado}, ${newAddress.pais}`;
-    const geocodeResult = await opencage.geocode({ q: addressString, key: EnvConfig.OPENCAGE.API_KEY });
-    
-    if (geocodeResult.results.length > 0) {
-      const { lat, lng } = geocodeResult.results[0].geometry;
-      newAddress.latitude = lat;
-      newAddress.longitude = lng;
-    }
+    const address = await this.addressRepository.save(partner.address);
+
+    const newAddress = await geoResult(address);
     
     const updatedAddress = await this.addressRepository.save(newAddress);
+    
     partner.address = updatedAddress;
+
     const logo = await this.fileService.save(file);
+   
     partner.file = logo;
 
     return await this.partnerRepository.save(partner);
       
   }
   
+  async update(partnerId: string, updates: Partial<Partner>, file?: Express.MulterS3.File): Promise<Partner>{
 
+    const partner = await this.findById(partnerId);
+   
+    if (updates.password) {
+       updates.password = await hash(updates.password, 10);
+    }
 
-  async update(userId: string, updates: Partial<Partner>): Promise<Partner>{
-
-    const partner = await this.findById(userId);
-  
-    return await this.partnerRepository.save({  ...partner, ...updates})
+    if(updates.address){
+      const newAddress = await geoResult(updates.address);
+      const updatedAddress = await this.addressRepository.save(newAddress);
+      partner.address = updatedAddress;
+    }
+    if(file){
+      await deleteFile(partner.file.url);
+      const logo = await this.fileService.save(file);
+      partner.file = logo;
+    }
     
-   }
+    const newPartner = await this.partnerRepository.save({  ...partner, ...updates})
+    
+    return newPartner
+  }
 
   public async authenticate(email: string, password: string) {
   
@@ -86,6 +97,7 @@ export class PartnerService {
     const partner = await this.findById(id);
     partner.deletedAt = new Date();
     partner.isActive = false;
+    await deleteFile(partner.file.url);
     await this.partnerRepository.save(partner)
     
     return {message: "Partner removed"};
@@ -100,9 +112,7 @@ export class PartnerService {
  
   }
 
-
-
-  async findByEmail(email: string){
+ async findByEmail(email: string){
     const partner = await this.partnerRepository.findOne({ where: { email: email.toLowerCase() } });
 
     if (!partner) {
@@ -110,6 +120,5 @@ export class PartnerService {
     }
     return partner; 
   }
-
-  
+ 
 }

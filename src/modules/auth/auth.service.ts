@@ -35,7 +35,7 @@ export class AuthService {
     const address = new Address();
     Object.assign(address, createUserDto.address);
     const newAddress = await this.addressRepository.save(address);
-
+    
     user.roles = [];
 
     if (user.isDonor) {
@@ -55,6 +55,8 @@ export class AuthService {
       newAddress.latitude = lat;
       newAddress.longitude = lng;
     }
+
+
 
     const updatedAddress = await this.addressRepository.save(newAddress);
 

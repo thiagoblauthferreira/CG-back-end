@@ -1,6 +1,6 @@
 import { CreatePartnerDTO } from "../dto/request/CreatePartnerDTO";
 import { Partner } from "../entities/partner.entity";
-import { toAddressEntity } from "./toAddressEntity copy";
+import { toAddressEntity } from "./toAddressEntity";
 
 export function toPartnerEntity(createPartnerDTO: CreatePartnerDTO) {
 

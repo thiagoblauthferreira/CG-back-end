@@ -11,6 +11,7 @@ export function toAddressEntity(createPartnerDTO: CreatePartnerDTO): Address {
   address.bairro = createPartnerDTO.bairro;
   address.logradouro = createPartnerDTO.logradouro;
   address.numero = createPartnerDTO.numero;
+  address.complemento = createPartnerDTO.complemento;
 
   return address;
 }

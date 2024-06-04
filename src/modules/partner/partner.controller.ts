@@ -1,11 +1,11 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { CreatePartnerDTO } from "./dto/request/CreatePartnerDTO";
 import { PartnerService } from "./partner.service";
-import { Partner } from "./entities/partner.entity";
-import { UpdatePartnerResponserDTO } from "./dto/response/UpdatePartnerResponseDTO copy";
+import { UpdatePartnerResponserDTO } from "./dto/response/UpdatePartnerResponseDTO ";
 import { FileInterceptor } from "@nestjs/platform-express";
 import multerConfig from "./utils/multer.config";
 import { DefaultPartnerResponserDTO } from "./dto/response/DefaultPartnerResponseDTO";
+import { Partner } from "./entities/partner.entity";
 
 @Controller('partner')
 export default class PartnerController {
@@ -25,8 +25,9 @@ export default class PartnerController {
   }
 
   @Put('update/:id')
-  async update(@Param('id') id: string, @Body() updates: Partial<Partner>) {
-  return new UpdatePartnerResponserDTO(await this.partnerService.update(id, updates))
+  @UseInterceptors(FileInterceptor('file', multerConfig))
+  async update(@Param('id') id: string, @Body() updates: Partial<Partner>,@UploadedFile() file?: Express.MulterS3.File,) {
+  return new UpdatePartnerResponserDTO(await this.partnerService.update(id, updates, file))
   }
 
   @Get('find-all')
