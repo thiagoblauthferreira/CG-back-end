@@ -45,5 +45,11 @@ export default class PartnerController {
     return await this.partnerService.delete(id);
   }
 
+  @Get('nearby-partner/:partnerId')
+  async findNearbyUsers(@Param('partnerId') partnerId: string) {
+    const nearbyUsers = await this.partnerService.findNearbyPartner(partnerId, 20);
+    return nearbyUsers;
+  }
+
 
 }
