@@ -5,6 +5,8 @@ import { corsOptions } from './config/cors.options';
 import * as fs from 'fs';
 import * as https from 'https';
 import * as http from 'http';
+import { ValidationPipe } from '@nestjs/common';
+import { appConfig } from './config/app.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: corsOptions });
@@ -13,10 +15,14 @@ async function bootstrap() {
     .setTitle('Coletivo Gloma - API')
     .setDescription('Coletivo Gloma')
     .setVersion('1.0')
-    .addTag('tag')
+    .addBearerAuth({ type: "http", scheme: "bearer", bearerFormat: "JWT" })
+    .addTag('Auth')
+    .addTag('Shelter')
+    .addTag('Hello World')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
+  appConfig(app);
 
   const certPath = './certificados/certificado.crt';
   const keyPath = './certificados/chave-privada.pem';
