@@ -4,6 +4,7 @@ import { Address } from "src/modules/auth/entities/adress.enity";
 import { EnvConfig } from "src/config";
 import { Partner } from "src/modules/partner/entities/partner.entity";
 import { FileEntity } from "src/modules/partner/entities/file.entity"
+import { Shelter } from "src/modules/shelter/entities/shelter.entity";
 
 export const dataSourceConfig = (): DataSourceOptions => {
   return {
@@ -18,7 +19,7 @@ export const dataSourceConfig = (): DataSourceOptions => {
         }
       : {
           host: EnvConfig.database.HOST_DB,
-          port: +EnvConfig.database.PORT_DB,
+          port: EnvConfig.database.PORT_DB,
           username: EnvConfig.database.USER_DB,
           password: EnvConfig.database.PASSWORD_DB,
           database: EnvConfig.database.NAME_DB,
@@ -32,7 +33,8 @@ export const dataSourceConfig = (): DataSourceOptions => {
       User,
       Address,
       Partner,
-      FileEntity
+      FileEntity,
+      Shelter
     ],
   };
 };

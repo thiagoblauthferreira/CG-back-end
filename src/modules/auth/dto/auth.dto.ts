@@ -55,20 +55,34 @@ export class CreateUserDto {
   @ApiProperty()
   @IsArray()
   @IsOptional()
-  @IsIn(['donor', 'coordinator', 'both', 'admin'], { each: true })
+  @IsIn(['donor', 'coordinator', 'user', 'admin'], { each: true })
   roles: string[];
 
-  @ApiProperty()
+  @ApiProperty({nullable: true})
   @IsBoolean()
   @IsOptional()
   hasVehicle: boolean;
 
-  @ApiProperty()
+  @ApiProperty({nullable: true})
   @IsString()
   @IsOptional()
   vehicleType: string;
 
-  
+  @ApiProperty({nullable: true})
+  @IsString()
+  @IsOptional()
+  color: string;
+
+  @ApiProperty({nullable: true})
+  @IsString()
+  @IsOptional()
+  identifier: string;
+
+  @ApiProperty({nullable: true})
+  @IsString()
+  @IsOptional()
+  brand: string;
+
   @ApiProperty({ enum: Status, default: Status.APPROVED })
   @IsEnum(Status)
   @IsOptional()
