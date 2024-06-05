@@ -2,9 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { corsOptions } from './config/cors.options';
-import * as fs from 'fs';
-import * as https from 'https';
-import * as http from 'http';
 import { appConfig } from './config/app.config';
 
 async function bootstrap() {
