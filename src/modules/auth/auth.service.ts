@@ -1,8 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/auth.enity';
-import { hash, compare } from 'bcrypt';
+import { hash, compare, genSalt } from 'bcrypt';
 import { Address } from './entities/adress.enity';
 import { CreateUserDto } from './dto/auth.dto';
 import * as opencage from 'opencage-api-client';
@@ -33,13 +33,13 @@ export class AuthService {
   }
 
   public async getProfile(userId: string) {
-    const user = await this.usersRepository.findOne({ 
-        where: { id: userId },
-        relations: ['address'] 
+    const user = await this.usersRepository.findOne({
+      where: { id: userId },
+      relations: ['address']
     });
 
     if (!user) {
-        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      throw new NotFoundException('Usuário não encontrado');
     }
 
     // Remover a senha do objeto do usuário antes de retorná-lo
@@ -54,54 +54,56 @@ export class AuthService {
       const existingUser = await this.usersRepository.findOne({
         where: [{ username: createUserDto.username }, { email: createUserDto.email }]
       });
-      
+
       if (existingUser) {
-        throw new HttpException('Username or email already in use', HttpStatus.CONFLICT);
+        throw new ConflictException('Nome de usuário ou Email já está em uso');
       }
-  
+
       const user = new User();
       Object.assign(user, createUserDto);
-  
-      user.password = await hash(createUserDto.password, 10);
-  
+
+      const salt = await genSalt();
+
+      user.password = await hash(createUserDto.password, salt);
+
       const address = new Address();
       Object.assign(address, createUserDto.address);
       const newAddress = await this.addressRepository.save(address);
-  
+
       user.roles = [];
-  
+
       if (user.isDonor) {
-          user.roles.push('donor');
+        user.roles.push('donor');
       }
       if (user.isCoordinator) {
-          user.roles.push('coordinator');
+        user.roles.push('coordinator');
       }
       if (user.isDonor && user.isCoordinator) {
         user.roles = ['user'];
       }
       const addressString = `${newAddress.logradouro}, ${newAddress.numero}, ${newAddress.bairro}, ${newAddress.municipio}, ${newAddress.estado}, ${newAddress.pais}`;
       const geocodeResult = await opencage.geocode({ q: addressString, key: EnvConfig.OPENCAGE.API_KEY });
-      
+
       if (geocodeResult.results.length > 0) {
         const { lat, lng } = geocodeResult.results[0].geometry;
         newAddress.latitude = lat;
         newAddress.longitude = lng;
       }
-  
+
       const updatedAddress = await this.addressRepository.save(newAddress);
-  
+
       user.address = updatedAddress;
       user.address = newAddress;
-      
+
       const newUser = await this.usersRepository.save(user);
-  
+
       const payload = { username: newUser.username, sub: newUser.id, roles: newUser.roles };
       const token = this.jwtService.sign(payload);
-  
+
       return { token };
     } catch (error) {
       logger.error(error);
-      throw new HttpException('Error on register user', HttpStatus.INTERNAL_SERVER_ERROR)
+      throw error;
     }
   }
 
@@ -109,13 +111,13 @@ export class AuthService {
     const user = await this.usersRepository.findOne({ where: { id: userId } });
 
     if (!user) {
-      throw new Error('Usuário não encontrado');
+      throw new NotFoundException('Usuário não encontrado');
     }
 
     const passwordMatches = await compare(password, user.password);
 
     if (!passwordMatches) {
-      throw new Error('Senha inválida');
+      throw new NotFoundException('Senha inválida');
     }
 
     await this.usersRepository.delete(userId);
@@ -128,7 +130,7 @@ export class AuthService {
     const user = await this.usersRepository.findOne({ where: { id: userId } });
 
     if (!user) {
-      throw new Error('Usuário não encontrado');
+      throw new NotFoundException('Usuário não encontrado');
     }
 
     if (updates.password) {
@@ -141,30 +143,30 @@ export class AuthService {
 
     return updatedUser;
   }
-  
-/*
-  async sendConfirmationEmail(user: User) {
-    
+
+  /*
+    async sendConfirmationEmail(user: User) {
+      
+    }
+  */
+  public async authenticate(email: string, password: string) {
+    const user = await this.usersRepository.findOne({ where: { email: email.toLowerCase() } });
+
+    if (!user) {
+      throw new NotFoundException("Usuário não encontrado");
+    }
+
+    const passwordMatches = await compare(password, user.password);
+
+    if (!passwordMatches) {
+      throw new NotFoundException("Senhas não coincidem");
+    }
+
+    const payload = { username: user.username, sub: user.id, roles: user.roles };
+    const token = this.jwtService.sign(payload);
+
+    return { token };
   }
-*/
-public async authenticate(email: string, password: string) {
-  const user = await this.usersRepository.findOne({ where: { email: email.toLowerCase() } });
-
-  if (!user) {
-    throw new Error('Usuário não encontrado');
-  }
-
-  const passwordMatches = await compare(password, user.password);
-
-  if (!passwordMatches) {
-    throw new Error('Senha inválida');
-  }
-
-  const payload = { username: user.username, sub: user.id, roles: user.roles };
-  const token = this.jwtService.sign(payload);
-
-  return { token };
-}
   public async findNearbyUsers(userId: string, radius: number) {
     const user = await this.usersRepository.findOne({
       where: { id: userId },
@@ -172,7 +174,7 @@ public async authenticate(email: string, password: string) {
     });
 
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     const userLatitude = user.address.latitude;

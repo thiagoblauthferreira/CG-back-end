@@ -12,7 +12,9 @@ import {
 import { CreateShelterDto } from './dto/create-shelter.dto';
 import { ShelterService } from './shelter.service';
 import { UpdateShelterDto } from './dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("Shelter")
 @Controller('shelter')
 export class ShelterController {
   constructor(private shelterService: ShelterService) {}
