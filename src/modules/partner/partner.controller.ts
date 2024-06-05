@@ -6,7 +6,9 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import multerConfig from "./utils/multer.config";
 import { DefaultPartnerResponserDTO } from "./dto/response/DefaultPartnerResponseDTO";
 import { Partner } from "./entities/partner.entity";
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("Partner")
 @Controller('partner')
 export default class PartnerController {
 
@@ -17,7 +19,7 @@ export default class PartnerController {
   @Post('register')
   @UseInterceptors(FileInterceptor('file', multerConfig))
   async register(@UploadedFile() file: Express.MulterS3.File, @Body() createPartnerDTO: CreatePartnerDTO) {
-    return new DefaultPartnerResponserDTO(await this.partnerService.create(createPartnerDTO, file));
+     return new DefaultPartnerResponserDTO(await this.partnerService.create(createPartnerDTO, file));
   }
   @Post('login')
   async login(@Body('email') email: string, @Body('password') password: string) {

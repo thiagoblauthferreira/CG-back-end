@@ -20,5 +20,6 @@ export const EnvConfig = {
         BUCKET: process.env.BUCKET,
         ACL: process.env.ACL
     },
+    JWT_SECRET: process.env.JWT_SECRET,
     ENV: process.env.ENV,
 }

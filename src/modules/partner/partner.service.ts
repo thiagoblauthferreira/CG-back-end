@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { toPartnerEntity } from "./factory/toPartnerEntity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Address } from "../auth/entities/adress.enity";
@@ -6,7 +6,7 @@ import { Repository } from "typeorm";
 import { Partner } from "./entities/partner.entity";
 import { CreatePartnerDTO } from "./dto/request/CreatePartnerDTO";
 import { FilesService } from "./utils/file.service";
-import { hash, compare } from 'bcrypt';
+import { hash, compare, genSalt } from 'bcrypt';
 import { geoResult } from "./utils/geoResult";
 import { deleteFile } from "./utils/deleteFIle";
 
@@ -30,10 +30,11 @@ export class PartnerService {
     const validation = await this.validations(partner)
 
     if (validation) {
-      throw new HttpException("Usuário já cadastrado", HttpStatus.NOT_ACCEPTABLE);
+      throw new ConflictException("Usuário já cadastrado");
     }
   
-    partner.password = await hash(partner.password, 10);
+    const salt = await genSalt()
+    partner.password = await hash(partner.password, salt);
     const address = await this.addressRepository.save(partner.address);
     const newAddress = await geoResult(address);
     const updatedAddress = await this.addressRepository.save(newAddress);
@@ -85,8 +86,9 @@ export class PartnerService {
     const passwordMatches = await compare(password, partner.password);
     
     if (!passwordMatches) {
-      throw new Error('Senha inválida');
+      throw new NotFoundException('Senha inválida');
     }
+
     return partner;
   }
 
@@ -96,7 +98,7 @@ export class PartnerService {
         where: {id: id}
       })
       if(!partner){
-          throw new HttpException("Partner not found.", HttpStatus.NOT_FOUND)
+          throw new NotFoundException("Usuário não encontrado")
       }
       return partner;
     }
@@ -123,7 +125,7 @@ export class PartnerService {
  async findByEmail(email: string){
     const partner = await this.partnerRepository.findOne({ where: { email: email.toLowerCase() } });
     if (!partner) {
-      throw new HttpException('Erro com as credenciais.', HttpStatus.NOT_FOUND);
+      throw new NotFoundException('Erro com as credenciais.');
     }
     return partner; 
   }
@@ -132,7 +134,7 @@ export class PartnerService {
     const partner = await this.partnerRepository.findOne({ where: { cnpj: cnpj } });
   
     if (partner) {
-      throw new HttpException('CNPJ já cadastrado.', HttpStatus.NOT_FOUND);
+      throw new ConflictException('CNPJ já cadastrado.');
     }
     
   }
@@ -141,7 +143,7 @@ export class PartnerService {
       const partner = await this.partnerRepository.findOne({ where: { email: email } });
     
       if (partner) {
-        throw new HttpException('E-mail já cadastrado.', HttpStatus.NOT_FOUND);
+        throw new ConflictException('E-mail já cadastrado.');
       }
     }
 
@@ -162,7 +164,7 @@ export class PartnerService {
       });
   
       if (!partner) {
-        throw new HttpException("Usuário não encontrado", HttpStatus.BAD_REQUEST);
+        throw new NotFoundException("Usuário não encontrado");
       }
   
       const partnerLatitude = partner.address.latitude;
