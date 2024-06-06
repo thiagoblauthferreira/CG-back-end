@@ -13,10 +13,14 @@ async function bootstrap() {
     .setTitle('Coletivo Gloma - API')
     .setDescription('Coletivo Gloma')
     .setVersion('1.0')
-    .addTag('tag')
+    .addBearerAuth({ type: "http", scheme: "bearer", bearerFormat: "JWT" })
+    .addTag('Auth')
+    .addTag('Shelter')
+    .addTag('Hello World')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
+
 
   const certPath = './certificados/certificado.crt';
   const keyPath = './certificados/chave-privada.pem';
