@@ -4,8 +4,10 @@ import {
   PrimaryGeneratedColumn,
   JoinColumn,
   OneToOne,
+  ManyToOne,
 } from 'typeorm';
 import { Address } from '../entities/adress.enity';
+import { Shelter } from 'src/modules/shelter/entities/shelter.entity';
 
 export enum Status {
   WAITING = 'waiting',
@@ -60,4 +62,7 @@ export class User {
     default: Status.APPROVED,
   })
   status: Status;
+
+  @ManyToOne(() => Shelter, (shelter) => shelter.coordinators)
+  shelter: Shelter;
 }
