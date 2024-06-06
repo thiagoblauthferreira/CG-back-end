@@ -1,5 +1,5 @@
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
-import { IsEmpty, IsString } from 'class-validator';
+import { IsEmpty, IsOptional, IsString } from 'class-validator';
 import { CreateAddressDto } from 'src/modules/auth/dto/adress.dto';
 
 export class CreateDistribuitionPoin {
@@ -15,10 +15,16 @@ export class CreateDistribuitionPoin {
   @IsString()
   name: string;
 
-  @ApiProperty({ type: () => CreateAddressDto })
-  address: CreateAddressDto;
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  description: string;
 
   @ApiHideProperty()
   @IsString()
-  userId: string;
+  @IsOptional()
+  creatorId: string;
+
+  @ApiProperty({ type: () => CreateAddressDto })
+  address: CreateAddressDto;
 }
