@@ -1,5 +1,5 @@
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
-import { IsEmpty, IsString } from 'class-validator';
+import { IsEmpty, IsOptional, IsString } from 'class-validator';
 import { CreateAddressDto } from 'src/modules/auth/dto/adress.dto';
 
 export class CreateShelterDto {
@@ -15,16 +15,17 @@ export class CreateShelterDto {
   @IsString()
   name: string;
 
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  description: string;
+
   @ApiProperty({ type: () => CreateAddressDto })
   address: CreateAddressDto;
 
   @ApiHideProperty()
   @IsString()
-  userId: string;
-
-  @ApiHideProperty()
-  @IsString()
-  coordinatorId: string;
+  creatorId: string;
 
   @ApiHideProperty()
   @IsEmpty()
