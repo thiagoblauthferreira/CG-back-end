@@ -1,11 +1,13 @@
 import { Address } from 'src/modules/auth/entities/adress.enity';
 import { User } from 'src/modules/auth/entities/auth.enity';
+import { Products } from 'src/modules/products/entities/product.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -13,7 +15,7 @@ import {
 
 @Entity()
 export class DistribuitionPoints {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
@@ -22,23 +24,20 @@ export class DistribuitionPoints {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ nullable: true })
   description: string;
 
-  @OneToOne(() => Address, (address) => address, {
-    eager: true,
-  })
+  @OneToOne(() => User, (user) => user)
+  @JoinColumn()
+  creator: User;
+
+  @OneToOne(() => Address, (address) => address)
   @JoinColumn()
   address: Address;
 
-  @OneToOne(() => User, (user) => user, {
-    eager: true,
-  })
+  @OneToMany(() => Products, (products) => products.distribuitionPoint)
   @JoinColumn()
-  user: User;
-
-  @Column()
-  products: [];
+  products: Products[];
 
   @CreateDateColumn()
   createdAt: Date;
