@@ -20,7 +20,7 @@ export class DistribuitionPointsService {
 
   public async create(createDistribuitionPoin: CreateDistribuitionPoin) {
     const user = await this.usersRepository.findOne({
-      where: { id: createDistribuitionPoin.userId },
+      where: { id: createDistribuitionPoin.creatorId },
     });
     if (!user) {
       throw new NotFoundException('User not found');
@@ -35,7 +35,7 @@ export class DistribuitionPointsService {
     const saveAddress = await this.addressRepository.save(address);
 
     distibuitionPoint.address = saveAddress;
-    distibuitionPoint.user = user;
+    distibuitionPoint.creator = user;
 
     await this.distribuitionPointsRepository.save(distibuitionPoint);
 
@@ -54,6 +54,7 @@ export class DistribuitionPointsService {
     return this.distribuitionPointsRepository.find({
       relations: {
         address: true,
+        products: true,
       },
     });
   }
@@ -64,6 +65,7 @@ export class DistribuitionPointsService {
         where: { id },
         relations: {
           address: true,
+          products: true,
         },
       },
     );
