@@ -6,8 +6,7 @@ import {
   DeleteDateColumn,
   Entity,
   JoinColumn,
-  JoinTable,
-  ManyToMany,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -24,22 +23,18 @@ export class Shelter {
   @Column()
   phone: string;
 
-  @OneToOne(() => User, (user) => user, {
-    eager: true,
-  })
-  @JoinColumn()
-  user: User;
+  @Column({ nullable: true })
+  description: string;
 
-  @OneToOne(() => Address, (address) => address, {
-    eager: true,
-  })
+  @OneToOne(() => User, (user) => user)
+  @JoinColumn()
+  creator: User;
+
+  @OneToOne(() => Address, (address) => address)
   @JoinColumn()
   address: Address;
 
-  @ManyToMany(() => User, (user) => user, {
-    eager: true,
-  })
-  @JoinTable()
+  @OneToMany(() => User, (user) => user.shelter)
   coordinators: User[];
 
   @CreateDateColumn()
