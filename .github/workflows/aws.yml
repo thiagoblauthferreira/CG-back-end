@@ -14,7 +14,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.8.1
+        uses: webfactory/ssh-agent@v0.5.4
         with:
           ssh-private-key: ${{ secrets.SSH_ACCESS_AWS }}
 
@@ -23,6 +23,6 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@18.204.69.210 '
             cd CG-back-end &&
             git pull origin main &&
-            docker compose down
+            docker compose down &&
             docker compose --env-file compose.yml up -d
           '
