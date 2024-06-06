@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/auth.enity';
@@ -11,6 +11,8 @@ import { EnvConfig } from 'src/config';
 import { JwtPayload } from './payload/jwt.payload';
 import { JwtService } from '@nestjs/jwt';
 import logger from 'src/logger';
+import { CompanyService } from '../company/company.service';
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -19,6 +21,7 @@ export class AuthService {
     @InjectRepository(Address)
     private addressRepository: Repository<Address>,
     private jwtService: JwtService,
+    private companyService: CompanyService
   ) {}
 
 
@@ -148,12 +151,29 @@ export class AuthService {
   }
 */
 public async authenticate(email: string, password: string) {
+ 
   const user = await this.usersRepository.findOne({ where: { email: email.toLowerCase() } });
-
-  if (!user) {
+  //adicionando pesquisa company
+  const company = await this.companyService.findByEmail(email);
+  //adiciona comparação para validação de e-mail
+  if (!user && !company) {
     throw new Error('Usuário não encontrado');
   }
+ //Início da lógica do token para a company  
+  let token = "";
+  if(company && !user){
+    const passwordMatchesCompany = await compare(password, company.password);
+    if(!passwordMatchesCompany){
+      throw new ForbiddenException("Erro nas credenciais de acesso.");
+    }
 
+    const payload = { username: company.tradeName, sub: company.id, roles: ["donor", "company"] };
+    token = this.jwtService.sign(payload);
+    return { token }
+  
+  }
+  //fim da lógica do token para a company  
+ 
   const passwordMatches = await compare(password, user.password);
 
   if (!passwordMatches) {
@@ -161,7 +181,7 @@ public async authenticate(email: string, password: string) {
   }
 
   const payload = { username: user.username, sub: user.id, roles: user.roles };
-  const token = this.jwtService.sign(payload);
+  token = this.jwtService.sign(payload);
 
   return { token };
 }

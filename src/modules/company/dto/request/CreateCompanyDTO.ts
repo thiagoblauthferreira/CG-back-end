@@ -2,7 +2,7 @@ import { ApiHideProperty, ApiProperty } from "@nestjs/swagger";
 import { IsEmail, IsEmpty,  IsNumber,  IsOptional,  IsString, Matches, MinLength } from "class-validator";
 
 
-export class CreatePartnerDTO {
+export class CreateCompanyDTO {
   @ApiHideProperty()
   @IsEmpty()
   id: string;

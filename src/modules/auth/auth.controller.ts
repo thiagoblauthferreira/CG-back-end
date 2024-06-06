@@ -27,8 +27,7 @@ export class AuthController {
   }
 
   @Get('/me')
-  @UseGuards(AuthGuard('jwt'))
- 
+  @UseGuards(AuthGuard('jwt')) 
   async getProfile(@Request() req) {
     const user = await this.authService.getProfile(req.user.sub);
     return { status: HttpStatus.OK, data: user };

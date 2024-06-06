@@ -5,13 +5,13 @@ import { AuthModule } from './modules/auth/auth.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ShelterModule } from './modules/shelter/shelter.module';
-import { PartnerModule } from './modules/partner/partner.module';
+import { CompanyModule } from './modules/company/company.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(dataSourceConfig() as TypeOrmModuleOptions),
     AuthModule,
-    PartnerModule,
+    CompanyModule,
     ShelterModule,
   ],
   controllers: [AppController],

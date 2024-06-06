@@ -2,9 +2,9 @@ import { DataSource, DataSourceOptions } from "typeorm";
 import { User } from "src/modules/auth/entities/auth.enity";
 import { Address } from "src/modules/auth/entities/adress.enity";
 import { EnvConfig } from "src/config";
-import { Partner } from "src/modules/partner/entities/partner.entity";
-import { FileEntity } from "src/modules/partner/entities/file.entity"
 import { Shelter } from "src/modules/shelter/entities/shelter.entity";
+import { Company } from "src/modules/company/entities/company.entity";
+import { FileEntity } from "src/modules/company/entities/file.entity";
 
 export const dataSourceConfig = (): DataSourceOptions => {
   return {
@@ -32,7 +32,7 @@ export const dataSourceConfig = (): DataSourceOptions => {
     entities: [
       User,
       Address,
-      Partner,
+      Company,
       FileEntity,
       Shelter
     ],

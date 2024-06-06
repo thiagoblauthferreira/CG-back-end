@@ -3,7 +3,7 @@ import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, OneToOn
 import { FileEntity } from "./file.entity";
 
 @Entity()
-export class Partner {
+export class Company {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
