@@ -14,13 +14,14 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.5.4
+        uses: shimataro/ssh-key-action@v2.5.0
         with:
-          ssh-private-key: ${{ secrets.SSH_ACCESS_AWS }}
+          key: ${{ secrets.SSH_ACCESS_AWS }}
+          known_hosts: '18.204.69.210'
 
       - name: Deploy to EC2
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@18.204.69.210 '
+          ssh -o StrictHostKeyChecking=no ec2-user@18.204.69.210 '
             cd CG-back-end &&
             git pull origin main &&
             docker compose down &&
