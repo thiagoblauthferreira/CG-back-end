@@ -12,6 +12,7 @@ import {
 import { CreateShelterDto } from './dto/create-shelter.dto';
 import { ShelterService } from './shelter.service';
 import { UpdateShelterDto } from './dto';
+import { ShelterCoordinatorDto } from './dto/coordinator.dto';
 
 @Controller('shelter')
 export class ShelterController {
@@ -46,11 +47,19 @@ export class ShelterController {
     return await this.shelterService.remove(shelterId);
   }
 
-  @Patch('/:shelterId/coordinator/:coordinatorId')
+  @Patch('/:shelterId/coordinator')
   async addCoordinator(
-    @Param('coordinatorId') coordinatorId: string,
     @Param('shelterId') shelterId: string,
+    @Body() coordinationAction: ShelterCoordinatorDto,
   ) {
-    return await this.shelterService.addCoordinator(shelterId, coordinatorId);
+    const { action, coordinatorId } = coordinationAction;
+    if (action === 'add') {
+      return await this.shelterService.addCoordinator(shelterId, coordinatorId);
+    } else {
+      return await this.shelterService.removeCoordinator(
+        shelterId,
+        coordinatorId,
+      );
+    }
   }
 }
