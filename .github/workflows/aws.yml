@@ -25,5 +25,6 @@ jobs:
             cd CG-back-end &&
             git pull origin main &&
             docker compose down &&
+            docker rmi cg-back-end-nestjs:latest &&
             docker compose --env-file compose.env up -d
           '

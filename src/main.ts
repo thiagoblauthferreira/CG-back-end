@@ -5,6 +5,7 @@ import { corsOptions } from './config/cors.options';
 import * as fs from 'fs';
 import * as https from 'https';
 import * as http from 'http';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: corsOptions });
@@ -21,7 +22,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-
   const certPath = './certificados/certificado.crt';
   const keyPath = './certificados/chave-privada.pem';
   const cert = fs.readFileSync(certPath);
@@ -32,12 +32,15 @@ async function bootstrap() {
     key: key,
     passphrase: 'gloma'
   };
-  const server = https.createServer(httpsOptions, app.getHttpAdapter().getInstance());
-  server.listen(443);
-  http.createServer((req, res) => {
 
+  const httpsServer = https.createServer(httpsOptions, app.getHttpAdapter().getInstance());
+  httpsServer.listen(443);
+
+  http.createServer((req, res) => {
     res.writeHead(301, { Location: `https://${req.headers.host}${req.url}` });
     res.end();
   }).listen(80);
+
 }
+
 bootstrap();
