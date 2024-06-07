@@ -64,9 +64,9 @@ export class ShelterService {
       newShelter.address = saveAddress;
     }
 
-    await this.shelterRepository.save(newShelter);
+    const saveShelter = await this.shelterRepository.save(newShelter);
 
-    return await this.findOne(shelterId);
+    return saveShelter;
   }
 
   async findOne(shelterId: string, relations?: IRelations) {
