@@ -19,7 +19,9 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { CreateUserDto } from '../auth/dto/auth.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("Shelter")
 @Controller('shelter')
 export class ShelterController {
   constructor(private shelterService: ShelterService) {}
