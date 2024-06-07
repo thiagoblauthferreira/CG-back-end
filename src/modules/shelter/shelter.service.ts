@@ -27,18 +27,10 @@ export class ShelterService {
     private addressRepository: Repository<Address>,
   ) {}
 
-  async create(createShelter: CreateShelterDto) {
+  async create(createShelter: CreateShelterDto, currentUser: any) {
     const user = await this.usersRepository.findOne({
-      where: { id: createShelter.creatorId },
+      where: { id: currentUser.id },
     });
-    if (!user) {
-      throw new NotFoundException(ShelterMessagesHelper.USER_NOT_FOUND);
-    }
-    if (user.roles.includes('donor')) {
-      throw new ForbiddenException(
-        ShelterMessagesHelper.THIS_USER_NOT_COORDINATOR,
-      );
-    }
 
     const shelter = this.shelterRepository.create(createShelter);
 
@@ -66,27 +58,6 @@ export class ShelterService {
         ...updateShelter.address,
       },
     };
-
-    if (updateShelter.creatorId) {
-      const creator = await this.usersRepository.findOne({
-        where: { id: updateShelter.creatorId },
-      });
-      if (!creator) {
-        throw new NotFoundException(ShelterMessagesHelper.USER_NOT_FOUND);
-      }
-      if (creator.roles.includes('donor')) {
-        throw new ForbiddenException(
-          ShelterMessagesHelper.THIS_USER_NOT_COORDINATOR,
-        );
-      }
-      if (shelter.creator.id === creator.id) {
-        throw new NotFoundException(
-          ShelterMessagesHelper.SHELTER_COORDINATOR_ALREADY_ASSOCIATED,
-        );
-      }
-
-      newShelter.creator = creator;
-    }
 
     if (updateShelter.address) {
       const saveAddress = await this.addressRepository.save(newShelter.address);
