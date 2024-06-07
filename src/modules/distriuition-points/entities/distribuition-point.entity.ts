@@ -35,7 +35,9 @@ export class DistribuitionPoints {
   @JoinColumn()
   address: Address;
 
-  @OneToMany(() => Products, (products) => products.distribuitionPoint)
+  @OneToMany(() => Products, (products) => products.distribuitionPoint, {
+    nullable: true,
+  })
   @JoinColumn()
   products: Products[];
 

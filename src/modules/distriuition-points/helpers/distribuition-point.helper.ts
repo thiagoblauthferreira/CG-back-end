@@ -9,4 +9,6 @@ export const DistribuitionPointMessagesHelper = {
     'Produto adicionado ao ponto de distribuição',
   PRODUCT_REMOVED_DISTRIBUITION_POINT:
     'Produto removido do ponto de distribuição',
+  ONLY_PRODUCT_CREATOR_CAN_ADD_OR_REMOVE:
+    'Apenas criadores de produtos podem adicionar ou remover',
 };

@@ -18,11 +18,6 @@ export class UpdateDistribuitionPoin {
   @IsOptional()
   description: string;
 
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  creatorId: string;
-
   @ApiProperty({ type: () => UpdateAddressDto })
   @IsOptional()
   address: UpdateAddressDto;
