@@ -36,7 +36,9 @@ export class ProductController {
 
   @Get('/:productId')
   async finOne(@Param('productId') productId: string) {
-    return await this.productsService.findOne(productId);
+    return await this.productsService.findOne(productId, {
+      distribuitionPoint: true,
+    });
   }
 
   @Delete('/:productId')

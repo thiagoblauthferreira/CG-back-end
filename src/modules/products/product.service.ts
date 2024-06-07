@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  forwardRef,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Products } from './entities/product.entity';
 import { CreateProduct, UpdateProduct } from './dto';
@@ -11,6 +16,7 @@ export class ProductService {
   constructor(
     @InjectRepository(Products)
     private productsRepository: Repository<Products>,
+    @Inject(forwardRef(() => DistribuitionPointsService))
     private distribuitionPointService: DistribuitionPointsService,
   ) {}
 
@@ -51,12 +57,13 @@ export class ProductService {
     return await this.findOne(id);
   }
 
-  public async findOne(id: string) {
+  public async findOne(
+    id: string,
+    relations?: { distribuitionPoint?: boolean },
+  ) {
     const products = await this.productsRepository.findOne({
       where: { id },
-      relations: {
-        distribuitionPoint: true,
-      },
+      relations,
       select: {
         distribuitionPoint: {
           id: true,
