@@ -1,19 +1,29 @@
-import { ApiHideProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
+import { UpdateAddressDto } from 'src/modules/auth/dto/update-adress.dto';
 
 export class UpdateDistribuitionPoin {
-  @ApiHideProperty()
+  @ApiProperty()
   @IsString()
   @IsOptional()
   name: string;
 
-  @ApiHideProperty()
+  @ApiProperty()
   @IsString()
   @IsOptional()
   phone: string;
 
-  @ApiHideProperty()
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  description: string;
+
+  @ApiProperty()
   @IsString()
   @IsOptional()
   creatorId: string;
+
+  @ApiProperty({ type: () => UpdateAddressDto })
+  @IsOptional()
+  address: UpdateAddressDto;
 }

@@ -20,9 +20,8 @@ export class CreateDistribuitionPoin {
   @IsOptional()
   description: string;
 
-  @ApiHideProperty()
+  @ApiProperty()
   @IsString()
-  @IsOptional()
   creatorId: string;
 
   @ApiProperty({ type: () => CreateAddressDto })
