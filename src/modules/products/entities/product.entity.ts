@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { ProducatType } from '../enums/products.enum';
 import { DistribuitionPoints } from 'src/modules/distriuition-points/entities/distribuition-point.entity';
+import { User } from 'src/modules/auth/entities/auth.enity';
 
 @Entity()
 export class Products {
@@ -34,9 +35,13 @@ export class Products {
   @Column({ nullable: true })
   description: string;
 
+  @ManyToOne(() => User, (user) => user)
+  creator: User;
+
   @ManyToOne(
     () => DistribuitionPoints,
     (distribuitionPoints) => distribuitionPoints.products,
+    { nullable: true },
   )
   distribuitionPoint: DistribuitionPoints;
 

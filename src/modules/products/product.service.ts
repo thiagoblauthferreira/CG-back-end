@@ -10,17 +10,28 @@ import { CreateProduct, UpdateProduct } from './dto';
 import { ProductMessagesHelper } from './helpers/product.helper';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DistribuitionPointsService } from '../distriuition-points/distribuition-point.service';
+import { User } from '../auth/entities/auth.enity';
+import { CreateUserDto } from '../auth/dto/auth.dto';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectRepository(Products)
     private productsRepository: Repository<Products>,
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
     @Inject(forwardRef(() => DistribuitionPointsService))
     private distribuitionPointService: DistribuitionPointsService,
   ) {}
 
-  public async create(createProduct: CreateProduct) {
+  public async create(
+    createProduct: CreateProduct,
+    currentUser: CreateUserDto,
+  ) {
+    const user = await this.usersRepository.findOne({
+      where: { id: currentUser.id },
+    });
+
     const product = this.productsRepository.create(createProduct);
 
     if (createProduct.distribuitionPointId) {
@@ -30,6 +41,8 @@ export class ProductService {
 
       product.distribuitionPoint = distribuitionPoint;
     }
+
+    product.creator = user;
 
     await this.productsRepository.save(product);
 
@@ -44,14 +57,6 @@ export class ProductService {
       ...updateProduct,
     };
 
-    if (updateProduct.distribuitionPointId) {
-      const distribuitionPoint = await this.distribuitionPointService.findOne(
-        updateProduct.distribuitionPointId,
-      );
-
-      newProduct.distribuitionPoint = distribuitionPoint;
-    }
-
     await this.productsRepository.save(newProduct);
 
     return await this.findOne(id);
@@ -59,7 +64,7 @@ export class ProductService {
 
   public async findOne(
     id: string,
-    relations?: { distribuitionPoint?: boolean },
+    relations?: { distribuitionPoint?: boolean; creator?: boolean },
   ) {
     const products = await this.productsRepository.findOne({
       where: { id },

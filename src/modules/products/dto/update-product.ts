@@ -27,9 +27,4 @@ export class UpdateProduct {
   @IsString()
   @IsOptional()
   description: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  distribuitionPointId: string;
 }

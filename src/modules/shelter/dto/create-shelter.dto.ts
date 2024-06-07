@@ -23,19 +23,15 @@ export class CreateShelterDto {
   @ApiProperty({ type: () => CreateAddressDto })
   address: CreateAddressDto;
 
-  @ApiHideProperty()
-  @IsString()
-  creatorId: string;
-
-  @ApiHideProperty()
+  @ApiProperty()
   @IsEmpty()
   createdAt: Date;
 
-  @ApiHideProperty()
+  @ApiProperty()
   @IsEmpty()
   updatedAt: Date;
 
-  @ApiHideProperty()
+  @ApiProperty()
   @IsEmpty()
   deletedAt: Date;
 }
