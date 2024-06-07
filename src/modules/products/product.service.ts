@@ -57,9 +57,9 @@ export class ProductService {
       ...updateProduct,
     };
 
-    await this.productsRepository.save(newProduct);
+    const saveProduct = await this.productsRepository.save(newProduct);
 
-    return await this.findOne(id);
+    return saveProduct;
   }
 
   public async findOne(
@@ -86,9 +86,13 @@ export class ProductService {
     return this.productsRepository.find({
       relations: {
         distribuitionPoint: true,
+        creator: true,
       },
       select: {
         distribuitionPoint: {
+          id: true,
+        },
+        creator: {
           id: true,
         },
       },
