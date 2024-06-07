@@ -1,10 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsEnum, IsString } from 'class-validator';
 import { CoordinationActionType } from '../enums/shelter.enum';
 
 export class ShelterCoordinatorDto {
   @ApiProperty()
   @IsString()
+  @IsEnum(CoordinationActionType)
   action: CoordinationActionType;
 
   @ApiProperty()
