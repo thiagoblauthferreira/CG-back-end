@@ -8,23 +8,37 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { DistribuitionPointsService } from './distribuition-point.service';
 import { CreateDistribuitionPoin, UpdateDistribuitionPoin } from './dto';
 import { ProductDto } from './dto/product.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { CreateUserDto } from '../auth/dto/auth.dto';
 
 @Controller('distribuitionPoint')
 export class DistribuitionPointsController {
   constructor(private distribuitionPointService: DistribuitionPointsService) {}
 
   @Post('/')
-  async create(@Body() createDistribuitionPoint: CreateDistribuitionPoin) {
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('coordinator', 'user')
+  async create(
+    @CurrentUser() currentUser: CreateUserDto,
+    @Body() createDistribuitionPoint: CreateDistribuitionPoin,
+  ) {
     return await this.distribuitionPointService.create(
       createDistribuitionPoint,
+      currentUser,
     );
   }
 
   @Patch('/:distribuitionPointId')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('coordinator', 'user')
   async update(
     @Param('distribuitionPointId') distribuitionPointId: string,
     @Body() updateDistribuitionPoin: UpdateDistribuitionPoin,
@@ -36,11 +50,13 @@ export class DistribuitionPointsController {
   }
 
   @Get('/')
+  @UseGuards(AuthGuard('jwt'))
   async listAll() {
     return await this.distribuitionPointService.listAll();
   }
 
   @Get('/:distribuitionPointId')
+  @UseGuards(AuthGuard('jwt'))
   async findOne(@Param('distribuitionPointId') distribuitionPointId: string) {
     return await this.distribuitionPointService.findOne(distribuitionPointId, {
       address: true,
@@ -49,12 +65,15 @@ export class DistribuitionPointsController {
   }
 
   @Delete('/:distribuitionPointId')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin')
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('distribuitionPointId') distribuitionPointId: string) {
     return await this.distribuitionPointService.remove(distribuitionPointId);
   }
 
   @Get('/:distribuitionPointId/products')
+  @UseGuards(AuthGuard('jwt'))
   async listProducts(
     @Param('distribuitionPointId') distribuitionPointId: string,
   ) {
@@ -64,7 +83,10 @@ export class DistribuitionPointsController {
   }
 
   @Patch('/:distribuitionPointId/products')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('coordinator', 'user')
   async addOrRemoveProduct(
+    @CurrentUser() currentUser: CreateUserDto,
     @Param('distribuitionPointId') distribuitionPointId: string,
     @Body() distribuitionPointAction: ProductDto,
   ) {
@@ -73,11 +95,14 @@ export class DistribuitionPointsController {
       return await this.distribuitionPointService.addProduct(
         distribuitionPointId,
         productId,
+        currentUser,
       );
-    } else {
+    }
+    if (action === 'remove') {
       return await this.distribuitionPointService.removeProduct(
         distribuitionPointId,
         productId,
+        currentUser,
       );
     }
   }
