@@ -38,7 +38,11 @@ export class ShelterController {
 
   @Get('/:shelterId')
   async finOne(@Param('shelterId') shelterId: string) {
-    return await this.shelterService.findOne(shelterId);
+    return await this.shelterService.findOne(shelterId, {
+      address: true,
+      coordinators: true,
+      creator: true,
+    });
   }
 
   @Delete('/:shelterId')
@@ -48,7 +52,7 @@ export class ShelterController {
   }
 
   @Patch('/:shelterId/coordinator')
-  async addCoordinator(
+  async addOrRemoveCoordinator(
     @Param('shelterId') shelterId: string,
     @Body() coordinationAction: ShelterCoordinatorDto,
   ) {

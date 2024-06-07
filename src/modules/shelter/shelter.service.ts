@@ -11,6 +11,11 @@ import { UpdateShelterDto, CreateShelterDto } from './dto';
 import { User } from '../auth/entities/auth.enity';
 import { Address } from '../auth/entities/adress.enity';
 
+interface IRelations {
+  address?: boolean;
+  creator?: boolean;
+  coordinators?: boolean;
+}
 @Injectable()
 export class ShelterService {
   constructor(
@@ -51,11 +56,15 @@ export class ShelterService {
   }
 
   async update(updateShelter: UpdateShelterDto, shelterId: string) {
-    const shelter = await this.findOne(shelterId);
+    const shelter = await this.findOne(shelterId, { address: true });
 
     const newShelter = {
       ...shelter,
       ...updateShelter,
+      address: {
+        ...shelter.address,
+        ...updateShelter.address,
+      },
     };
 
     if (updateShelter.creatorId) {
@@ -63,9 +72,7 @@ export class ShelterService {
         where: { id: updateShelter.creatorId },
       });
       if (!creator) {
-        throw new NotFoundException(
-          ShelterMessagesHelper.COORDINATOR_NOT_FOUND,
-        );
+        throw new NotFoundException(ShelterMessagesHelper.USER_NOT_FOUND);
       }
       if (creator.roles.includes('donor')) {
         throw new ForbiddenException(
@@ -81,15 +88,20 @@ export class ShelterService {
       newShelter.creator = creator;
     }
 
+    if (updateShelter.address) {
+      const saveAddress = await this.addressRepository.save(newShelter.address);
+      newShelter.address = saveAddress;
+    }
+
     await this.shelterRepository.save(newShelter);
 
     return await this.findOne(shelterId);
   }
 
-  async findOne(shelterId: string) {
+  async findOne(shelterId: string, relations?: IRelations) {
     const shelter = await this.shelterRepository.findOne({
       where: { id: shelterId },
-      relations: { address: true, creator: true, coordinators: true },
+      relations,
       select: {
         coordinators: {
           id: true,
@@ -130,7 +142,7 @@ export class ShelterService {
       where: { id: coordinatorId },
     });
     if (!coordinator) {
-      throw new NotFoundException(ShelterMessagesHelper.COORDINATOR_NOT_FOUND);
+      throw new NotFoundException(ShelterMessagesHelper.USER_NOT_FOUND);
     }
     if (coordinator.roles.includes('donor')) {
       throw new ForbiddenException(
@@ -150,7 +162,7 @@ export class ShelterService {
 
     await this.shelterRepository.save(shelter);
 
-    return { message: 'Coordenador adicionado ao abrigo' };
+    return { message: ShelterMessagesHelper.COORDINATOR_ADDED_SHELTER };
   }
 
   async removeCoordinator(shelterId: string, coordinatorId: string) {
@@ -160,13 +172,13 @@ export class ShelterService {
       where: { id: coordinatorId },
     });
     if (!coordinator) {
-      throw new NotFoundException(ShelterMessagesHelper.COORDINATOR_NOT_FOUND);
+      throw new NotFoundException(ShelterMessagesHelper.USER_NOT_FOUND);
     }
     const coordinatorExistsInShelter = shelter.coordinators.find(
       (shelterCoordinator) => shelterCoordinator.id === coordinatorId,
     );
     if (!coordinatorExistsInShelter) {
-      throw new NotFoundException(ShelterMessagesHelper.COORDINATOR_NOT_FOUND);
+      throw new NotFoundException(ShelterMessagesHelper.USER_NOT_FOUND);
     }
 
     shelter.coordinators = shelter.coordinators.filter(
@@ -175,6 +187,6 @@ export class ShelterService {
 
     await this.shelterRepository.save(shelter);
 
-    return { message: 'Coordenador removido do abrigo' };
+    return { message: ShelterMessagesHelper.COORDINATOR_REMOVED_SHELTER };
   }
 }
