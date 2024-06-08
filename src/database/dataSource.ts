@@ -1,30 +1,29 @@
-import "dotenv/config";
 import { DataSource, DataSourceOptions } from "typeorm";
 import { User } from "src/modules/auth/entities/auth.enity";
 import { Address } from "src/modules/auth/entities/adress.enity";
+import { Shelter } from "src/modules/shelter/entities/shelter.entity";
 import { NeedItem } from "src/modules/need/entities/needItems.entity";
 import { NeedVolunteers } from "src/modules/need/entities/needVolunteers.entity";
+import { EnvConfig } from "src/config";
 
-
-const env = String(process.env.ENV);
 
 export const dataSourceConfig = (): DataSourceOptions => {
   return {
     type: "postgres",
-    ...(env === "production"
+    ...(EnvConfig.ENV === "production"
       ? {
-          url: process.env.DATABASE_URL,
+          url: EnvConfig.database.URL,
           synchronize: false,
           ssl: {
             rejectUnauthorized: false, 
           },
         }
       : {
-          host: process.env.HOST_DB,
-          port: +process.env.PORT_DB,
-          username: process.env.USER_DB,
-          password: process.env.PASSWORD_DB,
-          database: process.env.NAME_DB,
+          host: EnvConfig.database.HOST_DB,
+          port: EnvConfig.database.PORT_DB,
+          username: EnvConfig.database.USER_DB,
+          password: EnvConfig.database.PASSWORD_DB,
+          database: EnvConfig.database.NAME_DB,
           synchronize: true,
           ssl: {
             rejectUnauthorized: true, 
@@ -33,6 +32,7 @@ export const dataSourceConfig = (): DataSourceOptions => {
     entities: [
       User,
       Address,
+      Shelter,
       NeedItem,
       NeedVolunteers
     ],
