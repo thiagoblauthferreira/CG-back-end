@@ -32,6 +32,7 @@
     "@nestjs/swagger": "^7.3.1",
     "@nestjs/typeorm": "^10.0.2",
     "bcrypt": "^5.1.1",
+    "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "opencage-api-client": "^1.0.5",
     "passport": "^0.7.0",

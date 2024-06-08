@@ -1,7 +1,8 @@
 import { User } from 'src/modules/auth/entities/auth.enity';
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, DeleteDateColumn } from 'typeorm';
 import { Priority } from '../enums/enumPriority';
 import { Status } from '../enums/enumsStatus';
+import { Shelter } from 'src/modules/shelter/entities/shelter.entity';
 
 
 @Entity()
@@ -23,9 +24,9 @@ export class NeedVolunteers {
   @Column("simple-array")
   specificSkills: string[];
 
-  //Aqui vai ficar uma entidade de endereço, um para muitos e joinColumn.
-  @Column()
-  shelter: string;
+  @ManyToOne(() => Shelter, { onDelete: 'CASCADE' } )
+  @JoinColumn({ name: "shelterId"})
+  shelter: Shelter;
 
   @Column({type: "enum", enum: Status, default: Status.CREATED})
   status: Status;
@@ -38,6 +39,9 @@ export class NeedVolunteers {
 
   @Column()
   limitDate: Date;
+
+  @Column("simple-array", { nullable: true })
+  volunteers?: string[] = []
   
   @CreateDateColumn()
   created: Date;
@@ -45,16 +49,15 @@ export class NeedVolunteers {
   @UpdateDateColumn()
   updated: Date;
 
-  //tem que fazer a relação com o voluntário, como se trata de muitos para muitos e depende de outro módulo, não farei
-  @Column("simple-array", { nullable: true })
-  volunteers?: string[] = []
+  @DeleteDateColumn()
+  deleted: Date;
 
   constructor(
     coordinator: User,
     title: string,
     description: string,
     specificSkills: string[],
-    shelter: string,
+    shelter: Shelter,
     status: Status,
     priority: Priority,
     workHours: number,

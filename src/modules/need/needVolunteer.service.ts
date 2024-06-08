@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { NeedVolunteers } from "./entities/needVolunteers.entity";
@@ -11,6 +11,7 @@ import { validateUpdate } from "./validator/need/updateValidator/updateValidatio
 import { validateUpdateDTO } from "./validator/need/updateValidator/updateValidationsDTO";
 import { userValidationsToAccepted } from "./validator/user/userValidationsToAccepted";
 import { acceptedValidate } from "./validator/need/accepted/acceptedValidations";
+import { VerifyIfShelterExits } from "./validator/shelter/verifyIfShelterExits";
 
 
 @Injectable()
@@ -19,6 +20,7 @@ export class NeedVolunteerService {
   @InjectRepository(NeedVolunteers)
   private needVolunteerRepository: Repository<NeedVolunteers>,
   private verifyIfUserExits: VerifyIfUserExits,
+  private verifyIfShelterExists: VerifyIfShelterExits,
   )
   {}
 
@@ -32,7 +34,9 @@ export class NeedVolunteerService {
     
     userValidations(coordinator);
 
-    const need  = toNeedVolunteerEntity(coordinator, createVolunteerDTO);
+    const shelter = await this.verifyIfShelterExists.verifyIfShelterExits(createVolunteerDTO.shelterId)
+
+    const need  = toNeedVolunteerEntity(coordinator, shelter, createVolunteerDTO);
 
     return await this.needVolunteerRepository.save(need);
 
@@ -59,10 +63,10 @@ export class NeedVolunteerService {
 
     const need =  await this.needVolunteerRepository.findOne({
       where: {id: id},
-      relations: ['coordinator']
+      relations: ['coordinator', 'shelter']
    })
     if(!need){
-      throw new HttpException('Need not found.', HttpStatus.BAD_REQUEST);
+      throw new NotFoundException('Necessidade não encontrada');
     }
     return need;
   }
@@ -78,7 +82,7 @@ export class NeedVolunteerService {
 
   async findAll(): Promise<NeedVolunteers[]>{
     return await this.needVolunteerRepository.find({
-     relations: ['coordinator']
+     relations: ['coordinator', 'shelter']
      })
    }
 
@@ -91,6 +95,6 @@ export class NeedVolunteerService {
       await this.needVolunteerRepository.save(need)
       return need
           
-     }
+    }
 
 }

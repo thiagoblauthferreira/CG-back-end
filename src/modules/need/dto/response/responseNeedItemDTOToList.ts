@@ -1,3 +1,4 @@
+import { Shelter } from "src/modules/shelter/entities/shelter.entity";
 import { NeedItem } from "../../entities/needItems.entity";
 import { Priority } from "../../enums/enumPriority";
 import { Status } from "../../enums/enumsStatus";
@@ -7,7 +8,7 @@ export class ResponseNeedItemDToToList {
   coordinator: string;
   title: string;
   description: string;
-  shelter: string;
+  shelter: Shelter;
   status: Status;
   priority: Priority;
   limitDate: Date;
