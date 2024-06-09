@@ -8,9 +8,10 @@ import { Company } from "./entities/company.entity";
 import { CompanyService } from "./company.service";
 import CompanyController from "./company.controller";
 import { JwtModule } from "@nestjs/jwt";
+import { Partner } from "./entities/parnter.entity";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Company, Address, FileEntity]),
+  imports: [TypeOrmModule.forFeature([Company, Address, FileEntity, Partner]),
   JwtModule.register({
     secret: process.env.JWT_SECRET,
     signOptions: { expiresIn: '7d' }, 
