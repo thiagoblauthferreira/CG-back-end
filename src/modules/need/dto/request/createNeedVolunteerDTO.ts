@@ -49,13 +49,13 @@ export class CreateVolunteerDTO {
 
   @ApiProperty()
   @IsInt()
-  @IsNotEmpty({ message: "É obrigatório informa a quantidade de horas trabalhadas."})
+  @IsNotEmpty({ message: "É obrigatório informar a quantidade de horas trabalhadas."})
   workHours: number;
 
   //YYYY-MM-DD
   @ApiProperty()
   @IsDate()
-  @IsNotEmpty({ message: "É obrigatório informa a data limite."})
+  @IsNotEmpty({ message: "É obrigatório informar a data limite."})
   @Type(() => Date)
   limitDate: Date;
   

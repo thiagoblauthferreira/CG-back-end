@@ -8,6 +8,7 @@ import { ResponseNeedVolunteerUpdateDTOToList } from "./dto/response/responseUpd
 import { AcceptedNeedDTO } from "./dto/request/accepetdNeedDTO";
 import { ApiTags } from "@nestjs/swagger";
 import { AuthGuard } from "@nestjs/passport";
+import { CancelNeedDTO } from "./dto/request/cancelNeedDTO";
 
 @ApiTags("Need-volunteer")
 @Controller('needs-volunteer')
@@ -51,9 +52,14 @@ export class NeedVolunteerController {
 
     @Patch('need-accepted/:id')
     @UseGuards(AuthGuard('jwt'))
-    async accepted(@Param('id') needId: string, @Body() userId: AcceptedNeedDTO) {
-     return new ResponseNeedVolunteerUpdateDTO(await this.needVolunteerService.accepted(needId, userId.userId));
-   
+    async accepted(@Param('id') needId: string, @Body() acceptedNeedDTO: AcceptedNeedDTO) {
+     return new ResponseNeedVolunteerUpdateDTO(await this.needVolunteerService.accepted(needId, acceptedNeedDTO.userId, acceptedNeedDTO.status));
+    }   
+
+    @Patch('need-cancel/:id')
+    @UseGuards(AuthGuard('jwt'))
+    async cancel(@Param('id') needId: string, @Body() cancelNeedDTO: CancelNeedDTO) {
+     return new ResponseNeedVolunteerUpdateDTO(await this.needVolunteerService.canceled(needId, cancelNeedDTO.userId));
     }   
 
 }
