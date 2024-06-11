@@ -5,13 +5,13 @@ export function toAddressEntity(createCompanyDTO: CreateCompanyDTO): Address {
 
   const address = new Address()
   address.cep = createCompanyDTO.cep;
-  address.estado = createCompanyDTO.estado;
-  address.pais = createCompanyDTO.pais;
-  address.municipio = createCompanyDTO.municipio;
-  address.bairro = createCompanyDTO.bairro;
-  address.logradouro = createCompanyDTO.logradouro;
-  address.numero = createCompanyDTO.numero;
-  address.complemento = createCompanyDTO.complemento;
+  address.estado = createCompanyDTO.state;
+  address.pais = createCompanyDTO.country;
+  address.municipio = createCompanyDTO.county;
+  address.bairro = createCompanyDTO.neighborhood;
+  address.logradouro = createCompanyDTO.street;
+  address.numero = createCompanyDTO.number;
+  address.complemento = createCompanyDTO.complement;
 
   return address;
 }

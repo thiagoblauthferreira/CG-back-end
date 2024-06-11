@@ -17,5 +17,6 @@ export class FilesService {
     newFile.contentType = file.mimetype;
     newFile.url = file.location;
     return await this.logoRepository.save(newFile);
-    }
+   
+   }
  }

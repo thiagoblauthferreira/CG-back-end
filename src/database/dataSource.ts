@@ -5,7 +5,6 @@ import { EnvConfig } from "src/config";
 import { Shelter } from "src/modules/shelter/entities/shelter.entity";
 import { Company } from "src/modules/company/entities/company.entity";
 import { FileEntity } from "src/modules/company/entities/file.entity";
-import { Partner } from "src/modules/company/entities/parnter.entity";
 
 export const dataSourceConfig = (): DataSourceOptions => {
   return {
@@ -25,16 +24,14 @@ export const dataSourceConfig = (): DataSourceOptions => {
           password: EnvConfig.database.PASSWORD_DB,
           database: EnvConfig.database.NAME_DB,
           synchronize: true,
-          ssl: false,
-          /*ssl: {
+          ssl: {
             rejectUnauthorized: false, 
-          },*/
+          },
         }),
     entities: [
       User,
       Address,
       Company,
-      Partner,
       FileEntity,
       Shelter
     ],

@@ -21,6 +21,7 @@ export class UpdateCompanyResponserDTO {
     fileName: string;
     url: string;
   };
+  partners: string[];
   
   constructor(company: Company){
     this.id = company.id;
@@ -39,9 +40,10 @@ export class UpdateCompanyResponserDTO {
       additional: company.address.complemento
     };
      this.file = {
-      fileName: 'company.file.fileName',
-      url: 'company.file.url'
+      fileName: company.fileEntity.fileName,
+      url: company.fileEntity.url
     };
+    this.partners = company.partner
   }
 
 }

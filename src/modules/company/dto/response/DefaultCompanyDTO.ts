@@ -19,9 +19,10 @@ export class DefaultCompanyResponserDTO {
       additional: string | null;
   };
   file: {
-    fileName: string;
-    url: string;
+    fileName: string | null;
+    url: string | null;
   };
+  partners: string[];
 
   constructor(company: Company) {
     this.id = company.id;
@@ -39,10 +40,11 @@ export class DefaultCompanyResponserDTO {
       number: company.address.numero,
       additional: company.address.complemento
     };
-     this.file = {
-      fileName: company.file.fileName,
-      url: company.file.url
+    this.file = {
+      fileName: company.fileEntity.fileName,
+      url: company.fileEntity.url
     };
+    this.partners = company.partner
   }
 }
 

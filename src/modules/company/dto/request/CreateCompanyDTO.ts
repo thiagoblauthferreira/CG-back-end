@@ -1,5 +1,6 @@
 import { ApiHideProperty, ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsEmpty,  IsNumber,  IsOptional,  IsString, Matches, MinLength } from "class-validator";
+import { IsEmail, IsEmpty,  IsNotEmpty,  IsNumber,  IsOptional,  IsString, Matches, MinLength } from "class-validator";
+
 
 
 export class CreateCompanyDTO {
@@ -9,17 +10,28 @@ export class CreateCompanyDTO {
 
   @ApiProperty()
   @IsString()
-  @MinLength(3, { message: 'O nome do parceiro deve ter pelo menos 3 caracteres' })
+  @MinLength(2, { message: 'O nome do parceiro deve ter pelo menos 2 caracteres' })
   tradeName: string;
 
   @ApiProperty()
   @IsString()
-  @MinLength(3, { message: 'O nome registrado deve ter pelo menos 3 caracteres' })
+  @MinLength(2, { message: 'O nome registrado deve ter pelo menos 2 caracteres' })
   registeredName: string;
 
   @ApiProperty()
   @IsEmail()
+  @IsNotEmpty({ message: "É obrigatório informar o e-mail"})
   email: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty({ message: "É obrigatório informar o número de contato"})
+  contact: string;
+
+  @ApiProperty()
+  @IsString({ each: true })
+  @IsOptional({ each: true })
+  partner: string[];
 
   @ApiProperty()
   @IsString()
@@ -41,35 +53,36 @@ export class CreateCompanyDTO {
   @ApiProperty()
   @IsString()
   @MinLength(2, { message: 'O estado deve ter pelo menos 2 caracteres' })
-  estado: string;
+  state: string;
 
   @ApiProperty()
   @IsString()
   @MinLength(2, { message: 'O país deve ter pelo menos 2 caracteres' })
-  pais: string;
+  country: string;
 
   @ApiProperty()
   @IsString()
   @MinLength(2, { message: 'O município deve ter pelo menos 2 caracteres' })
-  municipio: string;
+  county: string;
 
   @ApiProperty()
   @IsString()
   @MinLength(2, { message: 'O bairro deve ter pelo menos 2 caracteres' })
-  bairro: string;
+  neighborhood: string;
 
   @ApiProperty()
   @IsString()
   @MinLength(2, { message: 'O logradouro deve ter pelo menos 2 caracteres' })
-  logradouro: string;
+  street: string;
+
   @ApiProperty()
   @IsString()
-  numero: string;
+  number: string;
 
   @ApiProperty()
   @IsString()
   @IsOptional()
-  complemento: string;
+  complement: string;
 
   
   @ApiProperty()

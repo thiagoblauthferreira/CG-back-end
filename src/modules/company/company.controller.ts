@@ -9,18 +9,19 @@ import { UpdateCompanyResponserDTO } from "./dto/response/UpdateCompanyResponseD
 import { AuthGuard } from "@nestjs/passport";
 import { DefaultCompanyResponserDTO } from "./dto/response/DefaultCompanyDTO";
 
+
 @ApiTags("Company")
 @Controller('company')
 export default class CompanyController {
 
   constructor(
-    private companyService: CompanyService
+    private companyService: CompanyService,
   ){}
 
   @Post('register')
   @UseInterceptors(FileInterceptor('file', multerConfig))
   async register(@UploadedFile() file: Express.MulterS3.File, @Body() createCompanyDTO: CreateCompanyDTO) {
-     return await this.companyService.create(createCompanyDTO, file);
+    return await this.companyService.create(createCompanyDTO, file);
   }
 
   @Put('update/:id')
@@ -37,7 +38,6 @@ export default class CompanyController {
   @Get('/profile')
   @UseGuards(AuthGuard('jwt'))
   async findById(@Request() req) {
-    console.log(req)
    const company = await this.companyService.profile(req.user.sub);
    return  { status: HttpStatus.OK, data: new DefaultCompanyResponserDTO(company) };
   }
@@ -52,6 +52,5 @@ export default class CompanyController {
     const nearbyCompany = await this.companyService.findNearbyCompany(companyId, 20);
     return nearbyCompany;
   }
-
 
 }

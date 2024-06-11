@@ -22,35 +22,35 @@ export class CompanyService {
     @InjectRepository(Address)
     private addressRepository: Repository<Address>,
     private jwtService: JwtService,
-    private fileService: FilesService
+    private fileService: FilesService,
+    
 
   ){}
 
   async validateCompany(payload: JwtPayload) {
     if(payload.roles.includes("company")) {
       const company = await this.companyRepository.findOne({ where: { id: payload.sub } });
-
+   
       if (!company || company.tradeName !== payload.username) {
           throw new UnauthorizedException();
       }
-  
+      
       return company;
+      
   }
-  
+ 
   return null;
   }
-
-  
+ 
   async create(createCompanyDTO: CreateCompanyDTO, file: Express.MulterS3.File): Promise<any>{
   
     const company = await toCompanyEntity(createCompanyDTO);
-    //verifica se o e-mail está em uso
     const validation = await this.validations(company)
 
     if (validation) {
       throw new ConflictException("Usuário já cadastrado");
     }
-  
+    //Lógica endereços
     const salt = await genSalt()
     company.password = await hash(company.password, salt);
     const address = await this.addressRepository.save(company.address);
@@ -58,9 +58,11 @@ export class CompanyService {
     const updatedAddress = await this.addressRepository.save(newAddress);
     company.address = updatedAddress;
   
+    //Lógica logo
     const logo = await this.fileService.save(file);
-    company.file = logo;
+    company.fileEntity = logo
     
+    //Lógica para adicionar a nova empresa;
     const newCompany = await this.companyRepository.save(company);
     const payload = { username: newCompany.tradeName, sub: newCompany.id, roles: ['donor', 'company'] };
     const token = this.jwtService.sign(payload);
@@ -91,32 +93,34 @@ export class CompanyService {
       company.address = updatedAddress;
     }
     if(file){
-      await deleteFile(company.file.url);
+      await deleteFile(company.fileEntity.url);
       const logo = await this.fileService.save(file);
-      company.file = logo;
+      company.fileEntity = logo;
     }
-    
+    //partners devem ser enviados ao todo
+    if (updates.partner) {
+      company.partner = updates.partner;
+    }
+      
     const newCompany = await this.companyRepository.save({  ...company, ...updates})
     
     return newCompany
   }
 
-    async profile(id: string): Promise<Company>{
-      const company = await this.companyRepository.findOne({
-        where: {id: id}
-      })
-      if(!company){
-          throw new NotFoundException("Usuário não encontrado")
-      }
-      return company;
-    }
+  async profile(id: string): Promise<Company>{
+    const company = await this.findById(id)
 
+    if(!company){
+        throw new NotFoundException("Usuário não encontrado")
+    }
+    return company;
+  }
   async delete(id: string): Promise<any>{
 
     const company = await this.profile(id);
     company.deletedAt = new Date();
     company.isActive = false;
-    await deleteFile(company.file.url);
+    await deleteFile(company.fileEntity.url);
     await this.companyRepository.save(company)
     
     return {message: "Conta removida."};
@@ -135,6 +139,15 @@ export class CompanyService {
       
   }
 
+  async findById(id: string){
+    const company = await this.companyRepository.findOne({ where: { id: id } });
+    
+     if(!company){
+      throw new NotFoundException('Usuário não encontrado.')
+    }
+     return company
+  }
+
   async findByCNPJValidation(cnpj: string){
     const company = await this.companyRepository.findOne({ where: { cnpj: cnpj } });
   
@@ -144,38 +157,36 @@ export class CompanyService {
     
   }
 
-    async findByEmailValidation(email: string){
-      const company = await this.companyRepository.findOne({ where: { email: email } });
+  async findByEmailValidation(email: string){
+    const company = await this.companyRepository.findOne({ where: { email: email } });
     
-      if (company) {
-        throw new ConflictException('E-mail já cadastrado.');
-      }
+    if (company) {
+      throw new ConflictException('E-mail já cadastrado.');
     }
+  }
 
-    private async validations(company: Company): Promise<boolean>{
-      const companyExists = await this.companyRepository.findOne({ where: [{ email: company.email.toLowerCase()}, {cnpj: company.cnpj}] });
-      if (companyExists) {
-      return true
-      }
-      return false;
+  private async validations(company: Company): Promise<boolean>{
+    const companyExists = await this.companyRepository.findOne({ where: [{ email: company.email.toLowerCase()}, {cnpj: company.cnpj}] });
+    if (companyExists) {
+    return true
     }
+     return false;
+   }
 
-
-    public async findNearbyCompany(companyId: string, radius: number) {
+  public async findNearbyCompany(companyId: string, radius: number) {
     
-      const company = await this.companyRepository.findOne({ 
-        where: { id: companyId },
-        relations: ["address"]
-      });
+    const company = await this.companyRepository.findOne({ 
+      where: { id: companyId },
+      relations: ["address"]
+    });
   
-      if (!company) {
-        throw new NotFoundException("Usuário não encontrado");
-      }
+    if (!company) {
+      throw new NotFoundException("Usuário não encontrado");
+    }
+    const companyLatitude = company.address.latitude;
+    const companyLongitude = company.address.longitude;
   
-      const companyLatitude = company.address.latitude;
-      const companyLongitude = company.address.longitude;
-  
-      const query = this.companyRepository
+    const query = this.companyRepository
           .createQueryBuilder("company")
           .select(["company.id", "company.tradeName"]) // Select only the fields you want to return
           .addSelect(["address.latitude", "address.longitude"]) // Select only the fields you want from the address
@@ -188,6 +199,7 @@ export class CompanyService {
           .andWhere("company.id != :companyId", { companyId });  
   
       return await query.getMany();
-    }
- 
+  }
+
+
 }
