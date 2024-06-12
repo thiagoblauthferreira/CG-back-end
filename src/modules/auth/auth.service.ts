@@ -142,11 +142,12 @@ export class AuthService {
     return updatedUser;
   }
   
-/*
+
   async sendConfirmationEmail(user: User) {
+    const email = user.email;
     
   }
-*/
+
 public async authenticate(email: string, password: string) {
   const user = await this.usersRepository.findOne({ where: { email: email.toLowerCase() } });
 

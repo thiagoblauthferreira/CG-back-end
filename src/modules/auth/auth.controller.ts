@@ -14,10 +14,11 @@ import { CreateUserDto } from './dto/auth.dto';
 import { HttpStatus } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { LoginDto } from './dto/login.dto';
+import { MailService } from './mail/mail.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private mailService: MailService) {}
 
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {
@@ -32,6 +33,12 @@ export class AuthController {
   async getProfile(@Request() req) {
     const user = await this.authService.getProfile(req.user.sub);
     return { status: HttpStatus.OK, data: user };
+  }
+
+  @Post("/test-mail")
+  async testMail() {
+    await this.mailService.sendUserConfirmation();
+
   }
 
   @Patch('update/:userId')
