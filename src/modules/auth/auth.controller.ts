@@ -14,10 +14,11 @@ import { CreateUserDto } from './dto/auth.dto';
 import { HttpStatus } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { LoginDto } from './dto/login.dto';
+import { MailService } from '../mail/mail.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private mailService: MailService) {}
 
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {

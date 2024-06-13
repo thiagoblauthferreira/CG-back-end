@@ -23,6 +23,7 @@
     "exec:sync:server": "yarn typeorm:sync && yarn start:prod"
   },
   "dependencies": {
+    "@nestjs-modules/mailer": "^2.0.2",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.2",
     "@nestjs/core": "^10.0.0",
@@ -31,8 +32,11 @@
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/swagger": "^7.3.1",
     "@nestjs/typeorm": "^10.0.2",
+    "aws-sdk": "^2.1639.0",
     "bcrypt": "^5.1.1",
     "class-validator": "^0.14.1",
+    "nodemailer": "^6.9.13",
+    "nodemailer-express-handlebars": "^6.1.2",
     "opencage-api-client": "^1.0.5",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
