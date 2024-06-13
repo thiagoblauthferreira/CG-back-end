@@ -61,7 +61,7 @@ export class NeedVolunteerService {
 
     const need =  await this.needVolunteerRepository.findOne({
       where: {id: id},
-      relations: ['coordinator', 'shelter']
+      relations: ['coordinator', 'shelter', 'volunteers']
    })
     if(!need){
       throw new NotFoundException('Necessidade não encontrada');
@@ -82,16 +82,15 @@ export class NeedVolunteerService {
      })
    }
 
-  async accepted(id: string, userId: string, status: Status): Promise<NeedVolunteers> {
+  async accepted(id: string, userId: string): Promise<NeedVolunteers> {
     const volunteer = await this.verifyIfUserExits.verifyIfUserExits(userId)
     userValidationsToAccepted(volunteer);
     const need = await this.find(id);
     acceptedValidate(need);
-    if(need.volunteers.includes(volunteer.id)){
-      throw new ConflictException("Voluntário já cadastrado na necessidade.")
-    }
-    need.volunteers.push(volunteer.id);
-    need.status = status;
+    if (need.volunteers.some(vol => vol.id === userId)) {
+      throw new ConflictException("Voluntário já cadastrado na necessidade.");
+  }
+    need.volunteers.push(volunteer);
     await this.needVolunteerRepository.save(need)
     return need
   }
@@ -100,8 +99,8 @@ export class NeedVolunteerService {
     const volunteer = await this.verifyIfUserExits.verifyIfUserExits(userId)
     userValidationsToAccepted(volunteer);
     const need = await this.find(id);
-    const volunteerToRemove = (volunteer.id);
-    const index = need.volunteers.indexOf(volunteerToRemove)
+    const index = need.volunteers.findIndex(vol => vol.id === userId);
+    
     if (index > -1) {
       need.volunteers.splice(index, 1);
     }

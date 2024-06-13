@@ -53,7 +53,7 @@ export class NeedVolunteerController {
     @Patch('need-accepted/:id')
     @UseGuards(AuthGuard('jwt'))
     async accepted(@Param('id') needId: string, @Body() acceptedNeedDTO: AcceptedNeedDTO) {
-     return new ResponseNeedVolunteerUpdateDTO(await this.needVolunteerService.accepted(needId, acceptedNeedDTO.userId, acceptedNeedDTO.status));
+     return new ResponseNeedVolunteerUpdateDTO(await this.needVolunteerService.accepted(needId, acceptedNeedDTO.userId));
     }   
 
     @Patch('need-cancel/:id')

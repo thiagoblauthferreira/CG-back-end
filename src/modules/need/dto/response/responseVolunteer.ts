@@ -1,3 +1,4 @@
+import { User } from "src/modules/auth/entities/auth.enity";
 import { NeedVolunteers } from "../../entities/needVolunteers.entity";
 import { Priority } from "../../enums/enumPriority";
 import { Status } from "../../enums/enumsStatus";
@@ -10,7 +11,7 @@ export class ResponseNeedVolunteerDTO {
   coordinator_username: string;
   title: string;
   description: string;
-  volunteers: string[];
+  volunteers: User[];
   shelter_id: string;
   shelter_name: string;
   shelter_phone: string;

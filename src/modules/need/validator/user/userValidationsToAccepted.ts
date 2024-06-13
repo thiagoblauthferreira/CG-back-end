@@ -14,6 +14,7 @@ export function userValidationsToAccepted(user: User){
   if(user.status != Status.APPROVED){
     throw new ForbiddenException("Sem autorização parar aceitar necessidades.");
   }
+  
 
 }
 
