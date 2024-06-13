@@ -1,8 +1,6 @@
 import { MailerOptions } from '@nestjs-modules/mailer';
-import * as AWS from 'aws-sdk';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import path from 'path';
-
+import * as AWS from 'aws-sdk';
 
 AWS.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -20,7 +18,6 @@ export const mailConfig: MailerOptions = {
     from: 'ativacao@coletivogloma.com.br',
   },
   template: {
-    dir: __dirname + '/templates',
     adapter: new HandlebarsAdapter(),
     options: {
       strict: true,

@@ -11,6 +11,8 @@ import { EnvConfig } from 'src/config';
 import { JwtPayload } from './payload/jwt.payload';
 import { JwtService } from '@nestjs/jwt';
 import logger from 'src/logger';
+import { MailService } from '../mail/mail.service';
+import { SendMailActivationUserDto } from '../mail/dto/sendmailactivationuser.dto';
 @Injectable()
 export class AuthService {
   constructor(
@@ -19,6 +21,7 @@ export class AuthService {
     @InjectRepository(Address)
     private addressRepository: Repository<Address>,
     private jwtService: JwtService,
+    private mailService: MailService,
   ) {}
 
 
@@ -94,6 +97,10 @@ export class AuthService {
       user.address = newAddress;
       
       const newUser = await this.usersRepository.save(user);
+      const code = generateRandomCode(6)
+      const mailDto = new SendMailActivationUserDto(newUser.name, newUser.email, code);
+
+      this.mailService.sendUserConfirmation(mailDto)
   
       const payload = { username: newUser.username, sub: newUser.id, roles: newUser.roles };
       const token = this.jwtService.sign(payload);
@@ -141,12 +148,7 @@ export class AuthService {
 
     return updatedUser;
   }
-  
 
-  async sendConfirmationEmail(user: User) {
-    const email = user.email;
-    
-  }
 
 public async authenticate(email: string, password: string) {
   const user = await this.usersRepository.findOne({ where: { email: email.toLowerCase() } });
@@ -193,4 +195,16 @@ public async authenticate(email: string, password: string) {
 
     return await query.getMany();
   }
+}
+
+function generateRandomCode(length: number): string {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  const charactersLength = characters.length;
+
+  for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+
+  return result;
 }
