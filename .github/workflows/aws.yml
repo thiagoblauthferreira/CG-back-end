@@ -24,7 +24,8 @@ jobs:
           ssh -o StrictHostKeyChecking=no ec2-user@18.204.69.210 '
             cd CG-back-end &&
             git pull origin main &&
-            docker compose down &&
-            docker rmi cg-back-end-nestjs:latest &&
-            docker compose --env-file compose.env up -d
+            nvm use 16
+            sudo docker compose down &&
+            sudo docker rmi cg-back-end-nestjs:latest &&
+            sudo docker compose --env-file compose.env up -d
           '
