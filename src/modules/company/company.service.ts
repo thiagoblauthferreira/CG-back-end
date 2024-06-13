@@ -121,7 +121,7 @@ export class CompanyService {
     company.deletedAt = new Date();
     company.isActive = false;
     await deleteFile(company.fileEntity.url);
-    await this.companyRepository.save(company)
+    await this.companyRepository.delete(company.id)
     
     return {message: "Conta removida."};
 
