@@ -91,14 +91,16 @@ export class AuthService {
         newAddress.longitude = lng;
       }
   
+  
       const updatedAddress = await this.addressRepository.save(newAddress);
   
       user.address = updatedAddress;
       user.address = newAddress;
+      user.code = generateRandomCode(6);
       
       const newUser = await this.usersRepository.save(user);
-      const code = generateRandomCode(6)
-      const mailDto = new SendMailActivationUserDto(newUser.name, newUser.email, code);
+      
+      const mailDto = new SendMailActivationUserDto(newUser.name, newUser.email, newUser.code);
 
       this.mailService.sendUserConfirmation(mailDto)
   

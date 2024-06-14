@@ -83,8 +83,12 @@ export class CreateUserDto {
   @IsOptional()
   brand: string;
 
-  @ApiProperty({ enum: Status, default: Status.APPROVED })
+  @ApiProperty({ enum: Status, default: Status.WAITING })
   @IsEnum(Status)
   @IsOptional()
   status: Status;
+
+  @ApiHideProperty()
+  @IsOptional()
+  code: string;
 }
