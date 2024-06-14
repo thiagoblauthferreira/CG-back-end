@@ -15,7 +15,7 @@ export const mailConfig: MailerOptions = {
     }),
   },
   defaults: {
-    from: 'ativacao@coletivogloma.com.br',
+    from: `"Coletivo Gloma" <${process.env.MAIL_FROM}>`,
   },
   template: {
     adapter: new HandlebarsAdapter(),

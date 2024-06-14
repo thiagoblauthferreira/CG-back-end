@@ -3,6 +3,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import * as AWS from 'aws-sdk';
 import * as Handlebars from 'handlebars';
 import { SendMailActivationUserDto } from './dto/sendmailactivationuser.dto';
+import { SendMailResetPasswordDto } from './dto/sendmailresetpassword.dto';
 
 @Injectable()
 export class MailService {
@@ -34,8 +35,53 @@ export class MailService {
     });
 
     await this.mailerService.sendMail({
-      to: activationDto.mail, // Após liberado acesso a produção SES - activationDto.mail,
+      to: activationDto.mail,
       subject: 'Ativação de cadastro Coletivo Gloma',
+      html: compiledTemplate,
+      attachments: [
+        {
+          filename: 'logo.png',
+          content: logoContent,
+          cid: 'logo@coletivogloma',
+        },
+      ],
+    });
+  }
+
+  async sendResetPassword(resetPassword: SendMailResetPasswordDto) {
+    const logoContent = await this.getS3File('templates-mail-gloma', 'images/logo.png');
+    const templateContent = (await this.getS3File('templates-mail-gloma', 'templates/resetpassword.hbs')).toString('utf-8');
+
+    const compiledTemplate = this.compileTemplate(templateContent, {
+      password: resetPassword.password,
+      nome: resetPassword.name.split(' ')[0],
+    });
+
+    await this.mailerService.sendMail({
+      to: resetPassword.mail,
+      subject: 'Senha resetada Coletivo Gloma',
+      html: compiledTemplate,
+      attachments: [
+        {
+          filename: 'logo.png',
+          content: logoContent,
+          cid: 'logo@coletivogloma',
+        },
+      ],
+    });
+  }
+
+  async sendChangePasswordAlert(email: string, nome: string) {
+    const logoContent = await this.getS3File('templates-mail-gloma', 'images/logo.png');
+    const templateContent = (await this.getS3File('templates-mail-gloma', 'templates/change-password.hbs')).toString('utf-8');
+
+    const compiledTemplate = this.compileTemplate(templateContent, {
+      nome: nome.split(' ')[0],
+    });
+
+    await this.mailerService.sendMail({
+      to: email,
+      subject: 'Alteração de senha Coletivo Gloma',
       html: compiledTemplate,
       attachments: [
         {
