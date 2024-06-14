@@ -34,7 +34,7 @@ export class MailService {
     });
 
     await this.mailerService.sendMail({
-      to: 'mock-activation@coletivogloma.com.br', // Após liberado acesso a produção SES - activationDto.mail,
+      to: activationDto.mail, // Após liberado acesso a produção SES - activationDto.mail,
       subject: 'Ativação de cadastro Coletivo Gloma',
       html: compiledTemplate,
       attachments: [
