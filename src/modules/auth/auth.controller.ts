@@ -7,7 +7,8 @@ import {
   Get,
   Patch,
   Request,
-  UseGuards
+  UseGuards,
+  Put
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/auth.dto';
@@ -15,6 +16,8 @@ import { HttpStatus } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { LoginDto } from './dto/login.dto';
 import { MailService } from '../mail/mail.service';
+import { ResetPasswordDto } from './dto/resetpassword.dto';
+import { ChangePasswordDto } from './dto/changepassword.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -56,6 +59,21 @@ export class AuthController {
     @Body() loginDto: LoginDto
   ) {
     return this.authService.authenticate(loginDto.email, loginDto.password);
+  }
+
+  @Put('reset-password')
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.authService.resetPassword(resetPasswordDto);
+  }
+
+  @Put('activate/:activationCode')
+  async activateUser(@Param('activationCode') activationCode: string) {
+    return this.authService.activateUser(activationCode);
+  }
+
+  @Put('change-password')
+  async changePassword(@Body() changePasswordDto: ChangePasswordDto) {
+    return this.authService.changePassword(changePasswordDto);
   }
 
   @Get('nearby-users/:userId')

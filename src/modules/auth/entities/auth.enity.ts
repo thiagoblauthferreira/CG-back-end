@@ -57,7 +57,10 @@ export class User {
   @Column({
     type: 'enum',
     enum: Status,
-    default: Status.APPROVED,
+    default: Status.WAITING,
   })
   status: Status;
+
+  @Column({ nullable: true })
+  code: string;
 }
