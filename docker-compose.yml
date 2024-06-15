@@ -23,7 +23,7 @@ services:
       - MAIL_FROM=${MAIL_FROM}
     volumes:
       - logs:/app/logs
-      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - ./filebeat.yml:/app/filebeat.yml  # Mapeia o arquivo filebeat.yml do host para dentro do container
       - /var/lib/docker/containers:/var/lib/docker/containers  # Montagem para acessar os logs do Docker
 
   elasticsearch:
@@ -51,7 +51,7 @@ services:
     container_name: filebeat
     user: root  # Define o usuário como root para evitar problemas de permissão
     volumes:
-      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml  # Monta o arquivo de configuração do Filebeat
+      - ./filebeat.yml:/app/filebeat.yml  # Mapeia o arquivo filebeat.yml do host para dentro do container
       - /var/lib/docker/containers:/var/lib/docker/containers  # Permite acesso aos logs do Docker
       - /var/run/docker.sock:/var/run/docker.sock  # Permite que o Filebeat monitore os containers Docker
     depends_on:
