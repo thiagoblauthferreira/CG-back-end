@@ -20,7 +20,7 @@ async function bootstrap() {
     .addSecurityRequirements('bearer')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/document', app, document);
+  SwaggerModule.setup('api', app, document);
 
   const certPath = './certificados/certificado.crt';
   const keyPath = './certificados/chave-privada.pem';
