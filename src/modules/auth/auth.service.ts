@@ -1,8 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Status, User } from './entities/auth.enity';
-import { hash, compare } from 'bcrypt';
+import { hash, compare, genSalt } from 'bcrypt';
 import { Address } from './entities/adress.enity';
 import { CreateUserDto } from './dto/auth.dto';
 import * as opencage from 'opencage-api-client';
@@ -14,10 +14,9 @@ import logger from 'src/logger';
 import { MailService } from '../mail/mail.service';
 import { SendMailActivationUserDto } from '../mail/dto/sendmailactivationuser.dto';
 import { ResetPasswordDto } from './dto/resetpassword.dto';
-import { ActivateUserDto } from './dto/activateuser.dto';
 import { SendMailResetPasswordDto } from '../mail/dto/sendmailresetpassword.dto';
 import { ChangePasswordDto } from './dto/changepassword.dto';
-import { debug } from 'console';
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -47,7 +46,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      throw new NotFoundException('Usuário não encontrado');
     }
 
     // Remover a senha do objeto do usuário antes de retorná-lo
@@ -64,13 +63,15 @@ export class AuthService {
       });
 
       if (existingUser) {
-        throw new HttpException('Username or email already in use', HttpStatus.CONFLICT);
+        throw new ConflictException('Nome de usuário ou Email já está em uso');
       }
 
       const user = new User();
       Object.assign(user, createUserDto);
 
-      user.password = await hash(createUserDto.password, 10);
+      const salt = await genSalt();
+
+      user.password = await hash(createUserDto.password, salt);
 
       const address = new Address();
       Object.assign(address, createUserDto.address);
@@ -96,7 +97,6 @@ export class AuthService {
         newAddress.longitude = lng;
       }
 
-
       const updatedAddress = await this.addressRepository.save(newAddress);
 
       user.address = updatedAddress;
@@ -115,7 +115,7 @@ export class AuthService {
       return { token };
     } catch (error) {
       logger.error(error);
-      throw new HttpException('Error on register user', HttpStatus.INTERNAL_SERVER_ERROR)
+      throw error;
     }
   }
 
@@ -124,7 +124,7 @@ export class AuthService {
       const user = await this.usersRepository.findOne({ where: { email: dto.email.toLowerCase() } });
 
       if (!user) {
-        throw new Error('Usuário não encontrado');
+        throw new NotFoundException('Usuário não encontrado');
       }
 
       const newPassword = generateRandomCode(8);
@@ -148,11 +148,11 @@ export class AuthService {
       const user = await this.usersRepository.findOne({ where: { code: code } });
 
       if (!user) {
-        throw new Error('Usuário não encontrado');
+        throw new NotFoundException('Usuário não encontrado');
       }
 
       if (user.code !== code) {
-        throw new Error('Código de ativação inválido');
+        throw new NotFoundException('Código de ativação inválido');
       }
 
       user.status = Status.APPROVED;
@@ -171,14 +171,14 @@ export class AuthService {
       const user = await this.usersRepository.findOne({ where: { email: dto.email.toLowerCase() } });
 
       if (!user) {
-        throw new Error('Usuário não encontrado');
+        throw new NotFoundException('Usuário não encontrado');
       }
       debugger;
 
       const passwordMatches = await compare(dto.oldPassword, user.password);
 
       if (!passwordMatches) {
-        throw new Error('Senha inválida');
+        throw new NotFoundException('Senha inválida');
       }
 
       user.password = await hash(dto.newPassword, 10);
@@ -193,17 +193,11 @@ export class AuthService {
     }
   }
 
-  public async deleteAccount(userId: string, password: string) {
+  public async deleteAccount(userId: string) {
     const user = await this.usersRepository.findOne({ where: { id: userId } });
 
     if (!user) {
-      throw new Error('Usuário não encontrado');
-    }
-
-    const passwordMatches = await compare(password, user.password);
-
-    if (!passwordMatches) {
-      throw new Error('Senha inválida');
+      throw new NotFoundException('Usuário não encontrado');
     }
 
     await this.usersRepository.delete(userId);
@@ -216,12 +210,19 @@ export class AuthService {
     const user = await this.usersRepository.findOne({ where: { id: userId } });
 
     if (!user) {
-      throw new Error('Usuário não encontrado');
+      throw new NotFoundException('Usuário não encontrado');
     }
 
     if (updates.password) {
       updates.password = await hash(updates.password, 10);
     }
+
+    /**
+     * Se o usuário tentar alterar o email, podemos ter emails
+     * repetidos no banco, é bom adicionar uma lógica pra
+     * impedir isso ou só impedir que essa rota seja usada pra
+     * isso, criando uma outra so pro email
+     */
 
     const updatedUser = await this.usersRepository.save({ ...user, ...updates });
 
@@ -230,18 +231,17 @@ export class AuthService {
     return updatedUser;
   }
 
-
   public async authenticate(email: string, password: string) {
     const user = await this.usersRepository.findOne({ where: { email: email.toLowerCase() } });
 
     if (!user) {
-      throw new Error('Usuário não encontrado');
+      throw new NotFoundException("Usuário não encontrado");
     }
 
     const passwordMatches = await compare(password, user.password);
 
     if (!passwordMatches) {
-      throw new Error('Senha inválida');
+      throw new NotFoundException("Senhas não coincidem");
     }
 
     const payload = { username: user.username, sub: user.id, roles: user.roles };
@@ -256,7 +256,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     const userLatitude = user.address.latitude;
