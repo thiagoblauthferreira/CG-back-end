@@ -20,7 +20,6 @@ import { ResetPasswordDto } from './dto/resetpassword.dto';
 import { ChangePasswordDto } from './dto/changepassword.dto';
 import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService, private mailService: MailService) {}
@@ -28,7 +27,6 @@ export class AuthController {
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {
     const registeredUser = await this.authService.register(createUserDto);
-    // await this.authService.sendConfirmationEmail(registeredUser);
     return registeredUser;
   }
 

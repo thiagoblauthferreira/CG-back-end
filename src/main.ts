@@ -19,7 +19,7 @@ async function bootstrap() {
     .addTag('Hello World')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api/document', app, document);
 
   const certPath = './certificados/certificado.crt';
   const keyPath = './certificados/chave-privada.pem';
