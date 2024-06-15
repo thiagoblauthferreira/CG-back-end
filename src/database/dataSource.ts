@@ -7,15 +7,6 @@ import { Shelter } from "src/modules/shelter/entities/shelter.entity";
 export const dataSourceConfig = (): DataSourceOptions => {
   return {
     type: "postgres",
-    ...(EnvConfig.ENV === "production"
-      ? {
-          url: EnvConfig.database.URL,
-          synchronize: false,
-          ssl: {
-            rejectUnauthorized: false, 
-          },
-        }
-      : {
           host: EnvConfig.database.HOST_DB,
           port: EnvConfig.database.PORT_DB,
           username: EnvConfig.database.USER_DB,
@@ -25,7 +16,7 @@ export const dataSourceConfig = (): DataSourceOptions => {
           ssl: {
             rejectUnauthorized: false, 
           },
-        }),
+        
     entities: [
       User,
       Address, 

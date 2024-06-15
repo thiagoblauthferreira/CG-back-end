@@ -20,13 +20,14 @@ services:
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - AWS_REGION=${AWS_REGION}
       - MAIL_FROM=${MAIL_FROM}
+      - NODE_ENV=${NODE_ENV}
     volumes:
       - logs:/app/logs
       - ./filebeat.yml:/app/filebeat.yml
       - /var/lib/docker/containers:/var/lib/docker/containers
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.1
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
@@ -40,7 +41,7 @@ services:
       - ./elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:7.17.0
+    image: docker.elastic.co/kibana/kibana:8.14.1
     container_name: kibana
     ports:
       - "5601:5601"
@@ -54,7 +55,7 @@ services:
       - elasticsearch
 
   filebeat:
-    image: docker.elastic.co/beats/filebeat:7.17.0
+    image: docker.elastic.co/beats/filebeat:8.14.1
     container_name: filebeat
     user: root
     volumes:
