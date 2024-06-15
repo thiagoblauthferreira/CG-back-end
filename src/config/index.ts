@@ -15,5 +15,5 @@ export const EnvConfig = {
     JWT_SECRET:{
         JWT_SECRET: process.env.JWT_SECRET
     },
-    ENV: process.env.ENV,
+    ENV: process.env.NODE_ENV,
 }
