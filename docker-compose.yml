@@ -7,8 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: coletivogloma-backend
     ports:
-      - "80:80"
-      - "443:443"  # Porta do host : Porta do contêiner
+      - "3000:3000"
     environment:
       - HOST_DB=${HOST_DB}
       - PORT_DB=${PORT_DB}
@@ -24,6 +23,8 @@ services:
       - MAIL_FROM=${MAIL_FROM}
     volumes:
       - logs:/app/logs
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - /var/lib/docker/containers:/var/lib/docker/containers  # Montagem para acessar os logs do Docker
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.13.4
@@ -48,14 +49,13 @@ services:
   filebeat:
     image: docker.elastic.co/beats/filebeat:7.13.4
     container_name: filebeat
-    user: root
+    user: root  # Define o usuário como root para evitar problemas de permissão
     volumes:
-      - type: bind
-        source: ./filebeat.yml
-        target: /usr/share/filebeat/filebeat.yml
-      - logs:/app/logs
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml  # Monta o arquivo de configuração do Filebeat
+      - /var/lib/docker/containers:/var/lib/docker/containers  # Permite acesso aos logs do Docker
+      - /var/run/docker.sock:/var/run/docker.sock  # Permite que o Filebeat monitore os containers Docker
     depends_on:
-      - elasticsearch
+      - nestjs  # Dependência do serviço NestJS
 
 volumes:
   logs:
