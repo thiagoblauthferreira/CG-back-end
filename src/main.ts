@@ -1,11 +1,10 @@
 import { NestFactory } from '@nestjs/core';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as fs from 'fs';
+import * as http from 'http';
+import * as https from 'https';
 import { AppModule } from './app.module';
 import { corsOptions } from './config/cors.options';
-import * as fs from 'fs';
-import * as https from 'https';
-import * as http from 'http';
-import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: corsOptions });
@@ -17,7 +16,7 @@ async function bootstrap() {
     .addBearerAuth({ type: "http", scheme: "bearer", bearerFormat: "JWT" })
     .addTag('Auth')
     .addTag('Shelter')
-    .addSecurityRequirements('bearer')
+    .addTag('Hello World')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
@@ -41,7 +40,7 @@ key: key,
    res.end();
  }).listen(80);
 
-//  await app.listen(8080); //- Descomentar para rodar localmente
+// await app.listen(8080); //- Descomentar para rodar localmente
 
 }
 
