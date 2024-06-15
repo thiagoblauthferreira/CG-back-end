@@ -18,7 +18,9 @@ import { LoginDto } from './dto/login.dto';
 import { MailService } from '../mail/mail.service';
 import { ResetPasswordDto } from './dto/resetpassword.dto';
 import { ChangePasswordDto } from './dto/changepassword.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService, private mailService: MailService) {}

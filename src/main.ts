@@ -17,31 +17,31 @@ async function bootstrap() {
     .addBearerAuth({ type: "http", scheme: "bearer", bearerFormat: "JWT" })
     .addTag('Auth')
     .addTag('Shelter')
-    .addTag('Hello World')
+    .addSecurityRequirements('bearer')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api/document', app, document);
 
-  const certPath = './certificados/certificado.crt';
-  const keyPath = './certificados/chave-privada.pem';
-  const cert = fs.readFileSync(certPath);
-  const key = fs.readFileSync(keyPath);
+//   const certPath = './certificados/certificado.crt';
+//   const keyPath = './certificados/chave-privada.pem';
+//   const cert = fs.readFileSync(certPath);
+//   const key = fs.readFileSync(keyPath);
 
-  const httpsOptions = {
-    cert: cert,
-    key: key,
-    passphrase: 'gloma'
-  };
+//   const httpsOptions = {
+//    cert: cert,
+// key: key,
+//    passphrase: 'gloma'
+//     };
 
-  const httpsServer = https.createServer(httpsOptions, app.getHttpAdapter().getInstance());
-  httpsServer.listen(443);
+//  const httpsServer = https.createServer(httpsOptions, app.getHttpAdapter().getInstance());
+//  httpsServer.listen(443);
 
-  http.createServer((req, res) => {
-    res.writeHead(301, { Location: `https://${req.headers.host}${req.url}` });
-    res.end();
-  }).listen(80);
+//  http.createServer((req, res) => {
+//    res.writeHead(301, { Location: `https://${req.headers.host}${req.url}` });
+//    res.end();
+//  }).listen(80);
 
-  // await app.listen(8080); - Descomentar para rodar localmente
+ await app.listen(8080); //- Descomentar para rodar localmente
 
 }
 
