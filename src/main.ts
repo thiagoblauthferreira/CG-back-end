@@ -36,19 +36,21 @@ async function bootstrap() {
   const key = fs.readFileSync(keyPath);
 
   const httpsOptions = {
-   cert: cert,
-key: key,
-   passphrase: 'gloma'
-    };
+    cert: cert,
+    key: key,
+    passphrase: 'gloma'
+  };
 
- const httpsServer = https.createServer(httpsOptions, app.getHttpAdapter().getInstance());
- httpsServer.listen(443);
+  await app.init();
 
- http.createServer((req, res) => {
-   res.writeHead(301, { Location: `https://${req.headers.host}${req.url}` });
-   res.end();
- }).listen(80);
- 
+  const httpsServer = https.createServer(httpsOptions, app.getHttpAdapter().getInstance());
+  httpsServer.listen(443);
+
+  http.createServer((req, res) => {
+    res.writeHead(301, { Location: `https://${req.headers.host}${req.url}` });
+    res.end();
+  }).listen(80);
+
 }
 
 bootstrap();
