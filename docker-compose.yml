@@ -16,6 +16,12 @@ services:
       - PASSWORD_DB=${PASSWORD_DB}
       - NAME_DB=${NAME_DB}
       - OPENCAGE_API_KEY=${OPENCAGE_API_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+      - URL_DATABASE=${URL_DATABASE}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION}
+      - MAIL_FROM=${MAIL_FROM}
     volumes:
       - logs:/app/logs
 
