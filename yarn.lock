@@ -843,10 +843,10 @@
   "resolved" "https://registry.npmjs.org/@nestjs/passport/-/passport-10.0.3.tgz"
   "version" "10.0.3"
 
-"@nestjs/platform-express@^10.0.0":
-  "integrity" "sha512-sifLoxgEJvAgbim1UuW6wyScMfkS9SVQRH+lN33N/9ZvZSjO6NSDLOe+wxqsnZkia+QrjFC0qy0ITRAsggfqbg=="
-  "resolved" "https://registry.npmjs.org/@nestjs/platform-express/-/platform-express-10.3.8.tgz"
-  "version" "10.3.8"
+"@nestjs/platform-express@^10.0.0", "@nestjs/platform-express@^10.3.9":
+  "integrity" "sha512-si/UzobP6YUtYtCT1cSyQYHHzU3yseqYT6l7OHSMVvfG1+TqxaAqI6nmrix02LO+l1YntHRXEs3p+v9a7EfrSQ=="
+  "resolved" "https://registry.npmjs.org/@nestjs/platform-express/-/platform-express-10.3.9.tgz"
+  "version" "10.3.9"
   dependencies:
     "body-parser" "1.20.2"
     "cors" "2.8.5"
@@ -864,6 +864,13 @@
     "comment-json" "4.2.3"
     "jsonc-parser" "3.2.1"
     "pluralize" "8.0.0"
+
+"@nestjs/serve-static@^4.0.2":
+  "integrity" "sha512-cT0vdWN5ar7jDI2NKbhf4LcwJzU4vS5sVpMkVrHuyLcltbrz6JdGi1TfIMMatP2pNiq5Ie/uUdPSFDVaZX/URQ=="
+  "resolved" "https://registry.npmjs.org/@nestjs/serve-static/-/serve-static-4.0.2.tgz"
+  "version" "4.0.2"
+  dependencies:
+    "path-to-regexp" "0.2.5"
 
 "@nestjs/swagger@^7.3.1":
   "integrity" "sha512-LUC4mr+5oAleEC/a2j8pNRh1S5xhKXJ1Gal5ZdRjt9XebQgbngXCdW7JTA9WOEcwGtFZN9EnKYdquzH971LZfw=="
@@ -3016,7 +3023,7 @@
     "graceful-fs" "^4.2.11"
     "handlebars" "^4.7.8"
 
-"express@>=4.0.0 || >=5.0.0-beta", "express@4.19.2":
+"express@^4.18.1", "express@^4.19.2", "express@>=4.0.0 || >=5.0.0-beta", "express@4.19.2":
   "integrity" "sha512-5T6nhjsT+EOMzuck8JjBHARTHfMht0POzlA60WV2pMD3gyXw2LZnZ+ueGdNxG+0calOJcWKbpFcuzLZ91YWq9Q=="
   "resolved" "https://registry.npmjs.org/express/-/express-4.19.2.tgz"
   "version" "4.19.2"
@@ -5768,6 +5775,11 @@
   "integrity" "sha512-5DFkuoqlv1uYQKxy8omFBeJPQcdoE07Kv2sferDCrAq1ohOU+MSDswDIbnx3YAM60qIOnYa53wBhXW0EbMonrQ=="
   "resolved" "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-0.1.7.tgz"
   "version" "0.1.7"
+
+"path-to-regexp@0.2.5":
+  "integrity" "sha512-l6qtdDPIkmAmzEO6egquYDfqQGPMRNGjYtrU13HAXb3YSRrt7HSb1sJY0pKp6o2bAa86tSB6iwaW2JbthPKr7Q=="
+  "resolved" "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-0.2.5.tgz"
+  "version" "0.2.5"
 
 "path-to-regexp@3.2.0":
   "integrity" "sha512-jczvQbCUS7XmS7o+y1aEO9OBVFeZBQ1MDSEqmO7xSoPgOPoowY/SxLpZ6Vh97/8qHZOteiCKb7gkG9gA2ZUxJA=="
