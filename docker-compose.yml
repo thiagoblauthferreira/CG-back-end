@@ -23,3 +23,6 @@ services:
       - NODE_ENV=${NODE_ENV}
     volumes:
       - logs:/app/logs
+
+volumes:
+  logs:
