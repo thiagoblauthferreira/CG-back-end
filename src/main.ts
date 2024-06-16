@@ -18,7 +18,6 @@ async function bootstrap() {
     .addBearerAuth({ type: "http", scheme: "bearer", bearerFormat: "JWT" })
     .addTag('Auth')
     .addTag('Shelter')
-    .addTag('Hello World')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/document', app, document);
