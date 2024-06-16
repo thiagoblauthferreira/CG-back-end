@@ -23,5 +23,3 @@ services:
       - NODE_ENV=${NODE_ENV}
     volumes:
       - logs:/app/logs
-      - ./filebeat.yml:/app/filebeat.yml
-      - /var/lib/docker/containers:/var/lib/docker/containers
