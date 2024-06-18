@@ -27,7 +27,7 @@ export const dataSourceConfig = (): DataSourceOptions => {
           synchronize: true,
           ssl: false,
           ssl: {
-            rejectUnauthorized: true, 
+            rejectUnauthorized: false, 
           },
         }),
     entities: [
