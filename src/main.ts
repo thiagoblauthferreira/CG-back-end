@@ -1,18 +1,18 @@
 import { NestFactory } from '@nestjs/core';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as fs from 'fs';
+import * as http from 'http';
+import * as https from 'https';
 import { AppModule } from './app.module';
 import { corsOptions } from './config/cors.options';
 import { appConfig } from './config/app.config';
-
-/*import * as fs from 'fs';
-import * as https from 'https';
-import * as http from 'http';
-import { ValidationPipe } from '@nestjs/common';
+import { EnvConfig } from './config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: corsOptions });
+  app.setGlobalPrefix('api');
 
-  /*const config = new DocumentBuilder()
+  const config = new DocumentBuilder()
     .setTitle('Coletivo Gloma - API')
     .setDescription('Coletivo Gloma')
     .setVersion('1.0')
@@ -20,9 +20,15 @@ async function bootstrap() {
     .addTag('Auth')
     .addTag('Shelter')
     .addTag('Hello World')
+    .addTag('Distribution points')
+    .addTag('Products')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+
+  SwaggerModule.setup('api/document', app, document);
+  appConfig(app);
+
+  if (EnvConfig.ENV !== "production") return app.listen(8080);
 
   const certPath = './certificados/certificado.crt';
   const keyPath = './certificados/chave-privada.pem';
@@ -35,6 +41,8 @@ async function bootstrap() {
     passphrase: 'gloma'
   };
 
+  await app.init();
+
   const httpsServer = https.createServer(httpsOptions, app.getHttpAdapter().getInstance());
   httpsServer.listen(443);
 
@@ -45,26 +53,4 @@ async function bootstrap() {
 
 }
 
-bootstrap();*/
-
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: corsOptions });
-
-  const config = new DocumentBuilder()
-    .setTitle('Coletivo Gloma - API')
-    .setDescription('Coletivo Gloma')
-    .setVersion('1.0')
-    .addBearerAuth({ type: "http", scheme: "bearer", bearerFormat: "JWT" })
-    .addTag('Auth')
-    .addTag('Shelter')
-    .addTag('Need-items')
-    .addTag('Need-volunteer')
-    .addTag('Hello World')
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
-  appConfig(app);
-
-  await app.listen(8080);
-}
 bootstrap();
