@@ -209,6 +209,7 @@ export class AuthService {
     await this.usersRepository.delete(userId);
 
     return { message: 'Conta deletada com sucesso' };
+    
   }
 
 

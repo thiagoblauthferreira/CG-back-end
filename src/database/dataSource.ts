@@ -3,6 +3,9 @@ import { User } from "src/modules/auth/entities/auth.enity";
 import { Address } from "src/modules/auth/entities/adress.enity";
 import { EnvConfig } from "src/config";
 import { Shelter } from "src/modules/shelter/entities/shelter.entity";
+import { Management } from "src/modules/management/entities/management.entity";
+import { NeedItem } from "src/modules/need/entities/needItems.entity";
+import { NeedVolunteers } from "src/modules/need/entities/needVolunteers.entity";
 
 export const dataSourceConfig = (): DataSourceOptions => {
   return {
@@ -13,14 +16,16 @@ export const dataSourceConfig = (): DataSourceOptions => {
           password: EnvConfig.database.PASSWORD_DB,
           database: EnvConfig.database.NAME_DB,
           synchronize: true,
-          ssl: {
+          ssl: false,/*{
             rejectUnauthorized: false, 
-          },
+          },*/
         
     entities: [
       User,
       Address, 
-      
+      Management,
+      NeedItem,
+      NeedVolunteers,
       Shelter
     ],
   };

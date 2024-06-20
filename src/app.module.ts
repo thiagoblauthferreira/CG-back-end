@@ -7,12 +7,16 @@ import { AppService } from './app.service';
 import { ShelterModule } from './modules/shelter/shelter.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { ManagementModule } from './modules/management/management.module';
+import { NeedModule } from './modules/need/need.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(dataSourceConfig() as TypeOrmModuleOptions),
     AuthModule,
     ShelterModule,
+    ManagementModule,
+    NeedModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'src', 'assets'),
       serveRoot: '/assets',
