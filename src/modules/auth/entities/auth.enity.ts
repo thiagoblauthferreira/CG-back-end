@@ -9,8 +9,6 @@ import {
 } from 'typeorm';
 import { Address } from '../entities/adress.enity';
 import { NeedVolunteers } from 'src/modules/need/entities/needVolunteers.entity';
-} from 'typeorm';
-import { Address } from '../entities/adress.enity';
 import { Shelter } from 'src/modules/shelter/entities/shelter.entity';
 
 export enum Status {
