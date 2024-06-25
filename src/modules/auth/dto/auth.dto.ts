@@ -1,6 +1,7 @@
 import { IsEmail, IsString, MinLength, IsBoolean, IsOptional, IsEmpty, IsArray, IsIn, IsEnum, IsDateString } from 'class-validator';
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { CreateAddressDto } from './adress.dto';
+import { Type } from 'class-transformer';
 export enum Status {
   WAITING = 'waiting',
   APPROVED = 'approved',
@@ -91,3 +92,4 @@ export class CreateUserDto {
   @IsOptional()
   code: string;
 }
+

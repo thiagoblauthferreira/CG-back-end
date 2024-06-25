@@ -4,6 +4,7 @@ import { dataSourceConfig } from './database/dataSource';
 import { AuthModule } from './modules/auth/auth.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { NeedModule } from './modules/need/need.module';
 import { ShelterModule } from './modules/shelter/shelter.module';
 import { DistribuitionPointsModule } from './modules/distriuition-points/distribuition-point.module';
 import { ProductsModule } from './modules/products/product.module';
@@ -12,6 +13,7 @@ import { ProductsModule } from './modules/products/product.module';
   imports: [
     TypeOrmModule.forRoot(dataSourceConfig() as TypeOrmModuleOptions),
     AuthModule,
+    NeedModule,
     ShelterModule,
     DistribuitionPointsModule,
     ProductsModule,
