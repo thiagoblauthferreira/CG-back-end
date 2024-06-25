@@ -1,5 +1,6 @@
 import { Address } from 'src/modules/auth/entities/adress.enity';
 import { User } from 'src/modules/auth/entities/auth.enity';
+import { Products } from 'src/modules/products/entities/product.entity';
 import {
   Column,
   CreateDateColumn,
@@ -13,15 +14,15 @@ import {
 } from 'typeorm';
 
 @Entity()
-export class Shelter {
+export class DistribuitionPoints {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
-  name: string;
+  phone: string;
 
   @Column()
-  phone: string;
+  name: string;
 
   @Column({ nullable: true })
   description: string;
@@ -34,8 +35,11 @@ export class Shelter {
   @JoinColumn()
   address: Address;
 
-  @OneToMany(() => User, (user) => user.shelter)
-  coordinators: User[];
+  @OneToMany(() => Products, (products) => products.distribuitionPoint, {
+    nullable: true,
+  })
+  @JoinColumn()
+  products: Products[];
 
   @CreateDateColumn()
   createdAt: Date;
