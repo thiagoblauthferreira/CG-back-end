@@ -9,8 +9,8 @@ import { EnvConfig } from "src/config";
 
 export const dataSourceConfig = (): DataSourceOptions => {
   return {
-    type: 'postgres',
-    ...(EnvConfig.ENV === 'production'
+    type: "postgres",
+    ...(EnvConfig.ENV === "production"
       ? {
           url: EnvConfig.database.URL,
           synchronize: false,
@@ -26,7 +26,7 @@ export const dataSourceConfig = (): DataSourceOptions => {
           database: EnvConfig.database.NAME_DB,
           synchronize: true,
           ssl: {
-            rejectUnauthorized: false,
+            rejectUnauthorized: false, 
           },
         }),
     entities: [

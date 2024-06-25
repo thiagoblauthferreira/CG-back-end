@@ -2,6 +2,7 @@ import { User } from 'src/modules/auth/entities/auth.enity';
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Status } from '../enums/enumsStatus';
 import { Priority } from '../enums/enumPriority';
+import { Shelter } from 'src/modules/shelter/entities/shelter.entity';
 
 
 @Entity()
@@ -23,13 +24,12 @@ export class NeedItem {
   @Column()
   description: string;
 
-  //Aqui vai ficar uma entidade de endereço, um para muitos e joinColumn.
-  @Column()
-  shelter: string;
+  @ManyToOne(() => Shelter, { onDelete: 'CASCADE' } )
+  @JoinColumn({ name: "shelterId"})
+  shelter: Shelter;
 
   @Column({type: "enum", enum: Status, default: Status.CREATED})
   status: Status;
-
   
   @Column({type: "enum", enum: Priority, default: Priority.LOW})
   priority: Priority;
@@ -46,12 +46,17 @@ export class NeedItem {
   @ManyToOne(() => User)
   @JoinColumn({ name: "donorId"})
   donor?: User;
+  
+  /*Assim que empresa for aceita, ela será colocada aqui como possível aceitação
+  @ManyToOne(() => Company)
+  @JoinColumn({ name: "companyId"})
+  company?: Company;*/
 
   constructor(
     coordinator: User,
     title: string,
     description: string,
-    shelter: string,
+    shelter: Shelter,
     status: Status,
     priority: Priority,
     limitDate: Date,

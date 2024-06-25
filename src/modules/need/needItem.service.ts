@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { CreateNeedItemDTO } from "./dto/request/createNeedItemDTO";
@@ -11,6 +11,7 @@ import { validateUpdate } from "./validator/need/updateValidator/updateValidatio
 import { validateUpdateDTO } from "./validator/need/updateValidator/updateValidationsDTO";
 import { userValidationsToAccepted } from "./validator/user/userValidationsToAccepted";
 import { acceptedValidate } from "./validator/need/accepted/acceptedValidations";
+import { VerifyIfShelterExits } from "./validator/shelter/verifyIfShelterExits";
 
 @Injectable()
 export class NeedItemService {
@@ -18,6 +19,7 @@ export class NeedItemService {
   @InjectRepository(NeedItem)
   private needItemRepository: Repository<NeedItem>,
   private verifyIfUserExits: VerifyIfUserExits,
+  private verifyIfShelterExists: VerifyIfShelterExits,
   )
   {}
 
@@ -29,7 +31,9 @@ export class NeedItemService {
 
     userValidations(coordinator);
 
-    const need = toItemEntity(coordinator, createNeedItemDTO);
+    const shelter = await this.verifyIfShelterExists.verifyIfShelterExits(createNeedItemDTO.shelterId)
+
+    const need = toItemEntity(coordinator,shelter, createNeedItemDTO);
     
     return await this.needItemRepository.save(need)
         
@@ -41,7 +45,7 @@ export class NeedItemService {
       relations: ['coordinator']
     });
     if(!need){
-      throw new HttpException("Need not found.", HttpStatus.BAD_REQUEST);
+      throw new NotFoundException('Necessidade não encontrada');
     }
     return need;
  }
@@ -88,6 +92,19 @@ export class NeedItemService {
     return await this.needItemRepository.save(need)
               
    }
+
+   /*async acceptedCompany(id: string, companyId: string): Promise<NeedItem> {
+    const donor = await this.verifyIfUserExits.verifyIfUserExits(companyId)
+   
+    userValidationsToAccepted(donor);
+    const need = await this.findById(id);
+    acceptedValidate(need);
+    need.donor = donor;
+    return await this.needItemRepository.save(need)
+              
+   }*/
+
+    
 }
 
 

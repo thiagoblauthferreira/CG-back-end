@@ -1,21 +1,29 @@
-import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, OneToOne } from 'typeorm';
-import {Address} from "../entities/adress.enity"
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  JoinColumn,
+  OneToOne,
+  ManyToMany,
+} from 'typeorm';
+import { Address } from '../entities/adress.enity';
+import { NeedVolunteers } from 'src/modules/need/entities/needVolunteers.entity';
 
 export enum Status {
   WAITING = 'waiting',
   APPROVED = 'approved',
-  REJECTED = 'rejected'
+  REJECTED = 'rejected',
 }
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
-  name: string
+  name: string;
 
   @Column()
-  username: string
+  username: string;
 
   @Column()
   email: string;
@@ -26,7 +34,7 @@ export class User {
   @OneToOne(() => Address)
   @JoinColumn()
   address: Address;
-  
+
   @Column()
   phone: string;
 
@@ -39,7 +47,7 @@ export class User {
   @Column()
   isCoordinator: boolean;
 
-  @Column("simple-array")
+  @Column('simple-array')
   roles: string[];
 
   @Column({ nullable: true })
@@ -49,10 +57,12 @@ export class User {
   vehicleType: string;
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: Status,
-    default: Status.APPROVED
+    default: Status.APPROVED,
   })
   status: Status;
 
+  @ManyToMany(() => NeedVolunteers, (volunteer) => volunteer.volunteers)
+  needVolunteers: NeedVolunteers[];
 }
