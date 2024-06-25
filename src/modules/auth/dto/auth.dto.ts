@@ -1,4 +1,4 @@
-import { IsEmail, IsString, MinLength, IsBoolean, IsDate, IsOptional, IsEmpty, IsArray, IsIn, IsEnum } from 'class-validator';
+import { IsEmail, IsString, MinLength, IsBoolean, IsOptional, IsEmpty, IsArray, IsIn, IsEnum, IsDateString } from 'class-validator';
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { CreateAddressDto } from './adress.dto';
 import { Type } from 'class-transformer';
@@ -22,7 +22,6 @@ export class CreateUserDto {
 
   @ApiProperty()
   @IsString()
-  @IsOptional()
   username: string;
 
   @ApiProperty()
@@ -39,7 +38,7 @@ export class CreateUserDto {
   phone: string;
 
   @ApiProperty()
-  @IsDate()
+  @IsDateString()
   @IsOptional()
   @Type(() => Date) // retirar depois
   birthDate: Date;
@@ -85,8 +84,13 @@ export class CreateUserDto {
   @IsOptional()
   brand: string;
 
-  @ApiProperty({ enum: Status, default: Status.APPROVED })
+  @ApiProperty({ enum: Status, default: Status.WAITING })
   @IsEnum(Status)
   @IsOptional()
   status: Status;
+
+  @ApiHideProperty()
+  @IsOptional()
+  code: string;
 }
+

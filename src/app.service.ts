@@ -6,7 +6,7 @@ export class AppService {
 
   getHello(): string {
       this.logger.log('Hello world log');
-      logger.info('Hello world log with winston SSSSS');
+      logger.info('Hello world log with winston');
       return 'Hello World With Logs!';
   }
 }

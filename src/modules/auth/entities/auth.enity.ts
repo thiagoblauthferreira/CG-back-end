@@ -4,8 +4,12 @@ import {
   PrimaryGeneratedColumn,
   JoinColumn,
   OneToOne,
+  ManyToOne,
+  ManyToMany,
 } from 'typeorm';
 import { Address } from '../entities/adress.enity';
+import { NeedVolunteers } from 'src/modules/need/entities/needVolunteers.entity';
+import { Shelter } from 'src/modules/shelter/entities/shelter.entity';
 
 export enum Status {
   WAITING = 'waiting',
@@ -57,7 +61,17 @@ export class User {
   @Column({
     type: 'enum',
     enum: Status,
-    default: Status.APPROVED,
+    default: Status.WAITING,
   })
   status: Status;
+
+  @ManyToMany(() => NeedVolunteers, (volunteer) => volunteer.volunteers)
+  needVolunteers: NeedVolunteers[];
+
+  @Column({ nullable: true })
+  code: string;
+  
+  @ManyToOne(() => Shelter, (shelter) => shelter.coordinators)
+  shelter: Shelter;
+
 }
