@@ -32,10 +32,16 @@ export class AuthController {
   }
 
   @Get('/me')
+<<<<<<< HEAD
+  @UseGuards(AuthGuard('jwt')) 
+  async getProfile(@Request() req) {
+    const user = await this.authService.getProfile(req.user.sub);
+=======
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   async getProfile(@Request() req: any) {
     const user = await this.authService.getProfile(req.user.id);
+>>>>>>> 5894575a19bb60d14e0f92fccb3c5c9818ba3454
     return { status: HttpStatus.OK, data: user };
   }
 

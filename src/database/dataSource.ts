@@ -2,6 +2,8 @@ import { DataSource, DataSourceOptions } from "typeorm";
 import { User } from "src/modules/auth/entities/auth.enity";
 import { Address } from "src/modules/auth/entities/adress.enity";
 import { Shelter } from "src/modules/shelter/entities/shelter.entity";
+import { Company } from "src/modules/company/entities/company.entity";
+import { FileEntity } from "src/modules/company/entities/file.entity";
 import { NeedItem } from "src/modules/need/entities/needItems.entity";
 import { NeedVolunteers } from "src/modules/need/entities/needVolunteers.entity";
 import { EnvConfig } from "src/config";
@@ -31,7 +33,7 @@ export const dataSourceConfig = (): DataSourceOptions => {
             rejectUnauthorized: false,
           },
         }),
-    entities: [User, Address, Shelter, DistribuitionPoints, Products,  NeedItem, NeedVolunteers],
+    entities: [User, Address, Shelter, DistribuitionPoints, Products,  NeedItem, NeedVolunteers, Company,FileEntity],
   };
 };
 

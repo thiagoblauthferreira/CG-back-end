@@ -40,6 +40,7 @@ export class CreateUserDto {
   @ApiProperty()
   @IsDateString()
   @IsOptional()
+  @Type(() => Date) // retirar depois
   birthDate: Date;
 
   @ApiProperty()

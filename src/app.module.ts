@@ -6,6 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { NeedModule } from './modules/need/need.module';
 import { ShelterModule } from './modules/shelter/shelter.module';
+import { CompanyModule } from './modules/company/company.module';
 import { DistribuitionPointsModule } from './modules/distriuition-points/distribuition-point.module';
 import { ProductsModule } from './modules/products/product.module';
 
@@ -13,6 +14,7 @@ import { ProductsModule } from './modules/products/product.module';
   imports: [
     TypeOrmModule.forRoot(dataSourceConfig() as TypeOrmModuleOptions),
     AuthModule,
+    CompanyModule,
     NeedModule,
     ShelterModule,
     DistribuitionPointsModule,
