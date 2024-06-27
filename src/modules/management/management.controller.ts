@@ -5,6 +5,8 @@ import { ManagementService } from './management.service';
 import { CreateManagementDTO } from './dto/request/createManagementDTO';
 import { ResponseDefaultManagement } from './dto/response/responseDefaultManagement';
 
+
+
 @ApiTags('Management')
 @Controller('management')
 @UseGuards(AuthGuard('jwt'))
@@ -20,9 +22,8 @@ export class ManagementController {
   }
 
   @Patch('/:managementId')
-  async update(@Param('managementId') managementId: string, updates: Partial<CreateManagementDTO>) {
-    console.log(updates)
-    return await this.managementService.update(managementId, updates);
+  async update(@Param('managementId') managementId: string,@Body() updates: Partial<CreateManagementDTO>) {
+     return await this.managementService.update(managementId, updates);
   }
 
   @Get('/find-all')
@@ -33,7 +34,8 @@ export class ManagementController {
   async findOne(@Param('managementId') managementId: string) {
     return new ResponseDefaultManagement(await this.managementService.findById(managementId));
   }
- 
+
+
   @Delete('/:managementId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('managementId') managementId: string) {
@@ -52,8 +54,12 @@ export class ManagementController {
   async removeNeed(
    @Param('managementId') managementId: string,
    @Param('needId') needId: string ) {
-    
-    return await this.managementService.removeNeed(managementId, needId);
+   return await this.managementService.removeNeed(managementId, needId);
   }
 
+  /*@Post('/agendar-notificacoes')
+  async toSchedule(@Body() createScheduleDTO: CreateScheduleDTO) {
+    await this.managementService.sendEmailByNearby(createScheduleDTO);
+    return {message: "Envio agendado com sucesso."}
+  }*/
 }

@@ -13,11 +13,11 @@ export class FindNeedsItem{
 
   async findNeedItemById(id: string): Promise<NeedItem>{
     const need = await this.needItemRepository.findOne({
-      where: { id: id},
+      where: { id: id }
     });
-    if(need){
-      return need;
+    if(!need){
+      return null
     }
-    return null;
+    return need;
   }
 }

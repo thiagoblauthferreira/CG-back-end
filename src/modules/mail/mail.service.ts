@@ -74,7 +74,7 @@ export class MailService {
   async sendChangePasswordAlert(email: string, nome: string) {
     const logoContent = await this.getS3File('templates-mail-gloma', 'images/logo.png');
     const templateContent = (await this.getS3File('templates-mail-gloma', 'templates/change-password.hbs')).toString('utf-8');
-
+    //aqui eu vou ter que alterar para receber os dados.
     const compiledTemplate = this.compileTemplate(templateContent, {
       nome: nome.split(' ')[0],
     });
@@ -82,6 +82,29 @@ export class MailService {
     await this.mailerService.sendMail({
       to: email,
       subject: 'Alteração de senha Coletivo Gloma',
+      html: compiledTemplate,
+      attachments: [
+        {
+          filename: 'logo.png',
+          content: logoContent,
+          cid: 'logo@coletivogloma',
+        },
+      ],
+    });
+  }
+
+  //email para notificar usuários próximos
+  async sendNearByUsers(email: string, nome: string) {
+    const logoContent = await this.getS3File('templates-mail-gloma', 'images/logo.png');
+    const templateContent = (await this.getS3File('templates-mail-gloma', 'templates/change-password.hbs')).toString('utf-8');
+
+    const compiledTemplate = this.compileTemplate(templateContent, {
+      nome: nome.split(' ')[0],
+    });
+
+    await this.mailerService.sendMail({
+      to: email,
+      subject: 'Novo ponto de coleta próximo.',
       html: compiledTemplate,
       attachments: [
         {

@@ -14,10 +14,15 @@ export class CreateManagementDTO{
   @IsNotEmpty({ message: "É obrigatório informar o coordenador."})
   coordinatorId: string;
 
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty({ message: "É obrigatório informar o abrigo."})
+  shelterId: string;
+
   @ApiProperty({ type: String, format: 'date-time', example: '2024-06-17T10:00:00Z' })
   @IsDateString()
   @IsNotEmpty({message: 'É obrigatório informar a data'})
-  collectionData: Date;
+  collectionDate: Date;
 
  
   @ApiProperty()

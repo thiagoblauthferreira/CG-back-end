@@ -9,15 +9,17 @@ export class ResponseDefaultManagement {
   private id: string;
   private collectionData: Date;
   private coordinator: UserResponseDTO;
+  private shelterName: string;
   private collectionPoint: ResponseAddressDTO;
   private needItem?: NeedItem[];
   private needVolunteer?: NeedVolunteers[];
 
   constructor (management: Management){
     this.id = management.id,
-    this.collectionData = management.collectionData,
+    this.collectionData = management.collectionDate,
+    this.shelterName = management.shelter.name,
     this.coordinator = new UserResponseDTO(management.coordinator),
-    this.collectionPoint = new ResponseAddressDTO(management.collectPoint)
+    this.collectionPoint = new ResponseAddressDTO(management.collectPoint),
     this.needItem = management.needItem,
     this.needVolunteer = management.needVolunteer
   }

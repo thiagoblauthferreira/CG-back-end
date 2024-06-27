@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "src/modules/auth/entities/auth.enity";
 import { Repository } from "typeorm";
@@ -12,7 +12,7 @@ export class VerifyIfUserExits {
       )
     {}
    public async verifyIfUserExits(id: string): Promise<User> {
-    
+   
     const user = await this.userRepository.findOne({
       where: { id: id}
     });
@@ -21,6 +21,7 @@ export class VerifyIfUserExits {
       throw new BadRequestException('Usuário não encontrado.');
     }
     return user;
+  
 
   }
 

@@ -17,6 +17,7 @@ async function bootstrap() {
     .addTag('Need-items')
     .addTag('Need-volunteer')
     .addTag('Management')
+    .addTag('Schedule')
     .addTag('Hello World')
     .build();
   const document = SwaggerModule.createDocument(app, config);

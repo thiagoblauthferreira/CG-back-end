@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from "@nestjs/common";
+import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Management } from "./entities/management.entity";
 import { Repository } from "typeorm";
@@ -6,10 +6,15 @@ import { CreateManagementDTO } from "./dto/request/createManagementDTO";
 import { FindNeedsItem } from "./utils/findNeedItem";
 import { FindNeedsVolunteer } from "./utils/findNeedVolunteer";
 import { Address } from "../auth/entities/adress.enity";
-import { EnvConfig } from "src/config";
 import logger from "src/logger";
-import * as opencage from 'opencage-api-client';
 import { VerifyIfUserExits } from "./validators/verifyIfUserExits";
+import { UserNearby } from "./utils/usersNearby";
+import { VerifyIfShelterExits } from "./validators/verifyIfShelterExits";
+import { geoResult } from "./utils/geoResult";
+import { needValidator } from "./validators/needValidator";
+import { createValidator } from "./validators/createValidators";
+import { shelterValidator } from "./validators/shelterValidator";
+import { checkHours } from "./utils/BrasiliaTimeZone";
 
 @Injectable()
 export class ManagementService {
@@ -22,31 +27,37 @@ export class ManagementService {
     private verifyIfUserExists: VerifyIfUserExits,
     @InjectRepository(Address)
     private addressRepository: Repository<Address>,
+    private usersNearby: UserNearby,
+    private verifyIfShelterExits: VerifyIfShelterExits,
   ){}
 
   async create(createManagementDTO: CreateManagementDTO): Promise<Management>{
   try{
    
+    checkHours(createManagementDTO.collectionDate, 1)
+        
     const management = new Management();
-    management.collectionData = createManagementDTO.collectionData;
+    management.collectionDate = createManagementDTO.collectionDate;
 
     const coordinator = await this.verifyIfUserExists.verifyIfUserExits(createManagementDTO.coordinatorId);
+    createValidator(coordinator);
+  
     management.coordinator = coordinator;
+  
+    const shelter = await this.verifyIfShelterExits.verifyIfShelterExits(createManagementDTO.shelterId);
+    shelterValidator(shelter, coordinator)
+    management.shelter = shelter;  
+    
     const address = new Address();
     Object.assign(address, createManagementDTO.collectPoint);
-    const newAddress = await this.addressRepository.save(address);
-    const addressString = `${newAddress.logradouro}, ${newAddress.numero}, ${newAddress.bairro}, ${newAddress.municipio}, ${newAddress.estado}, ${newAddress.pais}`;
-    const geocodeResult = await opencage.geocode({ q: addressString, key: EnvConfig.OPENCAGE.API_KEY });
-    if (geocodeResult.results.length > 0) {
-      const { lat, lng } = geocodeResult.results[0].geometry;
-      newAddress.latitude = lat;
-      newAddress.longitude = lng;
-    }
-    const updatedAddress = await this.addressRepository.save(newAddress);
+    const newAddress = await this.addressRepository.create(address);
+  
+    const addressGeo = await geoResult(newAddress)
+    const updatedAddress   = await this.addressRepository.save(addressGeo)
     management.collectPoint = updatedAddress;
-    management.collectPoint = newAddress;
 
-    return await this.managementRepository.save(management);
+    return await this.managementRepository.save(management)
+    
    } catch (error) {
      logger.error(error);
      throw new InternalServerErrorException('Erro ao registrar.')
@@ -54,33 +65,35 @@ export class ManagementService {
   }
   
   async update(id: string, updates: Partial<CreateManagementDTO>): Promise<Management>{
+   
     const management = await this.findById(id);
     if(!management){
       throw new BadRequestException('Demanda não encontrada.')
     }
-
-    if (updates.collectPoint) {
-      const newAddress = new Address();
-      Object.assign(newAddress, updates.collectPoint);
-  
-      const savedAddress = await this.addressRepository.save(newAddress);
-  
-      const addressString = `${savedAddress.logradouro}, ${savedAddress.numero}, ${savedAddress.bairro}, ${savedAddress.municipio}, ${savedAddress.estado}, ${savedAddress.pais}`;
-  
-      const geocodeResult = await opencage.geocode({ q: addressString, key: EnvConfig.OPENCAGE.API_KEY });
-      
-      if (geocodeResult.results.length > 0) {
-        const { lat, lng } = geocodeResult.results[0].geometry;
-        savedAddress.latitude = lat;
-        savedAddress.longitude = lng;
-      }
-  
-      const updatedAddress = await this.addressRepository.save(savedAddress);
-  
-      management.collectPoint = updatedAddress;
+    if(updates.coordinatorId){
+      throw new UnauthorizedException('O coordenador não pode ser alterado.')
     }
 
-    return await this.managementRepository.save(management)
+    if(updates.shelterId){
+      throw new UnauthorizedException('O abrigo não pode ser alterado.')
+    }
+
+    if(updates.collectionDate){
+      checkHours(updates.collectionDate, 0.5)
+    }
+
+    if (updates.collectPoint) {
+  
+      const address = new Address();
+      Object.assign(address, updates.collectPoint);
+      const newAddress = await this.addressRepository.create(address);  
+      const updatedAddress = await geoResult(newAddress)
+      management.collectPoint = updatedAddress;
+      await this.addressRepository.save(updatedAddress);
+  
+   }
+
+    return await this.managementRepository.save({...management, ...updates})
 
   }
 
@@ -88,7 +101,7 @@ export class ManagementService {
   try {
     const management = await this.managementRepository.findOne({
       where: { id: id },
-      relations: ['coordinator','collectPoint', 'needItem', 'needVolunteer']
+      relations: ['coordinator','collectPoint', 'needItem', 'needVolunteer', 'shelter']
     });
     if(!management){
       return null;
@@ -103,7 +116,7 @@ export class ManagementService {
   async findAll(): Promise<Management[]>{
     try{
    return await this.managementRepository.find({
-    relations: ['coordinator','collectPoint', 'needItem', 'needVolunteer']
+    relations: ['coordinator','collectPoint', 'needItem', 'needVolunteer', 'shelter']
    });
     } catch (error) {
       logger.error(error);
@@ -130,24 +143,33 @@ export class ManagementService {
     try{
 
     const management = await this.findById(managementId);
+    if(!management){
+      throw new BadRequestException('Demanda não encontrada.')
+    }
     
     const needItem = await this.findNeedItem.findNeedItemById(needId);
-    
+    await needValidator(needItem)
     const needVolunteer = await this.findNeedVolunteer.findVolunteerItemById(needId)
-    
-    if(needItem){
-      management.needItem.push(needItem)
+    if(needItem && needVolunteer){
+      throw new BadRequestException("Necessidade não encontrada.")
     }
-    if(needVolunteer){
-      management.needVolunteer.push(needVolunteer)
+    
+    needValidator(needVolunteer)
+    if(management.needVolunteer.some(volunteer => volunteer.id === needVolunteer.id)){
+       management.needVolunteer.push(needVolunteer)  
+       return await this.managementRepository.save(management)    
     }
 
-    return await this.managementRepository.save(management)
-  }catch (error) {
+    if(management.needItem.some(item => item.id === needItem.id)){
+       management.needItem.push(needItem)
+       return await this.managementRepository.save(management)
+     }
+     throw new ConflictException('Necessidade já cadastrada.')
+        
+   }catch (error) {
     logger.error(error);
     throw new InternalServerErrorException('Erro ao registrar.')
   }
-
   }
 
   async removeNeed(managementId: string, needId: string){
@@ -156,12 +178,13 @@ export class ManagementService {
     const management = await this.findById(managementId);
     
     const needItem = await this.findNeedItem.findNeedItemById(needId);
-    
-    const needVolunteer = await this.findNeedVolunteer.findVolunteerItemById(needId)
-    
+
     if(needItem){
       management.needItem = management.needItem.filter(item => item.id !== needItem.id);
     }
+    
+    const needVolunteer = await this.findNeedVolunteer.findVolunteerItemById(needId)
+        
     if(needVolunteer){
       management.needVolunteer = management.needVolunteer.filter(item => item.id !== needVolunteer.id);
     }
@@ -174,4 +197,10 @@ export class ManagementService {
   }
 
   }
+  
+ 
+ 
+
+
+
 }
