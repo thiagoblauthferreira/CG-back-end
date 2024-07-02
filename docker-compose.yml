@@ -1,5 +1,3 @@
-version: '3.7'
-
 services:
   nestjs:
     build:
@@ -22,42 +20,9 @@ services:
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - AWS_REGION=${AWS_REGION}
       - MAIL_FROM=${MAIL_FROM}
+      - NODE_ENV=${NODE_ENV}
     volumes:
       - logs:/app/logs
-      - ./filebeat.yml:/app/filebeat.yml  # Mapeia o arquivo filebeat.yml do host para dentro do container
-      - /var/lib/docker/containers:/var/lib/docker/containers  # Montagem para acessar os logs do Docker
-
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.13.4
-    container_name: elasticsearch
-    environment:
-      - discovery.type=single-node
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
-    ports:
-      - "9200:9200"
-      - "9300:9300"
-    volumes:
-      - esdata:/usr/share/elasticsearch/data
-
-  kibana:
-    image: docker.elastic.co/kibana/kibana:7.13.4
-    container_name: kibana
-    ports:
-      - "5601:5601"
-    depends_on:
-      - elasticsearch
-
-  filebeat:
-    image: docker.elastic.co/beats/filebeat:7.13.4
-    container_name: filebeat
-    user: root  # Define o usuário como root para evitar problemas de permissão
-    volumes:
-      - ./filebeat.yml:/app/filebeat.yml  # Mapeia o arquivo filebeat.yml do host para dentro do container
-      - /var/lib/docker/containers:/var/lib/docker/containers  # Permite acesso aos logs do Docker
-      - /var/run/docker.sock:/var/run/docker.sock  # Permite que o Filebeat monitore os containers Docker
-    depends_on:
-      - nestjs  # Dependência do serviço NestJS
 
 volumes:
   logs:
-  esdata:

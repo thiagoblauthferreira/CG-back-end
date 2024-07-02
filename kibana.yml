@@ -1,0 +1,10 @@
+elasticsearch.hosts: ["http://elasticsearch:9200"]
+xpack.encryptedSavedObjects.encryptionKey: 'E1kP196vyDOi+y/X7I+xbZXxEW/FanzqQskNsbDDy/s='
+xpack.security.encryptionKey: 'a35YYMWEEDdVXBSmptZfWdr2US/tcBFqtJ6Rmybh4Fg='
+xpack.reporting.encryptionKey: '88Xqy5Bp9BIOzPKa9AQj7rGMS7mmyq4Wc5hyLsRvNNI='
+server.ssl.enabled: false
+server.ssl.certificate: /usr/share/kibana/config/certificate.crt
+server.ssl.key: /usr/share/kibana/config/private.pem
+elasticsearch.username: "kibana_system"
+elasticsearch.password: "vinicius"
+

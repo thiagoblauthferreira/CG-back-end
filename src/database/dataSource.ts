@@ -23,6 +23,7 @@ export const dataSourceConfig = (): DataSourceOptions => {
           },
         }
       : {
+    type: "postgres",
           host: EnvConfig.database.HOST_DB,
           port: EnvConfig.database.PORT_DB,
           username: EnvConfig.database.USER_DB,
