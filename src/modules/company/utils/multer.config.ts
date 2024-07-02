@@ -5,19 +5,19 @@ import { configS3 } from './s3Config';
 import { EnvConfig } from "src/config";
 
 
-const multerConfig ={
+const multerConfig = {
     storage: multerS3({
       s3: configS3,
-      bucket: EnvConfig.S3.BUCKET,
+      bucket: EnvConfig.S3.BUCKET, 
       contentType: multerS3.AUTO_CONTENT_TYPE,
       acl: EnvConfig.S3.ACL,
-      key:(req, file, cb) => {
+      key: (req: any, file: { originalname: string; }, cb: (arg0: null, arg1: string) => void) => {
         const fileName = 
          path.parse(file.originalname).name.replace(/\s/g, '') + '-' + uuidv4();
          const extension = path.parse(file.originalname).ext;
          cb(null, `${fileName}${extension}`);
         },
       }),
-    };
+};
 
 export default multerConfig;

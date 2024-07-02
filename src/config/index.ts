@@ -8,11 +8,10 @@ export const EnvConfig = {
         PASSWORD_DB: process.env.PASSWORD_DB,
         NAME_DB: process.env.NAME_DB,
         URL: process.env.URL_DATABASE,        
-
     },
     OPENCAGE: {
         API_KEY: process.env.OPENCAGE_API_KEY
-    },
+    }, 
     S3: {
         REGION: process.env.REGION,
         ACCESS_KEY_ID: process.env.ACCESSKEYID,

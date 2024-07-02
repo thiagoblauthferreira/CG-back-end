@@ -18,9 +18,7 @@ export const dataSourceConfig = (): DataSourceOptions => {
       ? {
           url: EnvConfig.database.URL,
           synchronize: false,
-          ssl: {
-            rejectUnauthorized: false,
-          },
+          ssl: false
         }
       : {
           host: EnvConfig.database.HOST_DB,
@@ -29,9 +27,7 @@ export const dataSourceConfig = (): DataSourceOptions => {
           password: EnvConfig.database.PASSWORD_DB,
           database: EnvConfig.database.NAME_DB,
           synchronize: true,
-          ssl: {
-            rejectUnauthorized: false,
-          },
+          ssl: false
         }),
     entities: [User, Address, Shelter, DistribuitionPoints, Products,  NeedItem, NeedVolunteers, Company,FileEntity],
   };

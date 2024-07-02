@@ -14,7 +14,7 @@ import { EnvConfig } from 'src/config';
     TypeOrmModule.forFeature([User, Address]),
     CompanyModule,
     JwtModule.register({
-      secret: EnvConfig.JWT_SECRET,
+      secret: EnvConfig.JWT_SECRET.JWT_SECRET,
       signOptions: { expiresIn: '7d' }, 
     }),
     MailModule,

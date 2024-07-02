@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
-=======
-import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
->>>>>>> 5894575a19bb60d14e0f92fccb3c5c9818ba3454
+import { ConflictException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Status, User } from './entities/auth.enity';
@@ -15,15 +11,12 @@ import { EnvConfig } from 'src/config';
 import { JwtPayload } from './payload/jwt.payload';
 import { JwtService } from '@nestjs/jwt';
 import logger from 'src/logger';
-<<<<<<< HEAD
 import { CompanyService } from '../company/company.service';
-=======
 import { MailService } from '../mail/mail.service';
 import { SendMailActivationUserDto } from '../mail/dto/sendmailactivationuser.dto';
 import { ResetPasswordDto } from './dto/resetpassword.dto';
 import { SendMailResetPasswordDto } from '../mail/dto/sendmailresetpassword.dto';
 import { ChangePasswordDto } from './dto/changepassword.dto';
->>>>>>> 5894575a19bb60d14e0f92fccb3c5c9818ba3454
 
 @Injectable()
 export class AuthService {
@@ -33,14 +26,9 @@ export class AuthService {
     @InjectRepository(Address)
     private addressRepository: Repository<Address>,
     private jwtService: JwtService,
-<<<<<<< HEAD
-    private companyService: CompanyService
-  ) {}
-=======
+    private companyService: CompanyService,
     private mailService: MailService,
   ) { }
->>>>>>> 5894575a19bb60d14e0f92fccb3c5c9818ba3454
-
 
   async validateUser(payload: JwtPayload) {
 
@@ -244,26 +232,7 @@ export class AuthService {
     return updatedUser;
   }
 
-  public async authenticate(email: string, password: string) {
-    const user = await this.usersRepository.findOne({ where: { email: email.toLowerCase() } });
 
-    if (!user) {
-      throw new NotFoundException("Usuário não encontrado");
-    }
-
-    const passwordMatches = await compare(password, user.password);
-
-    if (!passwordMatches) {
-      throw new NotFoundException("Senhas não coincidem");
-    }
-
-    const payload = { username: user.username, sub: user.id, roles: user.roles };
-    const token = this.jwtService.sign(payload);
-
-    return { token };
-  }
-<<<<<<< HEAD
-*/
 public async authenticate(email: string, password: string) {
  
   const user = await this.usersRepository.findOne({ where: { email: email.toLowerCase() } });
@@ -299,8 +268,6 @@ public async authenticate(email: string, password: string) {
 
   return { token };
 }
-=======
->>>>>>> 5894575a19bb60d14e0f92fccb3c5c9818ba3454
   public async findNearbyUsers(userId: string, radius: number) {
     const user = await this.usersRepository.findOne({
       where: { id: userId },

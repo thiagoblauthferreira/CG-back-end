@@ -23,7 +23,6 @@ export class CompanyService {
     private addressRepository: Repository<Address>,
     private jwtService: JwtService,
     private fileService: FilesService,
-    
 
   ){}
 

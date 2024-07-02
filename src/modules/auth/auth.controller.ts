@@ -15,7 +15,7 @@ import { CreateUserDto } from './dto/auth.dto';
 import { HttpStatus } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { LoginDto } from './dto/login.dto';
-import { ApiBearerAuth, ApiBody, ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
 import { MailService } from '../mail/mail.service';
 import { ChangePasswordDto } from './dto/changepassword.dto';
 import { ResetPasswordDto } from './dto/resetpassword.dto';
@@ -32,16 +32,10 @@ export class AuthController {
   }
 
   @Get('/me')
-<<<<<<< HEAD
-  @UseGuards(AuthGuard('jwt')) 
-  async getProfile(@Request() req) {
-    const user = await this.authService.getProfile(req.user.sub);
-=======
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   async getProfile(@Request() req: any) {
     const user = await this.authService.getProfile(req.user.id);
->>>>>>> 5894575a19bb60d14e0f92fccb3c5c9818ba3454
     return { status: HttpStatus.OK, data: user };
   }
 

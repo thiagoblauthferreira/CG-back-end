@@ -37,7 +37,7 @@ export default class CompanyController {
 
   @Get('/profile')
   @UseGuards(AuthGuard('jwt'))
-  async findById(@Request() req) {
+  async findById(@Request() req: any) {
    const company = await this.companyService.profile(req.user.sub);
    return  { status: HttpStatus.OK, data: new DefaultCompanyResponserDTO(company) };
   }
