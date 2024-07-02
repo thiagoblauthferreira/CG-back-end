@@ -5,6 +5,7 @@ import * as http from 'http';
 import * as https from 'https';
 import { AppModule } from './app.module';
 import { corsOptions } from './config/cors.options';
+import { appConfig } from './config/app.config';
 import { EnvConfig } from './config';
 
 async function bootstrap() {
@@ -18,11 +19,16 @@ async function bootstrap() {
     .addBearerAuth({ type: "http", scheme: "bearer", bearerFormat: "JWT" })
     .addTag('Auth')
     .addTag('Shelter')
+    .addTag('Hello World')
+    .addTag('Distribution points')
+    .addTag('Products')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/document', app, document);
 
-  if(EnvConfig.ENV !== "production") return app.listen(8080);
+  SwaggerModule.setup('api/document', app, document);
+  appConfig(app);
+
+  if (EnvConfig.ENV !== "production") return app.listen(8080);
 
   const certPath = './certificados/certificado.crt';
   const keyPath = './certificados/chave-privada.pem';
@@ -44,6 +50,7 @@ async function bootstrap() {
     res.writeHead(301, { Location: `https://${req.headers.host}${req.url}` });
     res.end();
   }).listen(80);
+
 }
 
 bootstrap();

@@ -24,3 +24,6 @@ export const mailConfig: MailerOptions = {
     },
   },
 };
+
+// henrique.florencio307@gmail.com
+// senhaForte
