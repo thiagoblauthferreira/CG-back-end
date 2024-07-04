@@ -22,7 +22,6 @@ import { VerifyIfShelterExits } from "./validators/verifyIfShelterExits";
     TypeOrmModule.forFeature([Management, NeedItem, NeedVolunteers, Address, User, Shelter]),
     forwardRef(() => NeedModule),
     forwardRef(() => Shelter),
-    ScheduleModule.forRoot(),
     ScheduleModule,
     MailModule
   ],

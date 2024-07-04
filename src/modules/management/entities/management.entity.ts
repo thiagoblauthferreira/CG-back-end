@@ -3,8 +3,8 @@ import { User } from "src/modules/auth/entities/auth.enity";
 import { NeedItem } from "src/modules/need/entities/needItems.entity";
 import { NeedVolunteers } from "src/modules/need/entities/needVolunteers.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { Schedule } from "./schedule.entity";
 import { Shelter } from "src/modules/shelter/entities/shelter.entity";
+import { EmailQueue } from "src/modules/schedule/entity/emailQueue.entity";
 
 @Entity()
 export class Management {
@@ -35,8 +35,11 @@ export class Management {
   @JoinTable()
   needVolunteer?: NeedVolunteers[];
 
-  @OneToMany(() => Schedule, (schedule) => schedule.management)
-  schedule: Schedule[]; 
+  @OneToMany(() => EmailQueue, (emailQueue) => emailQueue.management)
+  emailQueue: EmailQueue[]; 
+
+  @Column({ default: false })
+  processed: boolean;
   
   @CreateDateColumn()
   createdAt: Date;

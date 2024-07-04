@@ -90,9 +90,7 @@ export class ManagementService {
       const updatedAddress = await geoResult(newAddress)
       management.collectPoint = updatedAddress;
       await this.addressRepository.save(updatedAddress);
-  
-   }
-
+  }
     return await this.managementRepository.save({...management, ...updates})
 
   }
@@ -123,7 +121,7 @@ export class ManagementService {
       throw new InternalServerErrorException('Erro ao realizar a pesquisa.')
     }
   }
-   async delete(id: string){
+  async delete(id: string){
       try {
         const demand = await this.findById(id);
         if(!demand){       
@@ -198,9 +196,6 @@ export class ManagementService {
 
   }
   
- 
- 
-
-
+  
 
 }

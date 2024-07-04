@@ -14,9 +14,4 @@ export class CreateScheduleDTO{
   @IsNotEmpty({ message: "É obrigatório informar a hora antecedente." })
   hoursBefore: number;
 
-  @ApiProperty()
-  @IsNumber({}, { message: "O raio de busca deve ser um número válido." })
-  @IsNotEmpty({ message: "É obrigatório informar o raio de busca." })
-  radius: number;
-  
 }

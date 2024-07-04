@@ -1,126 +1,117 @@
-import { Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
-import { Cron } from "@nestjs/schedule";
-import { CreateScheduleDTO } from "../management/dto/request/createSchenduleDTO";
+import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import { Cron, CronExpression } from "@nestjs/schedule";
 import logger from "src/logger";
-import { Schedule } from "./schedule.module";
-import { CronJob } from 'cron';
+import { InjectRepository } from "@nestjs/typeorm";
+import { Management } from "../management/entities/management.entity";
+import { Repository } from "typeorm";
+import { EmailQueue } from "./entity/emailQueue.entity";
+import { UserNearby } from "./helpers/usersNearby";
+
 
 @Injectable()
 export class ScheduleService {
-  private readonly logger = new Logger(ScheduleService.name);
-  managementRepository: any;
-  scheduleService: any;
-
-  @Cron('45 * * * * *')
-  handleCron() {
-    this.logger.debug('Called when the current second is 45');
-  }
-
-
-  /*async sendEmailByNearbyBackup(id: string): Promise<void>{ 
-    try{
-      const admin = await this.verifyIfUserExists.verifyIfUserExits(id);
-   
-      if (!admin.roles.some(role => role === 'admin')) {
-        throw new ForbiddenException('Sem autorização para fazer o backup.');
-      }
-     const schedules = await this.scheduleService.findAll();
-    
-      schedules.forEach(async s => {
-          await this.sendEmailsJob(s);
-      })
-  }
-   catch (error) {
-    logger.error(error);
-    throw new InternalServerErrorException('Erro ao enviar as notificações.')
-  }
-    
-  }
-
-  async sendEmailByNearby(createScheduleDTO: CreateScheduleDTO): Promise<void> {
-    try {
-      const id = createScheduleDTO.managementId;
-      const management = await this.managementRepository.findOne({
-        where: { id: id },
-        relations: ["collectPoint"]
-      });
-  
-      if (!management) {
-        throw new NotFoundException('Demanda não encontrada.');
-      }
-  
-      const schedule = await this.scheduleService.create(createScheduleDTO, management);
-      await this.sendEmailsJob(schedule);
-    } catch (error) {
-      logger.error(error);
-      throw new InternalServerErrorException('Erro ao enviar as notificações.');
-    }
-  }
-
-  private async sendEmailsJob(schedule: Schedule) {
-    try {
-      const job = new CronJob(schedule.scheduleTime, async () => {
-        try {
-          const nearbyUsers = await this.usersNearby.usersNearby(schedule.management, schedule.radius);
-  
-          const emailPromises = nearbyUsers.map(async user => {
-            console.log(user.email);
-          //  await this.mailService.sendNearByUsers(user.email, user.name); // Linha descomentada
-          });
-  
-          await Promise.all(emailPromises);
-  
-          logger.info(`CronJob executado para ${schedule.scheduleTime} com ID job_${schedule.targetDate.getTime()}`);
-        } catch (error) {
-          logger.error('Erro ao executar tarefa agendada:', error);
-          throw new InternalServerErrorException('Erro ao enviar e-mails para usuários próximos.');
-        }
-      });
-  
-      this.schedulerRegistry.addCronJob(`job_${schedule.targetDate.getTime()}`, job);
-  
-      logger.info(`CronJob agendado para ${schedule.scheduleTime} com ID job_${schedule.targetDate.getTime()}`);
-  
-      job.start();
-    } catch (error) {
-      logger.error('Erro ao configurar a tarefa agendada:', error);
-      throw new InternalServerErrorException('Erro ao configurar a tarefa agendada.');
-    }
-
-
-    @Injectable()
-export class ScheduleService {
+  private readonly qtdEmails = 200;
   constructor(
-    @InjectRepository(Schedule)
-    private scheduledJobRepository: Repository<Schedule>,
+    @InjectRepository(Management)
+    private managementRepository: Repository<Management>,
+    @InjectRepository(EmailQueue)
+    private emailRepository: Repository<EmailQueue>,
+    private usersNearby: UserNearby
   ){}
 
-  async create(createScheduleDTO: CreateScheduleDTO, management: Management){
-   const targetDate = management.collectionDate;
-   const scheduleTime = new Date(targetDate.getTime() - createScheduleDTO.hoursBefore * 60 * 60 * 1000);
-   if (scheduleTime >= management.collectionDate) {
-     throw new UnprocessableEntityException('A data de envio do e-mail deve ser informada pelo menos 1h antes.');
+  
+
+  @Cron(CronExpression.EVERY_HOUR)
+  async sendEmailQueue() {
+    try{
+      logger.info(`Start sending ${this.qtdEmails} emails every hour.`)
+    const emails: EmailQueue[] = await this.imminentDemand();
+
+      if(!emails || emails.length === 0){
+        logger.info("No emails to send.");
+        return
+      }
+
+    for (const email of await emails){
+      const userName = email.user.name;
+      const userEmail = email.user.email;
+      const collectionDate = email.management.collectionDate;
+      const collectPoint = email.management.collectPoint;
+
+      await console.log(userEmail, `Coleta Agendada - ${collectionDate}`, `Olá ${userName}, sua coleta está agendada para ${collectionDate} no ponto ${collectPoint}.`);
+    
+      email.processed = true;
+      await this.emailRepository.save(email);
+      logger.info(`E-mail sent to ${userName} (${userEmail})`);
+    }
+
+    logger.info(`End the send ${this.qtdEmails} e-mails every hour`)
+
+  }catch (error) {
+    logger.error(error);
+    throw new InternalServerErrorException('Error while sent.' + error)
+  }
+  }
+  //a cada dois dias, enviar em array.
+  @Cron(CronExpression.EVERY_MINUTE)
+  async addUserInQueue(): Promise<void>{
+    try{
+    const demand = await this.recentDemand()
+    
+    if(!demand){
+      logger.info("No scheduled demands.");
+      return
+    }
+    console.log(demand)
+    
+    const users = await this.usersNearby.usersNearby(demand);
+
+    if(!users || users.length === 0){
+      logger.info("No users nearby.");
+      return
+    }
+  
+      for (const user of users){
+         const emailQueue = new EmailQueue();
+         emailQueue.date = demand.collectionDate;
+         emailQueue.management = demand;
+         emailQueue.user = user;
+         await this.emailRepository.save(emailQueue)
+         logger.info(`"User ${user.name} added to the queue.`);
+      }
+      demand.processed = true;
+
+      await this.managementRepository.save(demand);
+    }catch (error) {
+      logger.error(error);
+      
+      throw new InternalServerErrorException("Error processing users." + error)
+    }
+
    }
-   const schedule = new Schedule()
-   schedule.management = management;
-   schedule.targetDate = targetDate;
-   schedule.date = management.collectionDate;
-   schedule.hoursBefore = createScheduleDTO.hoursBefore;
-   schedule.scheduleTime = scheduleTime;
-   schedule.radius = createScheduleDTO.radius;
-   return await this.scheduledJobRepository.save(schedule);
- 
+
+  private  async recentDemand(): Promise<Management>{
+    return await this.managementRepository
+      .createQueryBuilder('demand')
+      .where('demand.processed = :processed', {processed: false})
+      .orderBy('demand.createdAt', 'ASC')
+      .getOne()
   }
 
-  async findAll(){
-    const date = new Date();
-    return await this.scheduledJobRepository.createQueryBuilder('schedule')
-      .where('schedule.sent = :status', { status: false })
-      .andWhere('schedule.scheduleTime > :date', { date: date })
-      .getMany()
-   }
+  async imminentDemand(): Promise<EmailQueue[]> {
+    const now = new Date();
+    const twentyFourHoursLater = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
-}
-  }*/
+    const demandList = await this.emailRepository
+      .createQueryBuilder('demand')
+      .where('demand.processed = :processed', { processed: false })
+      .andWhere('demand.date BETWEEN :now AND :twentyFourHoursLater', { now, twentyFourHoursLater })
+      .orderBy('demand.createdAt', 'ASC') 
+      .take(this.qtdEmails)
+      .getMany(); 
+
+    return demandList;
+  }
+
 
 }

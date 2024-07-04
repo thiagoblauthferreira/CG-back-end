@@ -6,7 +6,7 @@ import { Shelter } from "src/modules/shelter/entities/shelter.entity";
 import { Management } from "src/modules/management/entities/management.entity";
 import { NeedItem } from "src/modules/need/entities/needItems.entity";
 import { NeedVolunteers } from "src/modules/need/entities/needVolunteers.entity";
-import { Schedule } from "src/modules/schedule/schedule.module";
+import { EmailQueue } from "src/modules/schedule/entity/emailQueue.entity";
 
 export const dataSourceConfig = (): DataSourceOptions => {
   return {
@@ -28,7 +28,7 @@ export const dataSourceConfig = (): DataSourceOptions => {
       NeedItem,
       NeedVolunteers,
       Shelter,
-      Schedule
+      EmailQueue
     ],
   };
 };

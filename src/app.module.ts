@@ -9,7 +9,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ManagementModule } from './modules/management/management.module';
 import { NeedModule } from './modules/need/need.module';
-import { ScheduleModule } from '@nestjs/schedule';
+import { Schedule } from './modules/schedule/schedule.module';
 
 @Module({
   imports: [
@@ -17,7 +17,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     AuthModule,
     ShelterModule,
     ManagementModule,
-    ScheduleModule,
+    Schedule,
     NeedModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'src', 'assets'),

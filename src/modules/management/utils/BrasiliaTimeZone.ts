@@ -1,5 +1,5 @@
 import { NotAcceptableException } from "@nestjs/common";
-//You must pass the deadline date and time to schedule the shipment
+//You must pass the deadline date and time to schedule the shipment and 1 = 1h or 0.5 = 30m
 export function checkHours(collectionDate: Date, difference: number){
   
   const date = new Date();
@@ -9,7 +9,9 @@ export function checkHours(collectionDate: Date, difference: number){
   const diffHours = Math.ceil(timeHours / (1000 * 3600));
 
   if(diffHours < difference){
-    throw new NotAcceptableException(`A data de agendamento não pode ser menor que ${difference}h.`)
+    let response = ""
+    difference == 1 ? response = "01:00" : response = "00:30"
+    throw new NotAcceptableException(`A data de agendamento não pode ser menor que ${response}h.`)
   }
   
 }
