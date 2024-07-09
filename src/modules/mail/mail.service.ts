@@ -4,6 +4,7 @@ import * as AWS from 'aws-sdk';
 import * as Handlebars from 'handlebars';
 import { SendMailActivationUserDto } from './dto/sendmailactivationuser.dto';
 import { SendMailResetPasswordDto } from './dto/sendmailresetpassword.dto';
+import { Address } from '../auth/entities/adress.enity';
 
 @Injectable()
 export class MailService {
@@ -94,12 +95,20 @@ export class MailService {
   }
 
   //email para notificar usuários próximos
-  async sendNearByUsers(email: string, nome: string) {
+  async sendNearByUsers(name, email, collectionDate: string, collectionPoint: Address) {
     const logoContent = await this.getS3File('templates-mail-gloma', 'images/logo.png');
-    const templateContent = (await this.getS3File('templates-mail-gloma', 'templates/change-password.hbs')).toString('utf-8');
+    const templateContent = (await this.getS3File('templates-mail-gloma', 'templates/users-nearby.hbs')).toString('utf-8');
 
     const compiledTemplate = this.compileTemplate(templateContent, {
-      nome: nome.split(' ')[0],
+      shelterName: name,
+      date: collectionDate,
+      street: collectionPoint.logradouro,
+      number:   collectionPoint.numero,
+      neighborhood: collectionPoint.bairro,
+      city: collectionPoint.municipio,
+      state: collectionPoint.estado,
+      complement: collectionPoint.complemento,
+      cep: collectionPoint.cep
     });
 
     await this.mailerService.sendMail({

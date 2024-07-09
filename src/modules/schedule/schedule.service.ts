@@ -6,6 +6,7 @@ import { Management } from "../management/entities/management.entity";
 import { Repository } from "typeorm";
 import { EmailQueue } from "./entity/emailQueue.entity";
 import { UserNearby } from "./helpers/usersNearby";
+import { MailService } from "../mail/mail.service";
 
 
 
@@ -17,7 +18,8 @@ export class ScheduleService {
     private managementRepository: Repository<Management>,
     @InjectRepository(EmailQueue)
     private emailRepository: Repository<EmailQueue>,
-    private usersNearby: UserNearby
+    private usersNearby: UserNearby,
+    private mailService: MailService,
   ){}
 
   
@@ -38,8 +40,11 @@ export class ScheduleService {
       const userEmail = email.email;
       const collectionDate = email.management.collectionDate;
       const collectPoint = email.management.collectPoint;
+     
+      const localeDate = collectionDate.toLocaleString('pt-BR');
 
-      await console.log(userEmail, `Coleta Agendada - ${collectionDate}`, `Olá ${userName}, sua coleta está agendada para ${collectionDate} no ponto ${collectPoint}.`);
+      await this.mailService.sendNearByUsers(userName, userEmail, localeDate, collectPoint)
+      await console.log(`Send e-mail to ${userName}.`);
     
       email.processed = true;
       await this.emailRepository.save(email);
@@ -123,4 +128,8 @@ export class ScheduleService {
   }
 
 
+}
+
+function sendNearByUsers() {
+  throw new Error("Function not implemented.");
 }
