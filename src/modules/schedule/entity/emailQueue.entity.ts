@@ -1,11 +1,11 @@
-import { User } from "src/modules/auth/entities/auth.enity";
 import { Management } from "src/modules/management/entities/management.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 
 @Entity()
 export class EmailQueue {
-  @PrimaryGeneratedColumn()
+
+  @PrimaryGeneratedColumn('uuid')
   id: number;
 
   @Column()
@@ -14,11 +14,14 @@ export class EmailQueue {
   @Column({ default: false })
   processed: boolean;
 
-  @ManyToOne(() => User)
-  user: User;
+  @Column()
+  name: string;
+
+  @Column()
+  email: string;
 
   @ManyToOne(() => Management, management => management.emailQueue)
-  @JoinColumn({ name: "management_id" })
+  @JoinColumn()
   management: Management;
 
   @CreateDateColumn()

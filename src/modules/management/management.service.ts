@@ -13,7 +13,6 @@ import { VerifyIfShelterExits } from "./validators/verifyIfShelterExits";
 import { geoResult } from "./utils/geoResult";
 import { needValidator } from "./validators/needValidator";
 import { createValidator } from "./validators/createValidators";
-import { shelterValidator } from "./validators/shelterValidator";
 import { checkHours } from "./utils/BrasiliaTimeZone";
 
 @Injectable()
@@ -34,8 +33,8 @@ export class ManagementService {
   async create(createManagementDTO: CreateManagementDTO): Promise<Management>{
   try{
    
-    checkHours(createManagementDTO.collectionDate, 1)
-        
+    checkHours(createManagementDTO.collectionDate)
+           
     const management = new Management();
     management.collectionDate = createManagementDTO.collectionDate;
 
@@ -45,7 +44,6 @@ export class ManagementService {
     management.coordinator = coordinator;
   
     const shelter = await this.verifyIfShelterExits.verifyIfShelterExits(createManagementDTO.shelterId);
-    shelterValidator(shelter, coordinator)
     management.shelter = shelter;  
     
     const address = new Address();
@@ -79,7 +77,7 @@ export class ManagementService {
     }
 
     if(updates.collectionDate){
-      checkHours(updates.collectionDate, 0.5)
+      checkHours(updates.collectionDate)
     }
 
     if (updates.collectPoint) {
@@ -99,7 +97,7 @@ export class ManagementService {
   try {
     const management = await this.managementRepository.findOne({
       where: { id: id },
-      relations: ['coordinator','collectPoint', 'needItem', 'needVolunteer', 'shelter']
+      relations: ['coordinator','collectPoint', 'needItem', 'needVolunteer', 'shelter', 'emailQueue']
     });
     if(!management){
       return null;

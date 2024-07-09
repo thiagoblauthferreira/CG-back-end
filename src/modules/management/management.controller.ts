@@ -57,9 +57,4 @@ export class ManagementController {
    return await this.managementService.removeNeed(managementId, needId);
   }
 
-  /*@Post('/agendar-notificacoes')
-  async toSchedule(@Body() createScheduleDTO: CreateScheduleDTO) {
-    await this.managementService.sendEmailByNearby(createScheduleDTO);
-    return {message: "Envio agendado com sucesso."}
-  }*/
 }

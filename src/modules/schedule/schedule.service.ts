@@ -8,6 +8,7 @@ import { EmailQueue } from "./entity/emailQueue.entity";
 import { UserNearby } from "./helpers/usersNearby";
 
 
+
 @Injectable()
 export class ScheduleService {
   private readonly qtdEmails = 200;
@@ -21,11 +22,11 @@ export class ScheduleService {
 
   
 
-  @Cron(CronExpression.EVERY_HOUR)
+  @Cron(CronExpression.EVERY_MINUTE)
   async sendEmailQueue() {
     try{
       logger.info(`Start sending ${this.qtdEmails} emails every hour.`)
-    const emails: EmailQueue[] = await this.imminentDemand();
+      const emails: EmailQueue[] = await this.imminentDemand();
 
       if(!emails || emails.length === 0){
         logger.info("No emails to send.");
@@ -33,8 +34,8 @@ export class ScheduleService {
       }
 
     for (const email of await emails){
-      const userName = email.user.name;
-      const userEmail = email.user.email;
+      const userName = email.name;
+      const userEmail = email.email;
       const collectionDate = email.management.collectionDate;
       const collectPoint = email.management.collectPoint;
 
@@ -57,31 +58,39 @@ export class ScheduleService {
   async addUserInQueue(): Promise<void>{
     try{
     const demand = await this.recentDemand()
-    
+      
     if(!demand){
       logger.info("No scheduled demands.");
       return
     }
-    console.log(demand)
     
     const users = await this.usersNearby.usersNearby(demand);
-
+  
     if(!users || users.length === 0){
       logger.info("No users nearby.");
       return
     }
   
-      for (const user of users){
-         const emailQueue = new EmailQueue();
-         emailQueue.date = demand.collectionDate;
-         emailQueue.management = demand;
-         emailQueue.user = user;
-         await this.emailRepository.save(emailQueue)
-         logger.info(`"User ${user.name} added to the queue.`);
-      }
-      demand.processed = true;
+    for (const user of users) {
+      const emailQueue = this.emailRepository.create({
+        date: demand.collectionDate,
+        management: demand,
+        name: user.name,
+        email: user.email,
+        processed: false
+      });
 
-      await this.managementRepository.save(demand);
+      try {
+        await this.emailRepository.save(emailQueue);
+        logger.info(`User ${user.name} add in queue.`);
+      } catch (saveError) {
+       logger.info('Erro to save in queue:', saveError);
+        throw new InternalServerErrorException('Erro to save in queue: ' + saveError);
+      }
+    }
+      demand.processed = true;
+      await this.managementRepository.save(demand)
+    
     }catch (error) {
       logger.error(error);
       
@@ -93,24 +102,24 @@ export class ScheduleService {
   private  async recentDemand(): Promise<Management>{
     return await this.managementRepository
       .createQueryBuilder('demand')
+      .leftJoinAndSelect('demand.collectPoint', 'collectPoint')
+      .leftJoinAndSelect('demand.shelter', 'shelter')
       .where('demand.processed = :processed', {processed: false})
       .orderBy('demand.createdAt', 'ASC')
       .getOne()
   }
 
   async imminentDemand(): Promise<EmailQueue[]> {
-    const now = new Date();
-    const twentyFourHoursLater = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
     const demandList = await this.emailRepository
-      .createQueryBuilder('demand')
-      .where('demand.processed = :processed', { processed: false })
-      .andWhere('demand.date BETWEEN :now AND :twentyFourHoursLater', { now, twentyFourHoursLater })
-      .orderBy('demand.createdAt', 'ASC') 
-      .take(this.qtdEmails)
-      .getMany(); 
+    .createQueryBuilder('demand')
+    .leftJoinAndSelect('demand.management', 'management')
+    .andWhere('demand.processed = :processed', { processed: false })
+    .orderBy('demand.createdAt', 'ASC') 
+    .take(this.qtdEmails)
+    .getMany();
 
-    return demandList;
+  return demandList;
   }
 
 

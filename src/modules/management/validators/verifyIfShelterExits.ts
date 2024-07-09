@@ -14,7 +14,8 @@ export class VerifyIfShelterExits {
    public async verifyIfShelterExits(id: string): Promise<Shelter> {
     
     const shelter = await this.shelterRepository.findOne({
-      where: { id: id}
+      where: { id: id},
+      relations: ['coordinators']
     });
   
     if(!shelter){

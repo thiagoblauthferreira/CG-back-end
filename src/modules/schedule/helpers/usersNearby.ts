@@ -1,6 +1,5 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import logger from "src/logger";
 import { Status, User } from "src/modules/auth/entities/auth.enity";
 import { Management } from "src/modules/management/entities/management.entity";
 import { Repository } from "typeorm";
@@ -36,17 +35,4 @@ export class UserNearby {
         return await query.getMany();
     }
 
-    /*
-      .createQueryBuilder("user")
-      .select(["user.id", "user.name", "user.username", "user.phone", "user.birthDate", "user.isDonor", "user.isCoordinator", "user.roles", "user.status"]) // Select only the fields you want to return
-      .addSelect(["address.latitude", "address.longitude"]) // Select only the fields you want from the address
-      .leftJoin("user.address", "address")
-      .where(`6371 * acos(cos(radians(:userLatitude)) * cos(radians(address.latitude)) * cos(radians(address.longitude) - radians(:userLongitude)) + sin(radians(:userLatitude)) * sin(radians(address.latitude))) < :radius`, {
-        userLatitude,
-        userLongitude,
-        radius
-      })
-      .andWhere("user.id != :userId", { userId });
-    
-    */
-}
+  }

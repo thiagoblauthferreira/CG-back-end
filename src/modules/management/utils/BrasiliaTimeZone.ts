@@ -1,17 +1,20 @@
-import { NotAcceptableException } from "@nestjs/common";
-//You must pass the deadline date and time to schedule the shipment and 1 = 1h or 0.5 = 30m
-export function checkHours(collectionDate: Date, difference: number){
-  
-  const date = new Date();
-  const option = { timeZone: 'America/Sao_Paulo' };
-  const dateBrasilia = new Date(date.toLocaleString('pt-Br', option))
-  const timeHours = Math.abs(dateBrasilia.getTime() - collectionDate.getTime())
-  const diffHours = Math.ceil(timeHours / (1000 * 3600));
+import * as moment from 'moment-timezone';
 
-  if(diffHours < difference){
-    let response = ""
-    difference == 1 ? response = "01:00" : response = "00:30"
-    throw new NotAcceptableException(`A data de agendamento não pode ser menor que ${response}h.`)
+import { NotAcceptableException } from "@nestjs/common";
+
+export function checkHours(collectionDate: Date) {
+ if (typeof collectionDate === 'string') {
+    collectionDate = new Date(collectionDate);
   }
-  
+   
+  const dataBrasilia = moment.tz('America/Sao_Paulo');
+   
+  const collectionDateMoment = moment.utc(collectionDate).utcOffset('-03:00').add(3, 'hours');
+
+  const dataMinimaColeta = dataBrasilia.clone().add(1, 'hour');
+
+    if (collectionDateMoment.isBefore(dataMinimaColeta)) {
+    throw new NotAcceptableException('A data da coleta deve ter pelo menos uma hora após a data atual.');
+  }
+   
 }
