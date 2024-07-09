@@ -130,6 +130,3 @@ export class ScheduleService {
 
 }
 
-function sendNearByUsers() {
-  throw new Error("Function not implemented.");
-}
