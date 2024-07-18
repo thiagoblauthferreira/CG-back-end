@@ -14,7 +14,7 @@ import { Products } from 'src/modules/products/entities/product.entity';
 export const dataSourceConfig = (): DataSourceOptions => {
   return {
     type: 'postgres',
-    ...(EnvConfig.ENV === 'production'
+    ...(EnvConfig.ENV != 'production'
       ? {
           url: EnvConfig.database.URL,
           synchronize: false,
