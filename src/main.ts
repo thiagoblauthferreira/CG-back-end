@@ -5,7 +5,6 @@ import { corsOptions } from './config/cors.options';
 import * as fs from 'fs';
 import * as https from 'https';
 import * as http from 'http';
-import { ValidationPipe } from '@nestjs/common';
 import { appConfig } from './config/app.config';
 import { EnvConfig } from './config';
 
@@ -16,7 +15,7 @@ async function bootstrap() {
     .setTitle('Coletivo Gloma - API')
     .setDescription('Coletivo Gloma')
     .setVersion('1.0')
-    .addBearerAuth({ type: "http", scheme: "bearer", bearerFormat: "JWT" })
+    .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' })
     .addTag('Auth')
     .addTag('Shelter')
     .addTag('Hello World')
@@ -25,7 +24,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
   appConfig(app);
 
-  if (EnvConfig.ENV === "development") return app.listen(8080);
+  if (EnvConfig.ENV === 'development') return app.listen(8080);
 
   const certPath = './certificados/certificado.crt';
   const keyPath = './certificados/chave-privada.pem';
@@ -35,14 +34,18 @@ async function bootstrap() {
   const httpsOptions = {
     cert: cert,
     key: key,
-    passphrase: 'gloma'
+    passphrase: 'gloma',
   };
-  const server = https.createServer(httpsOptions, app.getHttpAdapter().getInstance());
+  const server = https.createServer(
+    httpsOptions,
+    app.getHttpAdapter().getInstance(),
+  );
   server.listen(443);
-  http.createServer((req, res) => {
-
-    res.writeHead(301, { Location: `https://${req.headers.host}${req.url}` });
-    res.end();
-  }).listen(80);
+  http
+    .createServer((req, res) => {
+      res.writeHead(301, { Location: `https://${req.headers.host}${req.url}` });
+      res.end();
+    })
+    .listen(80);
 }
 bootstrap();
