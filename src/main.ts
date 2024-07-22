@@ -24,8 +24,6 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
   appConfig(app);
 
-  if (EnvConfig.ENV === 'development') return app.listen(8080);
-
   const certPath = './certificados/certificado.crt';
   const keyPath = './certificados/chave-privada.pem';
   const cert = fs.readFileSync(certPath);
@@ -47,5 +45,6 @@ async function bootstrap() {
       res.end();
     })
     .listen(80);
+    
 }
 bootstrap();
