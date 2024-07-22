@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { corsOptions } from './config/cors.options';
 import * as fs from 'fs';
@@ -10,6 +10,7 @@ import { EnvConfig } from './config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: corsOptions });
+  app.setGlobalPrefix('api');
 
   const config = new DocumentBuilder()
     .setTitle('Coletivo Gloma - API')
@@ -19,9 +20,12 @@ async function bootstrap() {
     .addTag('Auth')
     .addTag('Shelter')
     .addTag('Hello World')
+    .addTag('Distribution points')
+    .addTag('Products')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+
+  SwaggerModule.setup('api/document', app, document);
   appConfig(app);
   if (EnvConfig.ENV !== "production") {
 
@@ -55,4 +59,5 @@ async function bootstrap() {
       .listen(80);
   }
 }
+
 bootstrap();

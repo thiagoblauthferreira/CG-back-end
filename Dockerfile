@@ -10,6 +10,8 @@ COPY . .
 
 COPY certificados ./certificados
 
+COPY filebeat.yml /app/filebeat.yml
+
 RUN npm run build
 
 EXPOSE 3000

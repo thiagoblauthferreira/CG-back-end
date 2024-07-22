@@ -156,7 +156,7 @@ export class DistribuitionPointsService {
     if (!product) {
       throw new NotFoundException(ProductMessagesHelper.PRODUCT_NOT_FOUND);
     }
-    console.log(product, currentUser);
+    
     if (product.creator.id !== currentUser.id) {
       throw new ForbiddenException(
         DistribuitionPointMessagesHelper.ONLY_PRODUCT_CREATOR_CAN_ADD_OR_REMOVE,

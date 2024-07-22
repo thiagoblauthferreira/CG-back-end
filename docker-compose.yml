@@ -1,5 +1,3 @@
-version: '3.7'
-
 services:
   nestjs:
     build:
@@ -8,7 +6,7 @@ services:
     container_name: coletivogloma-backend
     ports:
       - "80:80"
-      - "443:443"  # Porta do host : Porta do contêiner
+      - "443:443" 
     environment:
       - HOST_DB=${HOST_DB}
       - PORT_DB=${PORT_DB}
@@ -16,38 +14,16 @@ services:
       - PASSWORD_DB=${PASSWORD_DB}
       - NAME_DB=${NAME_DB}
       - OPENCAGE_API_KEY=${OPENCAGE_API_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+      - URL_DATABASE=${URL_DATABASE}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION}
+      - MAIL_FROM=${MAIL_FROM}
+      - NODE_ENV=${NODE_ENV}
+      - BUCKET=${BUCKET}
     volumes:
       - logs:/app/logs
-
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.13.4
-    container_name: elasticsearch
-    environment:
-      - discovery.type=single-node
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
-    ports:
-      - "9200:9200"
-      - "9300:9300"
-
-  kibana:
-    image: docker.elastic.co/kibana/kibana:7.13.4
-    container_name: kibana
-    ports:
-      - "5601:5601"
-    depends_on:
-      - elasticsearch
-
-  filebeat:
-    image: docker.elastic.co/beats/filebeat:7.13.4
-    container_name: filebeat
-    user: root
-    volumes:
-      - type: bind
-        source: ./filebeat.yml
-        target: /usr/share/filebeat/filebeat.yml
-      - logs:/app/logs
-    depends_on:
-      - elasticsearch
 
 volumes:
   logs:

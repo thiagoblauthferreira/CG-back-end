@@ -4,17 +4,27 @@ import { dataSourceConfig } from './database/dataSource';
 import { AuthModule } from './modules/auth/auth.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { NeedModule } from './modules/need/need.module';
 import { ShelterModule } from './modules/shelter/shelter.module';
+import { CompanyModule } from './modules/company/company.module';
 import { DistribuitionPointsModule } from './modules/distriuition-points/distribuition-point.module';
 import { ProductsModule } from './modules/products/product.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(dataSourceConfig() as TypeOrmModuleOptions),
     AuthModule,
+    CompanyModule,
+    NeedModule,
     ShelterModule,
     DistribuitionPointsModule,
     ProductsModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'src', 'assets'),
+      serveRoot: '/assets',
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],

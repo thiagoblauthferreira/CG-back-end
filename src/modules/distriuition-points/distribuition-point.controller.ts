@@ -18,7 +18,9 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { CreateUserDto } from '../auth/dto/auth.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("Distribution points")
 @Controller('distribuitionPoint')
 export class DistribuitionPointsController {
   constructor(private distribuitionPointService: DistribuitionPointsService) {}
