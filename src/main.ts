@@ -23,28 +23,36 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
   appConfig(app);
+  if (EnvConfig.ENV !== "production") {
 
-  const certPath = './certificados/certificado.crt';
-  const keyPath = './certificados/chave-privada.pem';
-  const cert = fs.readFileSync(certPath);
-  const key = fs.readFileSync(keyPath);
+    await app.listen(8080);
+  } else {
+    // Configurações para HTTPS
+    const certPath = './certificados/certificado.crt';
+    const keyPath = './certificados/chave-privada.pem';
+    const cert = fs.readFileSync(certPath);
+    const key = fs.readFileSync(keyPath);
 
-  const httpsOptions = {
-    cert: cert,
-    key: key,
-    passphrase: 'gloma',
-  };
-  const server = https.createServer(
-    httpsOptions,
-    app.getHttpAdapter().getInstance(),
-  );
-  server.listen(443);
-  http
-    .createServer((req, res) => {
-      res.writeHead(301, { Location: `https://${req.headers.host}${req.url}` });
-      res.end();
-    })
-    .listen(80);
-    
+    const httpsOptions = {
+      cert: cert,
+      key: key,
+      passphrase: 'gloma',
+    };
+
+    // Criar servidor HTTPS
+    const server = https.createServer(
+      httpsOptions,
+      app.getHttpAdapter().getInstance(),
+    );
+    server.listen(443);
+
+    // Redirecionar HTTP para HTTPS
+    http
+      .createServer((req, res) => {
+        res.writeHead(301, { Location: `https://${req.headers.host}${req.url}` });
+        res.end();
+      })
+      .listen(80);
+  }
 }
 bootstrap();
