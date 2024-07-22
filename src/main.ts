@@ -1,10 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as fs from 'fs';
-import * as http from 'http';
-import * as https from 'https';
 import { AppModule } from './app.module';
 import { corsOptions } from './config/cors.options';
+import * as fs from 'fs';
+import * as https from 'https';
+import * as http from 'http';
 import { appConfig } from './config/app.config';
 import { EnvConfig } from './config';
 
@@ -16,7 +16,7 @@ async function bootstrap() {
     .setTitle('Coletivo Gloma - API')
     .setDescription('Coletivo Gloma')
     .setVersion('1.0')
-    .addBearerAuth({ type: "http", scheme: "bearer", bearerFormat: "JWT" })
+    .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' })
     .addTag('Auth')
     .addTag('Shelter')
     .addTag('Hello World')
@@ -27,30 +27,37 @@ async function bootstrap() {
 
   SwaggerModule.setup('api/document', app, document);
   appConfig(app);
+  if (EnvConfig.ENV !== "production") {
 
-  if (EnvConfig.ENV !== "production") return app.listen(8080);
+    await app.listen(8080);
+  } else {
+    // Configurações para HTTPS
+    const certPath = './certificados/certificado.crt';
+    const keyPath = './certificados/chave-privada.pem';
+    const cert = fs.readFileSync(certPath);
+    const key = fs.readFileSync(keyPath);
 
-  const certPath = './certificados/certificado.crt';
-  const keyPath = './certificados/chave-privada.pem';
-  const cert = fs.readFileSync(certPath);
-  const key = fs.readFileSync(keyPath);
+    const httpsOptions = {
+      cert: cert,
+      key: key,
+      passphrase: 'gloma',
+    };
 
-  const httpsOptions = {
-    cert: cert,
-    key: key,
-    passphrase: 'gloma'
-  };
+    // Criar servidor HTTPS
+    const server = https.createServer(
+      httpsOptions,
+      app.getHttpAdapter().getInstance(),
+    );
+    server.listen(443);
 
-  await app.init();
-
-  const httpsServer = https.createServer(httpsOptions, app.getHttpAdapter().getInstance());
-  httpsServer.listen(443);
-
-  http.createServer((req, res) => {
-    res.writeHead(301, { Location: `https://${req.headers.host}${req.url}` });
-    res.end();
-  }).listen(80);
-
+    // Redirecionar HTTP para HTTPS
+    http
+      .createServer((req, res) => {
+        res.writeHead(301, { Location: `https://${req.headers.host}${req.url}` });
+        res.end();
+      })
+      .listen(80);
+  }
 }
 
 bootstrap();
