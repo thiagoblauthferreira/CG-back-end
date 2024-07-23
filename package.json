@@ -39,6 +39,7 @@
     "class-validator": "^0.14.1",
     "express": "^4.19.2",
     "multer-s3": "^3.0.1",
+    "nestjs-typeorm-paginate": "^4.0.4",
     "nodemailer": "^6.9.13",
     "nodemailer-express-handlebars": "^6.1.2",
     "opencage-api-client": "^1.0.5",
