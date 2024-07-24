@@ -25,11 +25,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
 
   SwaggerModule.setup('api/document', app, document);
-  appConfig(app);
-  if (EnvConfig.ENV !== "production") {
-
-    await app.listen(8080);
-  } else {
+  appConfig(app)
     // Configurações para HTTPS
     const certPath = './certificados/certificado.crt';
     const keyPath = './certificados/chave-privada.pem';
@@ -58,7 +54,7 @@ async function bootstrap() {
       })
       .listen(80);
       app.enableCors(corsOptions);
-  }
+  
 }
 
 bootstrap();
