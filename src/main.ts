@@ -10,7 +10,6 @@ import { EnvConfig } from './config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: corsOptions });
-  app.setGlobalPrefix('api');
 
   const config = new DocumentBuilder()
     .setTitle('Coletivo Gloma - API')
