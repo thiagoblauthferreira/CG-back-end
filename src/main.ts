@@ -53,7 +53,7 @@ async function bootstrap() {
         
       })
       .listen(80);
-      // app.enableCors(corsOptions);
+      app.enableCors(corsOptions);
   
 }
 
