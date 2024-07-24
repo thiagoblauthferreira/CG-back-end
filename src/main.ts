@@ -11,6 +11,7 @@ import { EnvConfig } from './config';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: corsOptions });
 
+
   const config = new DocumentBuilder()
     .setTitle('Coletivo Gloma - API')
     .setDescription('Coletivo Gloma')
@@ -25,7 +26,11 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
 
   SwaggerModule.setup('api/document', app, document);
-  appConfig(app)
+  appConfig(app);
+  if (EnvConfig.ENV === "production") {
+
+    await app.listen(80);
+  } else {
     // Configurações para HTTPS
     const certPath = './certificados/certificado.crt';
     const keyPath = './certificados/chave-privada.pem';
@@ -54,7 +59,7 @@ async function bootstrap() {
       })
       .listen(80);
       app.enableCors(corsOptions);
-  
+  }
 }
 
 bootstrap();
