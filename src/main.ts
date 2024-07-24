@@ -27,34 +27,33 @@ async function bootstrap() {
   SwaggerModule.setup('api/document', app, document);
   appConfig(app)
     // Configurações para HTTPS
-    // const certPath = './certificados/certificado.crt';
-    // const keyPath = './certificados/chave-privada.pem';
-    // const cert = fs.readFileSync(certPath);
-    // const key = fs.readFileSync(keyPath);
+    const certPath = './certificados/certificado.crt';
+    const keyPath = './certificados/chave-privada.pem';
+    const cert = fs.readFileSync(certPath);
+    const key = fs.readFileSync(keyPath);
 
-    // const httpsOptions = {
-    //   cert: cert,
-    //   key: key,
-    //   passphrase: 'gloma',
-    // };
+    const httpsOptions = {
+      cert: cert,
+      key: key,
+      passphrase: 'gloma',
+    };
 
     // Criar servidor HTTPS
-    // const server = https.createServer(
-    //   httpsOptions,
-    //   app.getHttpAdapter().getInstance(),
-    // );
-    // server.listen(443);
+    const server = https.createServer(
+      httpsOptions,
+      app.getHttpAdapter().getInstance(),
+    );
+    server.listen(443);
 
     // Redirecionar HTTP para HTTPS
-    // http
-    //   .createServer((req, res) => {
-    //     res.writeHead(301, { Location: `https://${req.headers.host}${req.url}` });
-    //     res.end();
+    http
+      .createServer((req, res) => {
+        res.writeHead(301, { Location: `https://${req.headers.host}${req.url}` });
+        res.end();
         
-    //   })
-    //   .listen(8080);
-    app.listen(8080)
-      app.enableCors(corsOptions);
+      })
+      .listen(80);
+      // app.enableCors(corsOptions);
   
 }
 
