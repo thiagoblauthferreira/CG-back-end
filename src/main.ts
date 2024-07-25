@@ -15,7 +15,6 @@ async function bootstrap() {
     .setTitle('Coletivo Gloma - API')
     .setDescription('Coletivo Gloma')
     .setVersion('1.0')
-    .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' })
     .addTag('Auth')
     .addTag('Shelter')
     .addTag('Hello World')
