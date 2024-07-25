@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { SearchDto } from "./dto/SearchDTO";
+import { SearchDto } from "./dto/searchDTO";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Shelter } from "../shelter/entities/shelter.entity";
 import { Repository } from "typeorm";
@@ -22,9 +22,10 @@ export class SearchService {
   ){}
 //Shelter
 async findShelter(query: SearchDto): Promise<Pagination<Shelter>> {
-  const { neighborhood, street, city, state, page = 1, pageSize = 10 } = query;
+  const { neighborhood, street, city, state, page, pageSize } = query;
 
-  const queryBuilder = this.shelterRepository.createQueryBuilder('shelter');
+  const queryBuilder = this.shelterRepository.createQueryBuilder('shelter')
+  .leftJoinAndSelect('shelter.address', 'address');
   
   if (neighborhood) {
     queryBuilder.andWhere('shelter.bairro ILIKE :neighborhood', { neighborhood: `%${neighborhood}%` });

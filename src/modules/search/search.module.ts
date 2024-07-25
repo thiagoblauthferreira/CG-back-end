@@ -13,7 +13,4 @@ import { NeedVolunteers } from '../need/entities/needVolunteers.entity';
   controllers: [SearchController]
 
 })
-export class SearchModule {
-  
-
-}
+export class SearchModule {}

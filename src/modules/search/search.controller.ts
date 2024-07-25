@@ -1,48 +1,73 @@
 import { Controller, Get, Query } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
-import { SearchDto } from "./dto/SearchDTO";
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { SearchDto } from "./dto/searchDTO";
 import { SearchService } from "./search.service";
 import { Pagination } from "nestjs-typeorm-paginate";
-import { Shelter } from "../shelter/entities/shelter.entity";
-import { NeedItem } from "../need/entities/needItems.entity";
-import { NeedVolunteers } from "../need/entities/needVolunteers.entity";
+import { SearchShelterResponseDto } from "./dto/searchShelterResponseDto";
+import { SearchDistributionPointResponseDto } from "./dto/searchDistributionPointResponseDto copy";
+import { ResponseNeedVolunteerUpdateDTO } from "./dto/responseVolunteers";
+import { ResponseNeedItemUpdateDTO } from "./dto/responseNeedItemUpdateDTO";
 
 
-@ApiTags("Search")
+
+@ApiTags('Search')
 @Controller('search')
 export class SearchController {
-  constructor(private searchService: SearchService){}
+  constructor(private searchService: SearchService) {}
 
-  //shelter
+  // Buscar Abrigos
   @Get('shelters')
-  async findShelter(@Query() query: SearchDto): Promise<Pagination<Shelter>>{
+  @ApiOperation({ summary: 'Buscar abrigos' })
+  @ApiResponse({ status: 200, description: 'Busca realizada com sucesso' })
+  async findShelter(@Query() query: SearchDto): Promise<Pagination<SearchShelterResponseDto>> {
     const { page = 1, pageSize = 10 } = query;
-    this.searchService.findShelter(query);
-    return null;
+    const paginatedResult = await this.searchService.findShelter(query);
+    const items = paginatedResult.items.map(item => new SearchShelterResponseDto(item));
+    return {
+      ...paginatedResult,
+      items,
+    };
   }
 
-  //pontos de distribuição
+  // Buscar Pontos de Distribuição
   @Get('distribution-points')
-  async findDistribututionPoints(@Query() query: SearchDto): Promise<Pagination<Shelter>>{
+  @ApiOperation({ summary: 'Buscar pontos de distribuição' })
+  @ApiResponse({ status: 200, description: 'Busca realizada com sucesso' })
+  async findDistribututionPoints(@Query() query: SearchDto): Promise<Pagination<SearchDistributionPointResponseDto>> {
     const { page = 1, pageSize = 10 } = query;
-    await this.searchService.findDistribututionPoints(query);
-    return null;
+    const paginatedResult = await this.searchService.findDistribututionPoints(query);
+    const items = paginatedResult.items.map(item => new SearchDistributionPointResponseDto(item));
+    return {
+      ...paginatedResult,
+      items,
+    };
   }
-  //necessidades de itens
+
+  // Buscar Necessidades de Voluntários
   @Get('volunteer-needs')
-  async findNeedVolunteer(@Query() query: SearchDto): Promise<Pagination<NeedVolunteers>>{
+  @ApiOperation({ summary: 'Buscar necessidades de voluntários' })
+  @ApiResponse({ status: 200, description: 'Busca realizada com sucesso' })
+  async findNeedVolunteer(@Query() query: SearchDto): Promise<Pagination<ResponseNeedVolunteerUpdateDTO>> {
     const { page = 1, pageSize = 10 } = query;
-    return await this.searchService.findNeedVolunteer(query);
-    
+    const paginatedResult = await this.searchService.findNeedVolunteer(query);
+    const items = paginatedResult.items.map(item => new ResponseNeedVolunteerUpdateDTO(item));
+    return {
+      ...paginatedResult,
+      items,
+    };
   }
-  //necessidades de vonluntários
-  
+
+  // Buscar Necessidades de Itens
   @Get('item-needs')
-  async findNeedItem(@Query() query: SearchDto): Promise<Pagination<NeedItem>>{
+  @ApiOperation({ summary: 'Buscar necessidades de itens' })
+  @ApiResponse({ status: 200, description: 'Busca realizada com sucesso' })
+  async findNeedItem(@Query() query: SearchDto): Promise<Pagination<ResponseNeedItemUpdateDTO>> {
     const { page = 1, pageSize = 10 } = query;
-    return await this.searchService.findNeedItem(query);
-    
+    const paginatedResult = await this.searchService.findNeedItem(query);
+    const items = paginatedResult.items.map(item => new ResponseNeedItemUpdateDTO(item));
+    return {
+      ...paginatedResult,
+      items,
+    };
   }
-
-
 }
