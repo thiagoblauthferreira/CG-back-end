@@ -15,6 +15,7 @@ async function bootstrap() {
     .setTitle('Coletivo Gloma - API')
     .setDescription('Coletivo Gloma')
     .setVersion('1.0')
+    .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' })
     .addTag('Auth')
     .addTag('Shelter')
     .addTag('Hello World')
@@ -49,13 +50,15 @@ async function bootstrap() {
     server.listen(443);
 
     // Redirecionar HTTP para HTTPS
-    http
-      .createServer((req, res) => {
-        res.writeHead(301, { Location: `https://${req.headers.host}${req.url}` });
-        res.end();
+    // http
+    //   .createServer((req, res) => {
+    //     res.writeHead(301, { Location: `https://${req.headers.host}${req.url}` });
+    //     res.end();
         
-      })
-      .listen(80);
+    //   })
+    //   .listen(80);
+
+    app.listen(80);
       app.enableCors(corsOptions);
   }
 }
