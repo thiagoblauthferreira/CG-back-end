@@ -1,6 +1,11 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString, IsInt, Min, Max, IsIn } from 'class-validator';
-export class SearchDto {
+export class RequestShelterDTO {
+  @IsString()
+  @IsOptional()
+  @ApiPropertyOptional({ description: 'name' })
+  readonly name?: string;
+
   @IsString()
   @IsOptional()
   @ApiPropertyOptional({ description: 'Neighborhood' })

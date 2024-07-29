@@ -1,12 +1,13 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { SearchDto } from "./dto/searchDTO";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Shelter } from "../shelter/entities/shelter.entity";
 import { Repository } from "typeorm";
-import { paginate, Pagination } from "nestjs-typeorm-paginate";
 import { DistribuitionPoints } from "../distriuition-points/entities/distribuition-point.entity";
 import { NeedVolunteers } from "../need/entities/needVolunteers.entity";
 import { NeedItem } from "../need/entities/needItems.entity";
+import { RequestShelterDTO } from "./dto/requestShelterDTO";
+import { RequestNeedsDTO } from "./dto/requestNeedsDTO";
 
 @Injectable()
 export class SearchService {
@@ -21,12 +22,16 @@ export class SearchService {
     private needItemRepository: Repository<NeedItem>
   ){}
 //Shelter
-async findShelter(query: SearchDto): Promise<Pagination<Shelter>> {
-  const { neighborhood, street, city, state, page, pageSize } = query;
+async findShelter(query: RequestShelterDTO): Promise<Shelter[]> {
+  const { name, neighborhood, street, city, state} = query;
 
   const queryBuilder = this.shelterRepository.createQueryBuilder('shelter')
   .leftJoinAndSelect('shelter.address', 'address');
-  
+ 
+  if (name) {
+    queryBuilder.andWhere('shelter.name ILIKE :name', { name: `%${name}%` });
+  }
+
   if (neighborhood) {
     queryBuilder.andWhere('shelter.bairro ILIKE :neighborhood', { neighborhood: `%${neighborhood}%` });
   }
@@ -39,15 +44,22 @@ async findShelter(query: SearchDto): Promise<Pagination<Shelter>> {
   if (state) {
     queryBuilder.andWhere('shelter.estado ILIKE :state', { state: `%${state}%` });
   }
-
-  return paginate(queryBuilder, { page, limit: pageSize });
+  try {
+  return await queryBuilder.getMany()
+  }catch (error) {
+    throw new InternalServerErrorException('Erro ao buscar abrigos');
+  }
 }
 
-async findDistribututionPoints(query: SearchDto): Promise<Pagination<DistribuitionPoints>>{
-  const { neighborhood, street, city, state, page = 1, pageSize = 10 } = query;
+async findDistribututionPoints(query: RequestShelterDTO): Promise<DistribuitionPoints[]>{
+  const { name, neighborhood, street, city, state } = query;
 
   const queryBuilder = this.distributionRepository.createQueryBuilder('distribututionPoints');
   
+  if (name) {
+    queryBuilder.andWhere('shelter.name ILIKE :name', { name: `%${name}%` });
+  }
+
   if (neighborhood) {
     queryBuilder.andWhere('distribututionPoints.bairro ILIKE :neighborhood', { neighborhood: `%${neighborhood}%` });
   }
@@ -60,53 +72,85 @@ async findDistribututionPoints(query: SearchDto): Promise<Pagination<Distribuiti
   if (state) {
     queryBuilder.andWhere('distribututionPoints.estado ILIKE :state', { state: `%${state}%` });
   }
-
-  return paginate(queryBuilder, { page, limit: pageSize });
-
+  try{
+  return await queryBuilder.getMany();
+  }catch (error) {
+    throw new InternalServerErrorException('Erro ao buscar abrigos');
+  }
 }
-async findNeedVolunteer(query: SearchDto): Promise<Pagination<NeedVolunteers>>{
+async findNeedVolunteer(query: RequestNeedsDTO): Promise<NeedVolunteers[]>{
  
-  const { neighborhood, street, city, state, page = 1, pageSize = 10 } = query;
+  const { title, status, priority, neighborhood, street, city, state } = query;
 
-  const queryBuilder = this.needVolunteerRepository.createQueryBuilder('needVolunteer');
-  
+  const queryBuilder = this.needVolunteerRepository.createQueryBuilder('n')
+    .select(["n.id", "n.title", "n.address", "n.description", "n.shelter", "n.status", "n.priority", "n.limitDate"]);
+
+  if (title) {
+      queryBuilder.andWhere('n.title ILIKE :title', { title: `%${title}%` });
+  }
+  if (status) {
+    queryBuilder.andWhere('n.status ILIKE :status', { title: `%${status}%` });
+  }
+  if (priority) {
+    queryBuilder.andWhere('n.priority ILIKE :neighborhood', { title: `%${priority}%` });
+} 
   if (neighborhood) {
-    queryBuilder.andWhere('needVolunteer.bairro ILIKE :neighborhood', { neighborhood: `%${neighborhood}%` });
-  }
+      queryBuilder.andWhere('n.bairro ILIKE :neighborhood', { neighborhood: `%${neighborhood}%` });
+  } 
+
   if (street) {
-    queryBuilder.andWhere('needVolunteer.rua ILIKE :street', { street: `%${street}%` });
+    queryBuilder.andWhere('n.rua ILIKE :street', { street: `%${street}%` });
   }
+
   if (city) {
-    queryBuilder.andWhere('needVolunteer.cidade ILIKE :city', { city: `%${city}%` });
+    queryBuilder.andWhere('n.cidade ILIKE :city', { city: `%${city}%` });
   }
+
   if (state) {
-    queryBuilder.andWhere('needVolunteer.estado ILIKE :state', { state: `%${state}%` });
+    queryBuilder.andWhere('n.estado ILIKE :state', { state: `%${state}%` });
   }
-
-  return paginate(queryBuilder, { page, limit: pageSize });
-
+  try{
+  return await queryBuilder.getMany();
+  }catch (error) {
+    throw new InternalServerErrorException('Erro ao buscar necessidades de voluntariado');
+  }
 }
 
-async findNeedItem(query: SearchDto): Promise<Pagination<NeedItem>>{
- 
-  const { neighborhood, street, city, state, page = 1, pageSize = 10 } = query;
+async findNeedItem(query: RequestNeedsDTO): Promise<NeedItem[]> {
+  const { title, status, priority, neighborhood, street, city, state } = query;
 
-  const queryBuilder = this.needItemRepository.createQueryBuilder('needItem');
-  
-  if (neighborhood) {
-    queryBuilder.andWhere('needItem.bairro ILIKE :neighborhood', { neighborhood: `%${neighborhood}%` });
+  const queryBuilder = this.needItemRepository.createQueryBuilder('n')
+    .select(["n.id", "n.title", "n.address", "n.description", "n.shelter", "n.status", "n.priority", "n.limitDate"]);
+
+
+    if (title) {
+        queryBuilder.andWhere('n.title ILIKE :title', { title: `%${title}%` });
+    }
+    if (status) {
+      queryBuilder.andWhere('n.status ILIKE :status', { title: `%${status}%` });
+    }
+    if (priority) {
+      queryBuilder.andWhere('n.priority ILIKE :neighborhood', { title: `%${priority}%` });
+    } 
+ if (neighborhood) {
+    queryBuilder.andWhere('n.bairro ILIKE :neighborhood', { neighborhood: `%${neighborhood}%` });
   }
+
   if (street) {
-    queryBuilder.andWhere('needItem.rua ILIKE :street', { street: `%${street}%` });
+    queryBuilder.andWhere('n.rua ILIKE :street', { street: `%${street}%` });
   }
+
   if (city) {
-    queryBuilder.andWhere('needItem.cidade ILIKE :city', { city: `%${city}%` });
+    queryBuilder.andWhere('n.cidade ILIKE :city', { city: `%${city}%` });
   }
+
   if (state) {
-    queryBuilder.andWhere('needItem.estado ILIKE :state', { state: `%${state}%` });
+    queryBuilder.andWhere('n.estado ILIKE :state', { state: `%${state}%` });
   }
-
-  return paginate(queryBuilder, { page, limit: pageSize });
-
+  try {
+  return await queryBuilder.getMany();
+  }catch (error) {
+    throw new InternalServerErrorException('Erro ao buscar abrigos');
+  }
 }
 }

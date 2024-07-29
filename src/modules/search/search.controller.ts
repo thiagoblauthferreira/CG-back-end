@@ -1,13 +1,17 @@
-import { Controller, Get, Query } from "@nestjs/common";
+import { Controller, Get, InternalServerErrorException, Query } from "@nestjs/common";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { SearchDto } from "./dto/searchDTO";
 import { SearchService } from "./search.service";
-import { Pagination } from "nestjs-typeorm-paginate";
-import { SearchShelterResponseDto } from "./dto/searchShelterResponseDto";
-import { SearchDistributionPointResponseDto } from "./dto/searchDistributionPointResponseDto copy";
-import { ResponseNeedVolunteerUpdateDTO } from "./dto/responseVolunteers";
+import { SearchShelterResponseDto } from "./dto/responseShelterDTO";
+import { ResponseNeedVolunteerUpdateDTO } from "./dto/responseVolunteersDTO";
 import { ResponseNeedItemUpdateDTO } from "./dto/responseNeedItemUpdateDTO";
-
+import { Shelter } from "../shelter/entities/shelter.entity";
+import { DistribuitionPoints } from "../distriuition-points/entities/distribuition-point.entity";
+import { NeedVolunteers } from "../need/entities/needVolunteers.entity";
+import { NeedItem } from "../need/entities/needItems.entity";
+import { ResponseDistributionPointDTO } from "./dto/responseDistributionPointDTO";
+import { RequestShelterDTO } from "./dto/requestShelterDTO";
+import { RequestNeedsDTO } from "./dto/requestNeedsDTO";
 
 
 @ApiTags('Search')
@@ -18,56 +22,52 @@ export class SearchController {
   // Buscar Abrigos
   @Get('shelters')
   @ApiOperation({ summary: 'Buscar abrigos' })
-  @ApiResponse({ status: 200, description: 'Busca realizada com sucesso' })
-  async findShelter(@Query() query: SearchDto): Promise<Pagination<SearchShelterResponseDto>> {
-    const { page = 1, pageSize = 10 } = query;
-    const paginatedResult = await this.searchService.findShelter(query);
-    const items = paginatedResult.items.map(item => new SearchShelterResponseDto(item));
-    return {
-      ...paginatedResult,
-      items,
-    };
+  async findShelter(@Query() query: RequestShelterDTO): Promise<SearchShelterResponseDto[]> {
+    try {
+      const itens: Shelter[] = await this.searchService.findShelter(query);
+      return itens.map(shelter => new SearchShelterResponseDto(shelter));
+    } catch (error) {
+      throw new InternalServerErrorException('Erro ao buscar abrigos');
+    }
   }
 
   // Buscar Pontos de Distribuição
   @Get('distribution-points')
   @ApiOperation({ summary: 'Buscar pontos de distribuição' })
-  @ApiResponse({ status: 200, description: 'Busca realizada com sucesso' })
-  async findDistribututionPoints(@Query() query: SearchDto): Promise<Pagination<SearchDistributionPointResponseDto>> {
-    const { page = 1, pageSize = 10 } = query;
-    const paginatedResult = await this.searchService.findDistribututionPoints(query);
-    const items = paginatedResult.items.map(item => new SearchDistributionPointResponseDto(item));
-    return {
-      ...paginatedResult,
-      items,
-    };
+  async findDistribututionPoints(@Query() query: RequestShelterDTO): Promise<ResponseDistributionPointDTO[]> {
+    try{
+      const itens: DistribuitionPoints[] = await this.searchService.findDistribututionPoints(query);
+      return itens.map(a => new ResponseDistributionPointDTO(a));
+     }catch (error){
+      throw new InternalServerErrorException('Erro ao buscar pontos de distribuição');
+    }
   }
 
   // Buscar Necessidades de Voluntários
   @Get('volunteer-needs')
   @ApiOperation({ summary: 'Buscar necessidades de voluntários' })
   @ApiResponse({ status: 200, description: 'Busca realizada com sucesso' })
-  async findNeedVolunteer(@Query() query: SearchDto): Promise<Pagination<ResponseNeedVolunteerUpdateDTO>> {
-    const { page = 1, pageSize = 10 } = query;
-    const paginatedResult = await this.searchService.findNeedVolunteer(query);
-    const items = paginatedResult.items.map(item => new ResponseNeedVolunteerUpdateDTO(item));
-    return {
-      ...paginatedResult,
-      items,
-    };
+  async findNeedVolunteer(@Query() query: RequestNeedsDTO): Promise<ResponseNeedVolunteerUpdateDTO[]> {
+    try {
+      const itens: NeedVolunteers[] = await this.searchService.findNeedVolunteer(query);
+      return itens.map(n => new ResponseNeedVolunteerUpdateDTO(n))
+
+    }catch (error){
+      throw new InternalServerErrorException('Erro ao buscar pontos de distribuição');
+    }
+    
   }
 
   // Buscar Necessidades de Itens
-  @Get('item-needs')
+  @Get('need-item')
   @ApiOperation({ summary: 'Buscar necessidades de itens' })
   @ApiResponse({ status: 200, description: 'Busca realizada com sucesso' })
-  async findNeedItem(@Query() query: SearchDto): Promise<Pagination<ResponseNeedItemUpdateDTO>> {
-    const { page = 1, pageSize = 10 } = query;
-    const paginatedResult = await this.searchService.findNeedItem(query);
-    const items = paginatedResult.items.map(item => new ResponseNeedItemUpdateDTO(item));
-    return {
-      ...paginatedResult,
-      items,
-    };
+  async findNeedItem(@Query() query: RequestNeedsDTO): Promise<ResponseNeedItemUpdateDTO[]> {
+  try{
+    const itens: NeedItem[] =  await this.searchService.findNeedItem(query);
+    return itens.map(n => new ResponseNeedItemUpdateDTO(n))
+  }catch (error){
+    throw new InternalServerErrorException('Erro ao buscar pontos de distribuição');
+  }
   }
 }
