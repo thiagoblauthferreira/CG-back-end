@@ -11,33 +11,28 @@ export class RequestNeedsDTO {
 
   @IsString()
   @IsOptional()
-  @ApiPropertyOptional({ description: 'Status: LOW, AVERAGE, HIGH, URGENT AND MEDICATION' })
+  @ApiPropertyOptional({ description: 'Status: CREATED, PENDING, IN_PROGRESS, PARTIALLY_COMPLETED AND COMPLETED' })
   readonly status?: Status;
 
   @IsString()
   @IsOptional()
-  @ApiPropertyOptional({ description: 'Priority: CREATED, PENDING, IN_PROGRESS, PARTIALLY_COMPLETED AND COMPLETED ' })
+  @ApiPropertyOptional({ description: 'Priority: LOW, AVERAGE, HIGH, URGENT AND MEDICATION' })
   readonly priority?: Priority;
 
   @IsString()
   @IsOptional()
-  @ApiPropertyOptional({ description: 'Neighborhood' })
-  readonly neighborhood?: string;
+  @ApiPropertyOptional({ description: 'Shelter' })
+  readonly shelter?: string;
 
   @IsString()
   @IsOptional()
-  @ApiPropertyOptional({ description: 'Street' })
-  readonly street?: string;
+  @ApiPropertyOptional({ enum: ['priority', 'status'] })
+  readonly sortBy?: 'priority' | 'status'; // String literal para sortBy
 
   @IsString()
   @IsOptional()
-  @ApiPropertyOptional({ description: 'City' })
-  readonly city?: string;
-
-  @IsString()
-  @IsOptional()
-  @ApiPropertyOptional({ description: 'State' })
-  readonly state?: string;
-
+  @IsIn(['ASC', 'DESC'])
+  @ApiPropertyOptional({ description: "'DESC' or 'ASC'" })
+  readonly sortOrder?: 'ASC' | 'DESC';
   }
 

@@ -12,6 +12,8 @@ import { NeedItem } from "../need/entities/needItems.entity";
 import { ResponseDistributionPointDTO } from "./dto/responseDistributionPointDTO";
 import { RequestShelterDTO } from "./dto/requestShelterDTO";
 import { RequestNeedsDTO } from "./dto/requestNeedsDTO";
+import logger from "src/logger";
+import { RequestNearbyDTO } from "./dto/requestNearbyDTO";
 
 
 @ApiTags('Search')
@@ -27,6 +29,7 @@ export class SearchController {
       const itens: Shelter[] = await this.searchService.findShelter(query);
       return itens.map(shelter => new SearchShelterResponseDto(shelter));
     } catch (error) {
+      logger.error(error);
       throw new InternalServerErrorException('Erro ao buscar abrigos');
     }
   }
@@ -39,6 +42,7 @@ export class SearchController {
       const itens: DistribuitionPoints[] = await this.searchService.findDistribututionPoints(query);
       return itens.map(a => new ResponseDistributionPointDTO(a));
      }catch (error){
+      logger.error(error);
       throw new InternalServerErrorException('Erro ao buscar pontos de distribuição');
     }
   }
@@ -53,6 +57,7 @@ export class SearchController {
       return itens.map(n => new ResponseNeedVolunteerUpdateDTO(n))
 
     }catch (error){
+      logger.error(error);
       throw new InternalServerErrorException('Erro ao buscar pontos de distribuição');
     }
     
@@ -67,7 +72,33 @@ export class SearchController {
     const itens: NeedItem[] =  await this.searchService.findNeedItem(query);
     return itens.map(n => new ResponseNeedItemUpdateDTO(n))
   }catch (error){
+    logger.error(error);
     throw new InternalServerErrorException('Erro ao buscar pontos de distribuição');
   }
   }
+
+  @Get('shelters/nearby')
+  @ApiOperation({ summary: 'Buscar abrigos por proximidade' })
+  async findShelterNearby(@Query() query: RequestNearbyDTO): Promise<SearchShelterResponseDto[]> {
+    try {
+      const itens: Shelter[] = await this.searchService.findNearbyShelter(query);
+      return itens.map(shelter => new SearchShelterResponseDto(shelter));
+    } catch (error) {
+      logger.error(error);
+      throw new InternalServerErrorException('Erro ao buscar abrigos');
+    }
+  }
+
+  @Get('distribution-points/nearby')
+  @ApiOperation({ summary: 'Buscar pontos de distribuição por proximidade' })
+  async findDistribututionPointsNearby(@Query() query: RequestNearbyDTO): Promise<ResponseDistributionPointDTO[]> {
+    try{
+      const itens: DistribuitionPoints[] = await this.searchService.findNearbyDistributionPoint(query);
+      return itens.map(a => new ResponseDistributionPointDTO(a));
+     }catch (error){
+      logger.error(error);
+      throw new InternalServerErrorException('Erro ao buscar pontos de distribuição');
+    }
+  }
+
 }
