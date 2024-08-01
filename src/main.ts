@@ -7,7 +7,7 @@ import * as https from 'https';
 import * as http from 'http';
 import { appConfig } from './config/app.config';
 import { EnvConfig } from './config';
-/*
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: corsOptions });
   app.setGlobalPrefix('api');
@@ -22,6 +22,7 @@ async function bootstrap() {
     .addTag('Hello World')
     .addTag('Distribution points')
     .addTag('Products')
+    .addTag('Search')
     .build();
   const document = SwaggerModule.createDocument(app, config);
 
@@ -62,25 +63,5 @@ async function bootstrap() {
   }
 }
 
-bootstrap();*/
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: corsOptions });
-
-  const config = new DocumentBuilder()
-  .setTitle('Coletivo Gloma - API')
-  .setDescription('Coletivo Gloma')
-  .setVersion('1.0')
-  .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' })
-  .addTag('Auth')
-  .addTag('Shelter')
-  .addTag('Hello World')
-  .addTag('Distribution points')
-  .addTag('Products')
-  .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
-  appConfig(app);
-
-  await app.listen(8080);
-}
 bootstrap();
+

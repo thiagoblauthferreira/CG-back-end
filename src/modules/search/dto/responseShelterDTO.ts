@@ -19,7 +19,6 @@ export class SearchShelterResponseDto {
     this.phone = shelter.phone,
     this.description = shelter.description,
     this.creator = new UserResponseDTO(shelter.creator),
-    this.address = new ResponseAddressDTO(shelter.address),
-    this.coordinators = shelter.coordinators.map(u => new UserResponseDTO(u))
+    this.address = new ResponseAddressDTO(shelter.address)
     }
 }

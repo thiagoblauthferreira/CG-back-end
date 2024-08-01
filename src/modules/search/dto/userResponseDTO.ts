@@ -11,5 +11,4 @@ export class UserResponseDTO {
     this.username = user.username,
     this.email = user.email
   }
-
 }

@@ -20,17 +20,16 @@ export class ResponseNeedItemUpdateDTO {
 
 
   constructor(needItem: NeedItem){
-    this.coordinator = needItem.coordinator.name,
-    this.coordinator_username = needItem.coordinator.username,
-    this.title = needItem.title,
-    this.description = needItem.description,
-    this.shelter_id = needItem.shelter.id,
-    this.shelter_name = needItem.shelter.name,
-    this.shelter_phone = needItem.shelter.phone
-    this.shelter_address = new ResponseAddressDTO(needItem.shelter.address)
-    this.item = needItem.item,   
-    this.status = needItem.status,
-    this.limitDate = needItem.limitDate
+    this.coordinator = needItem.coordinator.name;
+    this.coordinator_username = needItem.coordinator.username;
+    this.title = needItem.title;
+    this.description = needItem.description;
+    this.shelter_id = needItem.shelter.id;
+    this.shelter_name = needItem.shelter.name;
+    this.shelter_phone = needItem.shelter.phone;
+    this.item = needItem.item; 
+    this.status = needItem.status;
+    this.limitDate = needItem.limitDate;
   }
   
 }

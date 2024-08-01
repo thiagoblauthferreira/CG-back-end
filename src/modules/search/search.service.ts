@@ -33,23 +33,27 @@ async findShelter(query: RequestShelterDTO): Promise<Shelter[]> {
 
   const queryBuilder = this.shelterRepository.createQueryBuilder('shelter')
     .leftJoinAndSelect('shelter.address', 'address')
+    .leftJoinAndSelect('shelter.creator', 'creator')
     .select([
       'shelter.id',
       'shelter.name',
       'shelter.phone',
       'shelter.description',
-      'shelter.creator',
       'address.bairro',
       'address.logradouro',
       'address.municipio',
       'address.estado',
       'address.numero',
       'address.complemento',
-      'address.cep'
+      'address.cep',
+      'creator.id',
+      'creator.name',
+      'creator.email'
     ]);
 
   if (name) {
     queryBuilder.andWhere('shelter.name ILIKE :name', { name: `%${name}%` });
+  
   }
   if (neighborhood) {
     queryBuilder.andWhere('address.bairro ILIKE :neighborhood', { neighborhood: `%${neighborhood}%` });
@@ -78,6 +82,7 @@ async findDistribututionPoints(query: RequestShelterDTO): Promise<DistribuitionP
 
   const queryBuilder = this.distributionRepository.createQueryBuilder('d')
     .leftJoin('d.address', 'address')
+    .leftJoinAndSelect('d.creator', 'creator')
     .select([
       'd.id',
       'd.name',
@@ -90,7 +95,10 @@ async findDistribututionPoints(query: RequestShelterDTO): Promise<DistribuitionP
       'address.estado',
       'address.numero',
       'address.complemento',
-      'address.cep'
+      'address.cep',
+      'creator.id',
+      'creator.name',
+      'creator.email'
     ]);
 
   if (name) {
@@ -122,8 +130,22 @@ async findNeedVolunteer(query: RequestNeedsDTO): Promise<NeedVolunteers[]>{
   const { title, status, priority, shelter, sortBy, sortOrder  } = query;
 
   const queryBuilder = this.needVolunteerRepository.createQueryBuilder('n')
-  .leftJoin('n.shelter', 'shelter')
-  .select(["n.id", "n.title", "n.description", "n.shelter", "n.status", "n.priority", "n.limitDate"]);
+  .leftJoinAndSelect('n.shelter', 'shelter')
+  .leftJoinAndSelect('n.coordinator', 'coordinator')
+  .select([
+    "n.id",
+    "n.title",
+    "n.description",
+    "n.status",
+    "n.priority",
+    "n.limitDate",
+    "coordinator.name",
+    "coordinator.username",
+    "coordinator.email",
+    "shelter.id",
+    "shelter.phone",
+    "shelter.name",
+  ]);
 
   if (title) {
       queryBuilder.andWhere('n.title ILIKE :title', { title: `%${title}%` });
@@ -158,8 +180,22 @@ async findNeedItem(query: RequestNeedsDTO): Promise<NeedItem[]> {
   const { title, status, priority, shelter,  sortBy, sortOrder } = query;
 
   const queryBuilder = this.needItemRepository.createQueryBuilder('n')
-    .leftJoin('n.shelter', 'shelter')
-    .select(["n.id", "n.title", "n.description", "n.shelter", "n.status", "n.priority", "n.limitDate"]);
+    .leftJoinAndSelect('n.shelter', 'shelter')
+    .leftJoinAndSelect('n.coordinator', 'coordinator')
+    .select([
+      "n.id", 
+      "n.title", 
+      "n.description",       
+      "n.status", 
+      "n.priority",
+      "n.limitDate",
+      "coordinator.name",
+      "coordinator.username",
+      "coordinator.email",
+      "shelter.id",
+      "shelter.phone",
+      "shelter.name",
+      ]);
 
 
     if (title) {
@@ -204,23 +240,24 @@ async findNearbyShelter(query: RequestNearbyDTO): Promise<Shelter[]> {
   const userLongitude: number = newAddress.longitude;
 
   const queryBuilder = this.shelterRepository.createQueryBuilder('s')
-    .leftJoinAndSelect('s.address', 'address')
-    .select([
-      's.id',
-      's.name',
-      's.phone',
-      's.description',
-      's.creator',
-      'address.bairro',
-      'address.logradouro',
-      'address.municipio',
-      'address.estado',
-      'address.numero',
-      'address.complemento',
-      'address.cep',
-      'address.latitude',
-      'address.longitude'
-    ])
+  .leftJoinAndSelect('s.address', 'address')
+  .leftJoinAndSelect('s.creator', 'creator')
+  .select([
+    's.id',
+    's.name',
+    's.phone',
+    's.description',
+    'address.bairro',
+    'address.logradouro',
+    'address.municipio',
+    'address.estado',
+    'address.numero',
+    'address.complemento',
+    'address.cep',
+    'creator.id',
+    'creator.name',
+    'creator.email'
+  ])
     .where(`6371 * acos(cos(radians(:userLatitude)) * cos(radians(address.latitude)) * cos(radians(address.longitude) - radians(:userLongitude)) + sin(radians(:userLatitude)) * sin(radians(address.latitude))) < :radius`, {
       userLatitude,
       userLongitude,
@@ -250,6 +287,7 @@ async findNearbyDistributionPoint(query: RequestNearbyDTO): Promise<Distribuitio
 
   const queryBuilder = this.distributionRepository.createQueryBuilder('d')
     .leftJoinAndSelect('d.address', 'address')
+    .leftJoinAndSelect('d.creator', 'creator')
     .select([
       'd.id',
       'd.name',
@@ -264,7 +302,10 @@ async findNearbyDistributionPoint(query: RequestNearbyDTO): Promise<Distribuitio
       'address.complemento',
       'address.cep',
       'address.latitude',
-      'address.longitude'
+      'address.longitude',
+      'creator.id',
+      'creator.name',
+      'creator.email'
     ])
     .where(`6371 * acos(cos(radians(:userLatitude)) * cos(radians(address.latitude)) * cos(radians(address.longitude) - radians(:userLongitude)) + sin(radians(:userLatitude)) * sin(radians(address.latitude))) < :radius`, {
       userLatitude,
