@@ -18,9 +18,6 @@ export const dataSourceConfig = (): DataSourceOptions => {
       ? {
           url: EnvConfig.database.URL,
           synchronize: false,
-          ssl: {
-            rejectUnauthorized: false,
-          },
         }
       : {
     type: "postgres",
@@ -30,9 +27,6 @@ export const dataSourceConfig = (): DataSourceOptions => {
           password: EnvConfig.database.PASSWORD_DB,
           database: EnvConfig.database.NAME_DB,
           synchronize: true,
-          ssl: {
-            rejectUnauthorized: false,
-          },
         }),
     entities: [User, Address, Shelter, DistribuitionPoints, Products,  NeedItem, NeedVolunteers, Company,FileEntity],
   };
