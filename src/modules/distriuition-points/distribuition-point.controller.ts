@@ -28,8 +28,8 @@ export class DistribuitionPointsController {
   constructor(private distribuitionPointService: DistribuitionPointsService) {}
 
   @Post('/')
-  // @UseGuards(AuthGuard('jwt'), RolesGuard)
-  // @Roles('coordinator', 'user')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('coordinator', 'user')
   async create(
     @CurrentUser() currentUser: CreateUserDto,
     @Body() createDistribuitionPoint: CreateDistribuitionPoin,
@@ -54,7 +54,7 @@ export class DistribuitionPointsController {
   }
 
   @Get('/')
-  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'))
   async listAll(@Query() query: SearchDistribuitionPoin) {
     return await this.distribuitionPointService.listAll(query);
   }
