@@ -12,6 +12,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DistribuitionPointsService } from '../distriuition-points/distribuition-point.service';
 import { User } from '../auth/entities/auth.enity';
 import { CreateUserDto } from '../auth/dto/auth.dto';
+import { SearchProduct } from './dto/search-product';
+import { Paginate } from 'src/common/interface';
 
 @Injectable()
 export class ProductService {
@@ -82,21 +84,25 @@ export class ProductService {
     return products;
   }
 
-  public async listAll() {
-    return this.productsRepository.find({
-      relations: {
-        distribuitionPoint: true,
-        creator: true,
-      },
-      select: {
-        distribuitionPoint: {
-          id: true,
-        },
-        creator: {
-          id: true,
-        },
-      },
-    });
+  public async listAll(query: SearchProduct): Promise<Paginate<Products>> {
+    const distribuitionPointId = query.distribuitionPointId;
+    const options: any = {
+      where: {},
+      take: parseInt(query.limit as string) || 10,
+      skip: parseInt(query.offset as string) || 0,
+    };
+
+    if (distribuitionPointId) {
+      await this.distribuitionPointService.findOne(distribuitionPointId);
+      options.where['distribuitionPoint'] = { id: distribuitionPointId };
+    }
+
+    const [data, total] = await this.productsRepository.findAndCount(options);
+
+    return {
+      data,
+      total,
+    };
   }
 
   public async delete(id: string) {

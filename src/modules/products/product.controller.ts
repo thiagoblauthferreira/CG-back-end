@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
@@ -18,8 +19,9 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { CreateUserDto } from '../auth/dto/auth.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { SearchProduct } from './dto/search-product';
 
-@ApiTags("Products")
+@ApiTags('Products')
 @Controller('product')
 export class ProductController {
   constructor(private productsService: ProductService) {}
@@ -46,8 +48,8 @@ export class ProductController {
 
   @Get('/')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  async listAll() {
-    return await this.productsService.listAll();
+  async listAll(@Query() query: SearchProduct) {
+    return await this.productsService.listAll(query);
   }
 
   @Get('/:productId')
