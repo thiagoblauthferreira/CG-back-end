@@ -16,6 +16,8 @@ import { Products } from '../products/entities/product.entity';
 import { ProductService } from './../products/product.service';
 import { ProductMessagesHelper } from '../products/helpers/product.helper';
 import { CreateUserDto } from '../auth/dto/auth.dto';
+import { SearchDistribuitionPoin } from './dto/search-distribuition-point';
+import { Paginate } from 'src/common/interface';
 
 @Injectable()
 export class DistribuitionPointsService {
@@ -82,18 +84,23 @@ export class DistribuitionPointsService {
     return saveDistribuitionPoin;
   }
 
-  public async listAll() {
-    return this.distribuitionPointsRepository.find({
-      relations: {
-        address: true,
-        products: true,
-      },
-      select: {
-        products: {
-          id: true,
+  public async listAll(
+    query: SearchDistribuitionPoin,
+  ): Promise<Paginate<DistribuitionPoints>> {
+    const [data, total] = await this.distribuitionPointsRepository.findAndCount(
+      {
+        relations: {
+          address: true,
         },
+        take: parseInt(query.limit as string) || 10,
+        skip: parseInt(query.offset as string) || 0,
       },
-    });
+    );
+
+    return {
+      data,
+      total,
+    };
   }
 
   public async findOne(
@@ -132,15 +139,6 @@ export class DistribuitionPointsService {
     };
   }
 
-  public async listProducts(distribuitionPointId: string) {
-    await this.findOne(distribuitionPointId);
-    const products = await this.productsRepository.find({
-      where: { distribuitionPoint: { id: distribuitionPointId } },
-    });
-
-    return products;
-  }
-
   async addProduct(
     distribuitionPointId: string,
     productId: string,
@@ -156,7 +154,7 @@ export class DistribuitionPointsService {
     if (!product) {
       throw new NotFoundException(ProductMessagesHelper.PRODUCT_NOT_FOUND);
     }
-    
+
     if (product.creator.id !== currentUser.id) {
       throw new ForbiddenException(
         DistribuitionPointMessagesHelper.ONLY_PRODUCT_CREATOR_CAN_ADD_OR_REMOVE,

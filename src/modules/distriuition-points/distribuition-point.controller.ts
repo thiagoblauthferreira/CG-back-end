@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { DistribuitionPointsService } from './distribuition-point.service';
@@ -19,15 +20,16 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { CreateUserDto } from '../auth/dto/auth.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { SearchDistribuitionPoin } from './dto/search-distribuition-point';
 
-@ApiTags("Distribution points")
+@ApiTags('Distribution points')
 @Controller('distribuitionPoint')
 export class DistribuitionPointsController {
   constructor(private distribuitionPointService: DistribuitionPointsService) {}
 
   @Post('/')
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles('coordinator', 'user')
+  // @UseGuards(AuthGuard('jwt'), RolesGuard)
+  // @Roles('coordinator', 'user')
   async create(
     @CurrentUser() currentUser: CreateUserDto,
     @Body() createDistribuitionPoint: CreateDistribuitionPoin,
@@ -52,9 +54,9 @@ export class DistribuitionPointsController {
   }
 
   @Get('/')
-  @UseGuards(AuthGuard('jwt'))
-  async listAll() {
-    return await this.distribuitionPointService.listAll();
+  // @UseGuards(AuthGuard('jwt'))
+  async listAll(@Query() query: SearchDistribuitionPoin) {
+    return await this.distribuitionPointService.listAll(query);
   }
 
   @Get('/:distribuitionPointId')
@@ -72,16 +74,6 @@ export class DistribuitionPointsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('distribuitionPointId') distribuitionPointId: string) {
     return await this.distribuitionPointService.remove(distribuitionPointId);
-  }
-
-  @Get('/:distribuitionPointId/products')
-  @UseGuards(AuthGuard('jwt'))
-  async listProducts(
-    @Param('distribuitionPointId') distribuitionPointId: string,
-  ) {
-    return await this.distribuitionPointService.listProducts(
-      distribuitionPointId,
-    );
   }
 
   @Patch('/:distribuitionPointId/products')
