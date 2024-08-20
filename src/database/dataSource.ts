@@ -18,24 +18,16 @@ export const dataSourceConfig = (): DataSourceOptions => {
       ? {
           url: EnvConfig.database.URL,
           synchronize: false,
-          ssl: false,
-          /*ssl: {
-            rejectUnauthorized: false,
-          },*/
         }
       : {
-    type: "postgres",
-          host: EnvConfig.database.HOST_DB,
-          port: EnvConfig.database.PORT_DB,
-          username: EnvConfig.database.USER_DB,
-          password: EnvConfig.database.PASSWORD_DB,
-          database: EnvConfig.database.NAME_DB,
-          synchronize: true,
-          ssl: false,
-          /*ssl: {
-            rejectUnauthorized: false,
-          },*/
-        }),
+        type: "postgres",
+        host: EnvConfig.database.HOST_DB,
+        port: EnvConfig.database.PORT_DB,
+        username: EnvConfig.database.USER_DB,
+        password: EnvConfig.database.PASSWORD_DB,
+        database: EnvConfig.database.NAME_DB,
+        synchronize: true,
+      }),
     entities: [User, Address, Shelter, DistribuitionPoints, Products,  NeedItem, NeedVolunteers, Company,FileEntity],
   };
 };
