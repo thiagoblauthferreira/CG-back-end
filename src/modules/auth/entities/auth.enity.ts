@@ -44,9 +44,6 @@ export class User {
   birthDate: Date;
 
   @Column()
-  isDonor: boolean;
-
-  @Column()
   isCoordinator: boolean;
 
   @Column('simple-array')

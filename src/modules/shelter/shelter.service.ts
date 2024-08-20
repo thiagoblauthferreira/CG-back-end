@@ -115,7 +115,7 @@ export class ShelterService {
     if (!coordinator) {
       throw new NotFoundException(ShelterMessagesHelper.USER_NOT_FOUND);
     }
-    if (coordinator.roles.includes('donor')) {
+    if (coordinator.roles.includes('donor')) { // Changes for user roles
       throw new ForbiddenException(
         ShelterMessagesHelper.THIS_USER_NOT_COORDINATOR,
       );

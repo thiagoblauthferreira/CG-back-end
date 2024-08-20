@@ -79,14 +79,10 @@ export class AuthService {
       const newAddress = await this.addressRepository.save(address);
 
       user.roles = [];
-
-      if (user.isDonor) {
-        user.roles.push('donor');
-      }
+    
       if (user.isCoordinator) {
         user.roles.push('coordinator');
-      }
-      if (user.isDonor && user.isCoordinator) {
+      } else {
         user.roles = ['user'];
       }
       const addressString = `${newAddress.logradouro}, ${newAddress.numero}, ${newAddress.bairro}, ${newAddress.municipio}, ${newAddress.estado}, ${newAddress.pais}`;
@@ -283,7 +279,7 @@ public async authenticate(email: string, password: string) {
 
     const query = this.usersRepository
       .createQueryBuilder("user")
-      .select(["user.id", "user.name", "user.username", "user.phone", "user.birthDate", "user.isDonor", "user.isCoordinator", "user.roles", "user.status"]) // Select only the fields you want to return
+      .select(["user.id", "user.name", "user.username", "user.phone", "user.birthDate", "user.isCoordinator", "user.roles", "user.status"]) // Select only the fields you want to return
       .addSelect(["address.latitude", "address.longitude"]) // Select only the fields you want from the address
       .leftJoin("user.address", "address")
       .where(`6371 * acos(cos(radians(:userLatitude)) * cos(radians(address.latitude)) * cos(radians(address.longitude) - radians(:userLongitude)) + sin(radians(:userLatitude)) * sin(radians(address.latitude))) < :radius`, {

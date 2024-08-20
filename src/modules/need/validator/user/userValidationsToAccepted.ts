@@ -7,10 +7,6 @@ export function userValidationsToAccepted(user: User){
     throw new ForbiddenException("Sem autorização parar aceitar necessidades.");
   }
 
-  if(user.isDonor != true){
-    throw new ForbiddenException("Sem autorização parar aceitar necessidades.");
-  }
-
   if(user.status != Status.APPROVED){
     throw new ForbiddenException("Sem autorização parar aceitar necessidades.");
   }
