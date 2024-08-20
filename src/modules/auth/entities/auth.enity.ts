@@ -43,8 +43,6 @@ export class User {
   @Column()
   birthDate: Date;
 
-  @Column()
-  isDonor: boolean;
 
   @Column()
   isCoordinator: boolean;
