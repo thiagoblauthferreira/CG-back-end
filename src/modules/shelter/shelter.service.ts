@@ -10,6 +10,7 @@ import { ShelterMessagesHelper } from './helpers/shelter.helper';
 import { UpdateShelterDto, CreateShelterDto } from './dto';
 import { User } from '../auth/entities/auth.enity';
 import { Address } from '../auth/entities/adress.enity';
+import { SearchShelter } from './dto/search-shelter';
 
 interface IRelations {
   address?: boolean;
@@ -86,15 +87,19 @@ export class ShelterService {
     return shelter;
   }
 
-  async listAll() {
-    return await this.shelterRepository.find({
-      relations: { address: true, creator: true, coordinators: true },
-      select: {
-        coordinators: {
-          id: true,
-        },
+  async listAll(query: SearchShelter) {
+    const [data, total] = await this.shelterRepository.findAndCount({
+      relations: {
+        address: true,
       },
+      take: parseInt(query.limit as string) || 10,
+      skip: parseInt(query.offset as string) || 0,
     });
+
+    return {
+      data,
+      total,
+    };
   }
 
   async remove(shelterId: string) {
