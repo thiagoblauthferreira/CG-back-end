@@ -64,7 +64,7 @@ export class DistribuitionPointsController {
   async findOne(@Param('distribuitionPointId') distribuitionPointId: string) {
     return await this.distribuitionPointService.findOne(distribuitionPointId, {
       address: true,
-      products: true,
+      creator: true,
     });
   }
 

@@ -9,6 +9,7 @@ import {
   HttpStatus,
   HttpCode,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { CreateShelterDto } from './dto/create-shelter.dto';
 import { ShelterService } from './shelter.service';
@@ -20,8 +21,9 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { CreateUserDto } from '../auth/dto/auth.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { SearchShelter } from './dto/search-shelter';
 
-@ApiTags("Shelter")
+@ApiTags('Shelter')
 @Controller('shelter')
 export class ShelterController {
   constructor(private shelterService: ShelterService) {}
@@ -48,8 +50,8 @@ export class ShelterController {
 
   @Get('/')
   @UseGuards(AuthGuard('jwt'))
-  async listAll() {
-    return await this.shelterService.listAll();
+  async listAll(@Query() query: SearchShelter) {
+    return await this.shelterService.listAll(query);
   }
 
   @Get('/:shelterId')

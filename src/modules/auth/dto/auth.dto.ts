@@ -41,12 +41,7 @@ export class CreateUserDto {
   @IsDateString()
   @IsOptional()
   birthDate: Date;
-
-  @ApiProperty()
-  @IsBoolean()
-  @IsOptional()
-  isDonor: boolean;
-
+  
   @ApiProperty()
   @IsBoolean()
   @IsOptional()
@@ -55,7 +50,7 @@ export class CreateUserDto {
   @ApiProperty()
   @IsArray()
   @IsOptional()
-  @IsIn(['donor', 'coordinator', 'user', 'admin'], { each: true })
+  @IsIn(['coordinator', 'user', 'admin'], { each: true })
   roles: string[];
 
   @ApiProperty({ nullable: true })
