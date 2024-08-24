@@ -20,14 +20,14 @@ export const dataSourceConfig = (): DataSourceOptions => {
           synchronize: false,
         }
       : {
-    type: "postgres",
-          host: EnvConfig.database.HOST_DB,
-          port: EnvConfig.database.PORT_DB,
-          username: EnvConfig.database.USER_DB,
-          password: EnvConfig.database.PASSWORD_DB,
-          database: EnvConfig.database.NAME_DB,
-          synchronize: true,
-        }),
+        type: "postgres",
+        host: EnvConfig.database.HOST_DB,
+        port: EnvConfig.database.PORT_DB,
+        username: EnvConfig.database.USER_DB,
+        password: EnvConfig.database.PASSWORD_DB,
+        database: EnvConfig.database.NAME_DB,
+        synchronize: true,
+      }),
     entities: [User, Address, Shelter, DistribuitionPoints, Products,  NeedItem, NeedVolunteers, Company,FileEntity],
   };
 };
