@@ -34,7 +34,6 @@ async function bootstrap() {
     const certPath = './certificados/certificado.crt';
     const keyPath = './certificados/chave-privada.pem';
 
-    console.log(`Loading certificates from ${certPath} and ${keyPath}`);
     const cert = fs.readFileSync(certPath);
     const key = fs.readFileSync(keyPath);
 

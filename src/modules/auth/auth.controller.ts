@@ -8,7 +8,7 @@ import {
   Patch,
   Request,
   UseGuards,
-  Put
+  Put,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/auth.dto';
@@ -16,14 +16,13 @@ import { HttpStatus } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { LoginDto } from './dto/login.dto';
 import { ApiBearerAuth, ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
-import { MailService } from '../mail/mail.service';
 import { ChangePasswordDto } from './dto/changepassword.dto';
 import { ResetPasswordDto } from './dto/resetpassword.dto';
 
-@ApiTags("Auth")
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService, private mailService: MailService) { }
+  constructor(private authService: AuthService) {}
 
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {
@@ -42,26 +41,19 @@ export class AuthController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Patch('update/:userId')
-  async update(
-    @Request() req: any,
-    @Body() updates: CreateUserDto,
-  ) {
+  async update(@Request() req: any, @Body() updates: CreateUserDto) {
     return this.authService.updateAccount(req.user.id, updates);
   }
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Delete('delete/:userId')
-  async delete(
-    @Request() req: any
-  ) {
+  async delete(@Request() req: any) {
     return this.authService.deleteAccount(req.user.id);
   }
 
   @Post('login')
-  async login(
-    @Body() loginDto: LoginDto
-  ) {
+  async login(@Body() loginDto: LoginDto) {
     return this.authService.authenticate(loginDto.email, loginDto.password);
   }
 
