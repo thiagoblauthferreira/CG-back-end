@@ -4,7 +4,13 @@ import {
   NotFoundException,
   forwardRef,
 } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import {
+  Brackets,
+  FindManyOptions,
+  FindOptionsWhere,
+  Like,
+  Repository,
+} from 'typeorm';
 import { Products } from './entities/product.entity';
 import { CreateProduct, UpdateProduct } from './dto';
 import { ProductMessagesHelper } from './helpers/product.helper';
@@ -14,6 +20,7 @@ import { User } from '../auth/entities/auth.enity';
 import { CreateUserDto } from '../auth/dto/auth.dto';
 import { SearchProduct } from './dto/search-product';
 import { Paginate } from 'src/common/interface';
+import { ProducatType } from './enums/products.enum';
 
 @Injectable()
 export class ProductService {
@@ -84,20 +91,54 @@ export class ProductService {
     return products;
   }
 
-  public async listAll(query: SearchProduct): Promise<Paginate<Products>> {
+  public async listAll(
+    query: SearchProduct,
+    relations?: { distribuitionPoint?: boolean; creator?: boolean },
+  ): Promise<Paginate<Products>> {
     const distribuitionPointId = query.distribuitionPointId;
-    const options: any = {
-      where: {},
-      take: parseInt(query.limit as string) || 10,
-      skip: parseInt(query.offset as string) || 0,
-    };
 
-    if (distribuitionPointId) {
-      await this.distribuitionPointService.findOne(distribuitionPointId);
-      options.where['distribuitionPoint'] = { id: distribuitionPointId };
+    const queryBuilder = this.productsRepository.createQueryBuilder('product');
+
+    if (relations?.distribuitionPoint) {
+      queryBuilder
+        .leftJoinAndSelect('product.distribuitionPoint', 'distribuitionPoint')
+        .addSelect(['distribuitionPoint.id']);
+    }
+    if (relations?.creator) {
+      queryBuilder
+        .leftJoinAndSelect('product.creator', 'creator')
+        .addSelect(['creator.id']);
     }
 
-    const [data, total] = await this.productsRepository.findAndCount(options);
+    if (query.search) {
+      const formattedSearch = `%${query.search.toLowerCase().trim()}%`;
+      queryBuilder.andWhere(
+        new Brackets((qb) => {
+          qb.where('LOWER(product.name) LIKE :search', {
+            search: formattedSearch,
+          }).orWhere('LOWER(product.description) LIKE :search', {
+            search: formattedSearch,
+          });
+        }),
+      );
+    }
+    if (query.type) {
+      queryBuilder.andWhere('product.type = :type', { type: query.type });
+    }
+    if (distribuitionPointId) {
+      await this.distribuitionPointService.findOne(distribuitionPointId);
+      queryBuilder.andWhere(
+        'product.distribuitionPointId = :distribuitionPointId',
+        { distribuitionPointId },
+      );
+    }
+
+    const limit = parseInt(query.limit as string, 10) || 10;
+    const offset = parseInt(query.offset as string, 10) || 0;
+
+    queryBuilder.skip(offset).take(limit);
+
+    const [data, total] = await queryBuilder.getManyAndCount();
 
     return {
       data,

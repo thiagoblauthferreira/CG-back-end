@@ -7,6 +7,7 @@ import {
   DeleteDateColumn,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -27,13 +28,13 @@ export class DistribuitionPoints {
   @Column({ nullable: true })
   description: string;
 
-  @OneToOne(() => User, (user) => user)
-  @JoinColumn()
-  creator: User;
-
   @OneToOne(() => Address, (address) => address)
   @JoinColumn()
   address: Address;
+
+  @ManyToOne(() => User, (user) => user.distribuitionPoints)
+  @JoinColumn()
+  creator: User;
 
   @OneToMany(() => Products, (products) => products.distribuitionPoint, {
     nullable: true,

@@ -47,9 +47,8 @@ export class ProductController {
   }
 
   @Get('/')
-  @UseGuards(AuthGuard('jwt'))
   async listAll(@Query() query: SearchProduct) {
-    return await this.productsService.listAll(query);
+    return await this.productsService.listAll(query, { creator: true });
   }
 
   @Get('/:productId')
