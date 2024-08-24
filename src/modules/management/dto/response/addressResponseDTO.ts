@@ -20,5 +20,6 @@ export class ResponseAddressDTO {
     this.street = address.logradouro,
     this.number = address.numero,
     this.complement = address.complemento
+
   }
 }

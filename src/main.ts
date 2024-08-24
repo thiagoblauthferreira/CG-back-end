@@ -22,6 +22,8 @@ async function bootstrap() {
     .addTag('Hello World')
     .addTag('Distribution points')
     .addTag('Products')
+    .addTag('management')
+    .addTag('Search')
     .build();
   const document = SwaggerModule.createDocument(app, config);
 
@@ -66,3 +68,4 @@ async function bootstrap() {
 }
 
 bootstrap();
+

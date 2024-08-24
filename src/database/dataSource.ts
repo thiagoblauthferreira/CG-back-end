@@ -9,6 +9,7 @@ import { NeedVolunteers } from "src/modules/need/entities/needVolunteers.entity"
 import { EnvConfig } from "src/config";
 import { DistribuitionPoints } from 'src/modules/distriuition-points/entities/distribuition-point.entity';
 import { Products } from 'src/modules/products/entities/product.entity';
+import { Management } from "src/modules/management/entities/management.entity";
 
 
 export const dataSourceConfig = (): DataSourceOptions => {
@@ -20,15 +21,15 @@ export const dataSourceConfig = (): DataSourceOptions => {
           synchronize: false,
         }
       : {
-    type: "postgres",
-          host: EnvConfig.database.HOST_DB,
-          port: EnvConfig.database.PORT_DB,
-          username: EnvConfig.database.USER_DB,
-          password: EnvConfig.database.PASSWORD_DB,
-          database: EnvConfig.database.NAME_DB,
-          synchronize: true,
-        }),
-    entities: [User, Address, Shelter, DistribuitionPoints, Products,  NeedItem, NeedVolunteers, Company,FileEntity],
+        type: "postgres",
+        host: EnvConfig.database.HOST_DB,
+        port: EnvConfig.database.PORT_DB,
+        username: EnvConfig.database.USER_DB,
+        password: EnvConfig.database.PASSWORD_DB,
+        database: EnvConfig.database.NAME_DB,
+        synchronize: true,
+      }),
+    entities: [User, Address, Shelter, DistribuitionPoints, Management, Products,  NeedItem, NeedVolunteers, Company,FileEntity],
   };
 };
 
