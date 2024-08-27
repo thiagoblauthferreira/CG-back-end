@@ -7,4 +7,9 @@ export class SearchDistribuitionPoin extends QueryRequest {
   @IsOptional()
   @IsString()
   proximity: string;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsString()
+  search: string;
 }

@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DistribuitionPoints } from './entities/distribuition-point.entity';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { CreateDistribuitionPoin, UpdateDistribuitionPoin } from './dto';
 import { DistribuitionPointMessagesHelper } from './helpers/distribuition-point.helper';
 import { User } from '../auth/entities/auth.enity';
@@ -87,15 +87,31 @@ export class DistribuitionPointsService {
   public async listAll(
     query: SearchDistribuitionPoin,
   ): Promise<Paginate<DistribuitionPoints>> {
-    const [data, total] = await this.distribuitionPointsRepository.findAndCount(
-      {
-        relations: {
-          address: true,
-        },
-        take: parseInt(query.limit as string) || 10,
-        skip: parseInt(query.offset as string) || 0,
-      },
-    );
+    const queryBuilder = this.distribuitionPointsRepository
+      .createQueryBuilder('dp')
+      .leftJoinAndSelect('dp.address', 'address');
+
+    if (query.search) {
+      const formattedSearch = `%${query.search.toLowerCase().trim()}%`;
+      queryBuilder.andWhere(
+        new Brackets((qb) => {
+          qb.where('LOWER(dp.name) LIKE :search', { search: formattedSearch })
+            .orWhere('LOWER(dp.description) LIKE :search', {
+              search: formattedSearch,
+            })
+            .orWhere('LOWER(dp.phone) LIKE :search', {
+              search: formattedSearch,
+            });
+        }),
+      );
+    }
+
+    const limit = parseInt(query.limit as string, 10) || 10;
+    const offset = parseInt(query.offset as string, 10) || 0;
+
+    queryBuilder.skip(offset).take(limit);
+
+    const [data, total] = await queryBuilder.getManyAndCount();
 
     return {
       data,

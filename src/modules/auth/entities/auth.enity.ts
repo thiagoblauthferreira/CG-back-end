@@ -6,10 +6,12 @@ import {
   OneToOne,
   ManyToOne,
   ManyToMany,
+  OneToMany,
 } from 'typeorm';
 import { Address } from '../entities/adress.enity';
 import { NeedVolunteers } from 'src/modules/need/entities/needVolunteers.entity';
 import { Shelter } from 'src/modules/shelter/entities/shelter.entity';
+import { DistribuitionPoints } from 'src/modules/distriuition-points/entities/distribuition-point.entity';
 
 export enum Status {
   WAITING = 'waiting',
@@ -43,7 +45,6 @@ export class User {
   @Column()
   birthDate: Date;
 
-
   @Column()
   isCoordinator: boolean;
 
@@ -68,8 +69,21 @@ export class User {
 
   @Column({ nullable: true })
   code: string;
-  
-  @ManyToOne(() => Shelter, (shelter) => shelter.coordinators)
+
+  @ManyToOne(() => Shelter, (shelter) => shelter.coordinators, {
+    nullable: true,
+  })
   shelter: Shelter;
 
+  @OneToMany(
+    () => DistribuitionPoints,
+    (distribuitionPoints) => distribuitionPoints.creator,
+    { nullable: true },
+  )
+  distribuitionPoints: DistribuitionPoints[];
+
+  @OneToMany(() => Shelter, (shelter) => shelter.creator, {
+    nullable: true,
+  })
+  shelters: Shelter[];
 }
