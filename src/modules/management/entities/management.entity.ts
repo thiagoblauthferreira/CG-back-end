@@ -1,0 +1,53 @@
+import { Address } from "src/modules/auth/entities/adress.enity";
+import { User } from "src/modules/auth/entities/auth.enity";
+import { NeedItem } from "src/modules/need/entities/needItems.entity";
+import { NeedVolunteers } from "src/modules/need/entities/needVolunteers.entity";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Shelter } from "src/modules/shelter/entities/shelter.entity";
+import { EmailQueue } from "src/modules/schedule/entity/emailQueue.entity";
+
+@Entity()
+export class Management {
+
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column()
+  collectionDate: Date;
+  
+  @ManyToOne(() => User, (user) => user.id)
+  @JoinColumn({ name: 'coordinatorId' })
+  coordinator: User;
+
+  @ManyToOne(() => Shelter, (shelter) => shelter.id)
+  @JoinColumn({ name: 'shelterId' })
+  shelter: Shelter;
+  
+  @OneToOne(() => Address, (address) => address)
+  @JoinColumn()
+  collectPoint: Address
+
+  @ManyToMany(() => NeedItem, (need) => need)
+  @JoinTable()
+  needItem?: NeedItem[];
+
+  @ManyToMany(() => NeedVolunteers, (need) => need)
+  @JoinTable()
+  needVolunteer?: NeedVolunteers[];
+
+  @OneToMany(() => EmailQueue, (emailQueue) => emailQueue.management)
+  emailQueue: EmailQueue[]; 
+
+  @Column({ default: false })
+  processed: boolean;
+  
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
+
+}
