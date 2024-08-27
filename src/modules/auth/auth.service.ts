@@ -1,4 +1,10 @@
-import { ConflictException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Status, User } from './entities/auth.enity';
@@ -12,7 +18,7 @@ import { JwtPayload } from './payload/jwt.payload';
 import { JwtService } from '@nestjs/jwt';
 import logger from 'src/logger';
 import { CompanyService } from '../company/company.service';
-import { MailService } from '../mail/mail.service';
+// import { MailService } from '../mail/mail.service';
 import { SendMailActivationUserDto } from '../mail/dto/sendmailactivationuser.dto';
 import { ResetPasswordDto } from './dto/resetpassword.dto';
 import { SendMailResetPasswordDto } from '../mail/dto/sendmailresetpassword.dto';
@@ -27,12 +33,13 @@ export class AuthService {
     private addressRepository: Repository<Address>,
     private jwtService: JwtService,
     private companyService: CompanyService,
-    private mailService: MailService,
-  ) { }
+    // private mailService: MailService,
+  ) {}
 
   async validateUser(payload: JwtPayload) {
-
-    const user = await this.usersRepository.findOne({ where: { id: payload.sub } });
+    const user = await this.usersRepository.findOne({
+      where: { id: payload.sub },
+    });
 
     if (!user || user.username !== payload.username) {
       throw new UnauthorizedException();
@@ -43,7 +50,7 @@ export class AuthService {
   public async getProfile(userId: string) {
     const user = await this.usersRepository.findOne({
       where: { id: userId },
-      relations: ['address']
+      relations: ['address'],
     });
 
     if (!user) {
@@ -56,11 +63,13 @@ export class AuthService {
     return result;
   }
 
-
   public async register(createUserDto: CreateUserDto) {
     try {
       const existingUser = await this.usersRepository.findOne({
-        where: [{ username: createUserDto.username }, { email: createUserDto.email }]
+        where: [
+          { username: createUserDto.username },
+          { email: createUserDto.email },
+        ],
       });
 
       if (existingUser) {
@@ -86,7 +95,10 @@ export class AuthService {
         user.roles = ['user'];
       }
       const addressString = `${newAddress.logradouro}, ${newAddress.numero}, ${newAddress.bairro}, ${newAddress.municipio}, ${newAddress.estado}, ${newAddress.pais}`;
-      const geocodeResult = await opencage.geocode({ q: addressString, key: EnvConfig.OPENCAGE.API_KEY });
+      const geocodeResult = await opencage.geocode({
+        q: addressString,
+        key: EnvConfig.OPENCAGE.API_KEY,
+      });
 
       if (geocodeResult.results.length > 0) {
         const { lat, lng } = geocodeResult.results[0].geometry;
@@ -102,11 +114,19 @@ export class AuthService {
 
       const newUser = await this.usersRepository.save(user);
 
-      const mailDto = new SendMailActivationUserDto(newUser.name, newUser.email, newUser.code);
+      const mailDto = new SendMailActivationUserDto(
+        newUser.name,
+        newUser.email,
+        newUser.code,
+      );
 
-      this.mailService.sendUserConfirmation(mailDto)
+      // this.mailService.sendUserConfirmation(mailDto)
 
-      const payload = { username: newUser.username, sub: newUser.id, roles: newUser.roles };
+      const payload = {
+        username: newUser.username,
+        sub: newUser.id,
+        roles: newUser.roles,
+      };
       const token = this.jwtService.sign(payload);
 
       return { token };
@@ -118,7 +138,9 @@ export class AuthService {
 
   public async resetPassword(dto: ResetPasswordDto) {
     try {
-      const user = await this.usersRepository.findOne({ where: { email: dto.email.toLowerCase() } });
+      const user = await this.usersRepository.findOne({
+        where: { email: dto.email.toLowerCase() },
+      });
 
       if (!user) {
         throw new NotFoundException('Usuário não encontrado');
@@ -129,20 +151,29 @@ export class AuthService {
 
       await this.usersRepository.save(user);
 
-      const mailDto = new SendMailResetPasswordDto(user.name, newPassword, user.email)
+      const mailDto = new SendMailResetPasswordDto(
+        user.name,
+        newPassword,
+        user.email,
+      );
 
-      this.mailService.sendResetPassword(mailDto);
+      // this.mailService.sendResetPassword(mailDto);
 
       return { message: 'Senha redefinida com sucesso', newPassword };
     } catch (error) {
       logger.error(error);
-      throw new HttpException('Error on reset password', HttpStatus.INTERNAL_SERVER_ERROR)
+      throw new HttpException(
+        'Error on reset password',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   public async activateUser(code: string) {
     try {
-      const user = await this.usersRepository.findOne({ where: { code: code } });
+      const user = await this.usersRepository.findOne({
+        where: { code: code },
+      });
 
       if (!user) {
         throw new NotFoundException('Usuário não encontrado');
@@ -159,13 +190,18 @@ export class AuthService {
       return { message: 'Usuário ativado com sucesso' };
     } catch (error) {
       logger.error(error);
-      throw new HttpException('Error on activate user', HttpStatus.INTERNAL_SERVER_ERROR)
+      throw new HttpException(
+        'Error on activate user',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   public async changePassword(dto: ChangePasswordDto) {
     try {
-      const user = await this.usersRepository.findOne({ where: { email: dto.email.toLowerCase() } });
+      const user = await this.usersRepository.findOne({
+        where: { email: dto.email.toLowerCase() },
+      });
 
       if (!user) {
         throw new NotFoundException('Usuário não encontrado');
@@ -182,11 +218,14 @@ export class AuthService {
 
       await this.usersRepository.save(user);
 
-      this.mailService.sendChangePasswordAlert(user.email, user.name);
+      // this.mailService.sendChangePasswordAlert(user.email, user.name);
       return { message: 'Senha alterada com sucesso' };
     } catch (error) {
       logger.error(error);
-      throw new HttpException('Error on change password', HttpStatus.INTERNAL_SERVER_ERROR)
+      throw new HttpException(
+        'Error on change password',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -201,7 +240,6 @@ export class AuthService {
 
     return { message: 'Conta deletada com sucesso' };
   }
-
 
   public async updateAccount(userId: string, updates: Partial<User>) {
     const user = await this.usersRepository.findOne({ where: { id: userId } });
@@ -221,53 +259,63 @@ export class AuthService {
      * isso, criando uma outra so pro email
      */
 
-    const updatedUser = await this.usersRepository.save({ ...user, ...updates });
+    const updatedUser = await this.usersRepository.save({
+      ...user,
+      ...updates,
+    });
 
     delete updatedUser.password;
 
     return updatedUser;
   }
 
+  public async authenticate(email: string, password: string) {
+    const user = await this.usersRepository.findOne({
+      where: { email: email.toLowerCase() },
+    });
+    //adicionando pesquisa company
+    const company = await this.companyService.findByEmail(email);
+    //adiciona comparação para validação de e-mail
+    if (!user && !company) {
+      throw new Error('Usuário não encontrado');
+    }
+    //Início da lógica do token para a company
+    let token = '';
+    if (company && !user) {
+      const passwordMatchesCompany = await compare(password, company.password);
+      if (!passwordMatchesCompany) {
+        throw new ForbiddenException('Erro nas credenciais de acesso.');
+      }
 
-public async authenticate(email: string, password: string) {
- 
-  const user = await this.usersRepository.findOne({ where: { email: email.toLowerCase() } });
-  //adicionando pesquisa company
-  const company = await this.companyService.findByEmail(email);
-  //adiciona comparação para validação de e-mail
-  if (!user && !company) {
-    throw new Error('Usuário não encontrado');
-  }
- //Início da lógica do token para a company  
-  let token = "";
-  if(company && !user){
-    const passwordMatchesCompany = await compare(password, company.password);
-    if(!passwordMatchesCompany){
-      throw new ForbiddenException("Erro nas credenciais de acesso.");
+      const payload = {
+        username: company.tradeName,
+        sub: company.id,
+        roles: ['donor', 'company'],
+      };
+      token = this.jwtService.sign(payload);
+      return { token };
+    }
+    //fim da lógica do token para a company
+
+    const passwordMatches = await compare(password, user.password);
+
+    if (!passwordMatches) {
+      throw new Error('Senha inválida');
     }
 
-    const payload = { username: company.tradeName, sub: company.id, roles: ["donor", "company"] };
+    const payload = {
+      username: user.username,
+      sub: user.id,
+      roles: user.roles,
+    };
     token = this.jwtService.sign(payload);
-    return { token }
-  
+
+    return { token };
   }
-  //fim da lógica do token para a company  
- 
-  const passwordMatches = await compare(password, user.password);
-
-  if (!passwordMatches) {
-    throw new Error('Senha inválida');
-  }
-
-  const payload = { username: user.username, sub: user.id, roles: user.roles };
-  token = this.jwtService.sign(payload);
-
-  return { token };
-}
   public async findNearbyUsers(userId: string, radius: number) {
     const user = await this.usersRepository.findOne({
       where: { id: userId },
-      relations: ["address"]
+      relations: ['address'],
     });
 
     if (!user) {
@@ -278,23 +326,36 @@ public async authenticate(email: string, password: string) {
     const userLongitude = user.address.longitude;
 
     const query = this.usersRepository
-      .createQueryBuilder("user")
-      .select(["user.id", "user.name", "user.username", "user.phone", "user.birthDate", "user.isCoordinator", "user.roles", "user.status"]) // Select only the fields you want to return
-      .addSelect(["address.latitude", "address.longitude"]) // Select only the fields you want from the address
-      .leftJoin("user.address", "address")
-      .where(`6371 * acos(cos(radians(:userLatitude)) * cos(radians(address.latitude)) * cos(radians(address.longitude) - radians(:userLongitude)) + sin(radians(:userLatitude)) * sin(radians(address.latitude))) < :radius`, {
-        userLatitude,
-        userLongitude,
-        radius
-      })
-      .andWhere("user.id != :userId", { userId });
+      .createQueryBuilder('user')
+      .select([
+        'user.id',
+        'user.name',
+        'user.username',
+        'user.phone',
+        'user.birthDate',
+        'user.isCoordinator',
+        'user.roles',
+        'user.status',
+      ]) // Select only the fields you want to return
+      .addSelect(['address.latitude', 'address.longitude']) // Select only the fields you want from the address
+      .leftJoin('user.address', 'address')
+      .where(
+        `6371 * acos(cos(radians(:userLatitude)) * cos(radians(address.latitude)) * cos(radians(address.longitude) - radians(:userLongitude)) + sin(radians(:userLatitude)) * sin(radians(address.latitude))) < :radius`,
+        {
+          userLatitude,
+          userLongitude,
+          radius,
+        },
+      )
+      .andWhere('user.id != :userId', { userId });
 
     return await query.getMany();
   }
 }
 
 function generateRandomCode(length: number): string {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const characters =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let result = '';
   const charactersLength = characters.length;
 

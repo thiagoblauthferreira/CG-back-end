@@ -9,6 +9,8 @@ import { NeedVolunteers } from 'src/modules/need/entities/needVolunteers.entity'
 import { EnvConfig } from 'src/config';
 import { DistribuitionPoints } from 'src/modules/distriuition-points/entities/distribuition-point.entity';
 import { Products } from 'src/modules/products/entities/product.entity';
+import { EmailQueue } from 'src/modules/schedule/entity/emailQueue.entity';
+import { Management } from 'src/modules/management/entities/management.entity';
 
 export const dataSourceConfig = (): DataSourceOptions => {
   return {
@@ -37,6 +39,8 @@ export const dataSourceConfig = (): DataSourceOptions => {
       NeedVolunteers,
       Company,
       FileEntity,
+      EmailQueue,
+      Management,
     ],
   };
 };

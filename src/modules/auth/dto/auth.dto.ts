@@ -1,6 +1,7 @@
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsBoolean, IsDateString, IsEmail, IsEmpty, IsEnum, IsIn, IsOptional, IsString, MinLength } from 'class-validator';
 import { CreateAddressDto } from './adress.dto';
+import { Type } from 'class-transformer';
 export enum Status {
   WAITING = 'waiting',
   APPROVED = 'approved',
@@ -40,6 +41,7 @@ export class CreateUserDto {
   @ApiProperty()
   @IsDateString()
   @IsOptional()
+  @Type(() => Date) // retirar
   birthDate: Date;
   
   @ApiProperty()

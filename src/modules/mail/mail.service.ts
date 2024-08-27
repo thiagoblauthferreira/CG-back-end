@@ -4,6 +4,7 @@ import * as AWS from 'aws-sdk';
 import * as Handlebars from 'handlebars';
 import { SendMailActivationUserDto } from './dto/sendmailactivationuser.dto';
 import { SendMailResetPasswordDto } from './dto/sendmailresetpassword.dto';
+import { Address } from '../auth/entities/adress.enity';
 
 @Injectable()
 export class MailService {
@@ -25,12 +26,21 @@ export class MailService {
   }
 
   async sendUserConfirmation(activationDto: SendMailActivationUserDto) {
-    const logoContent = await this.getS3File('templates-mail-gloma', 'images/logo.png');
-    const templateContent = (await this.getS3File('templates-mail-gloma', 'templates/mail-confirmation.hbs')).toString('utf-8');
+    const logoContent = await this.getS3File(
+      'templates-mail-gloma',
+      'images/logo.png',
+    );
+    const templateContent = (
+      await this.getS3File(
+        'templates-mail-gloma',
+        'templates/mail-confirmation.hbs',
+      )
+    ).toString('utf-8');
 
     const compiledTemplate = this.compileTemplate(templateContent, {
       activationCode: activationDto.code,
-      activationLink: 'http://localhost:3000/' + activationDto.code + '/activate',
+      activationLink:
+        'http://localhost:3000/' + activationDto.code + '/activate',
       nome: activationDto.name.split(' ')[0],
     });
 
@@ -49,8 +59,16 @@ export class MailService {
   }
 
   async sendResetPassword(resetPassword: SendMailResetPasswordDto) {
-    const logoContent = await this.getS3File('templates-mail-gloma', 'images/logo.png');
-    const templateContent = (await this.getS3File('templates-mail-gloma', 'templates/resetpassword.hbs')).toString('utf-8');
+    const logoContent = await this.getS3File(
+      'templates-mail-gloma',
+      'images/logo.png',
+    );
+    const templateContent = (
+      await this.getS3File(
+        'templates-mail-gloma',
+        'templates/resetpassword.hbs',
+      )
+    ).toString('utf-8');
 
     const compiledTemplate = this.compileTemplate(templateContent, {
       password: resetPassword.password,
@@ -72,9 +90,17 @@ export class MailService {
   }
 
   async sendChangePasswordAlert(email: string, nome: string) {
-    const logoContent = await this.getS3File('templates-mail-gloma', 'images/logo.png');
-    const templateContent = (await this.getS3File('templates-mail-gloma', 'templates/change-password.hbs')).toString('utf-8');
-
+    const logoContent = await this.getS3File(
+      'templates-mail-gloma',
+      'images/logo.png',
+    );
+    const templateContent = (
+      await this.getS3File(
+        'templates-mail-gloma',
+        'templates/change-password.hbs',
+      )
+    ).toString('utf-8');
+    //aqui eu vou ter que alterar para receber os dados.
     const compiledTemplate = this.compileTemplate(templateContent, {
       nome: nome.split(' ')[0],
     });
@@ -82,6 +108,47 @@ export class MailService {
     await this.mailerService.sendMail({
       to: email,
       subject: 'Alteração de senha Coletivo Gloma',
+      html: compiledTemplate,
+      attachments: [
+        {
+          filename: 'logo.png',
+          content: logoContent,
+          cid: 'logo@coletivogloma',
+        },
+      ],
+    });
+  }
+
+  //email para notificar usuários próximos
+  async sendNearByUsers(
+    name: string,
+    email: string,
+    collectionDate: string,
+    collectionPoint: Address,
+  ) {
+    const logoContent = await this.getS3File(
+      'templates-mail-gloma',
+      'images/logo.png',
+    );
+    const templateContent = (
+      await this.getS3File('templates-mail-gloma', 'templates/users-nearby.hbs')
+    ).toString('utf-8');
+
+    const compiledTemplate = this.compileTemplate(templateContent, {
+      shelterName: name,
+      date: collectionDate,
+      street: collectionPoint.logradouro,
+      number: collectionPoint.numero,
+      neighborhood: collectionPoint.bairro,
+      city: collectionPoint.municipio,
+      state: collectionPoint.estado,
+      complement: collectionPoint.complemento,
+      cep: collectionPoint.cep,
+    });
+
+    await this.mailerService.sendMail({
+      to: email,
+      subject: 'Novo ponto de coleta próximo.',
       html: compiledTemplate,
       attachments: [
         {
