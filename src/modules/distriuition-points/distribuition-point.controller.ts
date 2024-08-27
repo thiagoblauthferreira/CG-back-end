@@ -54,13 +54,11 @@ export class DistribuitionPointsController {
   }
 
   @Get('/')
-  @UseGuards(AuthGuard('jwt'))
   async listAll(@Query() query: SearchDistribuitionPoin) {
     return await this.distribuitionPointService.listAll(query);
   }
 
   @Get('/:distribuitionPointId')
-  @UseGuards(AuthGuard('jwt'))
   async findOne(@Param('distribuitionPointId') distribuitionPointId: string) {
     return await this.distribuitionPointService.findOne(distribuitionPointId, {
       address: true,
@@ -70,7 +68,7 @@ export class DistribuitionPointsController {
 
   @Delete('/:distribuitionPointId')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles('admin')
+  @Roles('coordinator', 'admin')
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('distribuitionPointId') distribuitionPointId: string) {
     return await this.distribuitionPointService.remove(distribuitionPointId);
