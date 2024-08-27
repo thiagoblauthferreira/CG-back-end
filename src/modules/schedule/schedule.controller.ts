@@ -1,8 +1,8 @@
-import { Body, Controller, Post, UseGuards } from "@nestjs/common";
-import { AuthGuard } from "@nestjs/passport";
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import { ScheduleService } from "./schedule.service";
-import { RestoresDTO } from "./dto/restoresDTO";
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ScheduleService } from './schedule.service';
+import { RestoresDTO } from './dto/restoresDTO';
 
 @ApiTags('Schedule')
 @Controller('schedule')
@@ -11,15 +11,10 @@ import { RestoresDTO } from "./dto/restoresDTO";
 export class ScheduleController {
   managementService: any;
 
-  constructor(
-    private scheduleService: ScheduleService
-  ){}
+  constructor(private scheduleService: ScheduleService) {}
 
   @Post('/restore-schedules')
-  async backupSchedule(@Body() id: RestoresDTO) { 
+  async backupSchedule(@Body() id: RestoresDTO) {
     return await this.managementService.sendEmailByNearbyBackup(id.id);
   }
-
-
-
 }

@@ -12,7 +12,7 @@ import { Address } from "../auth/entities/adress.enity";
 import { VerifyIfUserExits } from "./validators/verifyIfUserExits";
 import { User } from "../auth/entities/auth.enity";
 import { UserNearby } from "./utils/usersNearby";
-import { MailModule } from "../mail/mail.module";
+// import { MailModule } from "../mail/mail.module";
 import { ScheduleModule } from "@nestjs/schedule";
 import { Shelter } from "../shelter/entities/shelter.entity";
 import { VerifyIfShelterExits } from "./validators/verifyIfShelterExits";
@@ -23,7 +23,7 @@ import { VerifyIfShelterExits } from "./validators/verifyIfShelterExits";
     forwardRef(() => NeedModule),
     forwardRef(() => Shelter),
     ScheduleModule,
-    MailModule
+    // MailModule
   ],
   providers: [ManagementService, FindNeedsItem, FindNeedsVolunteer, VerifyIfUserExits, UserNearby, VerifyIfShelterExits],
   controllers: [ManagementController],
