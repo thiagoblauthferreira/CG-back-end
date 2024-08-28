@@ -27,7 +27,6 @@ async function bootstrap() {
 
   SwaggerModule.setup('api/document', app, document);
   appConfig(app);
-  await app.listen(8080);
 
   if (EnvConfig.ENV !== 'production') {
     await app.listen(8080);
@@ -61,8 +60,6 @@ async function bootstrap() {
         res.end();
       })
       .listen(80, () => {});
-
-    app.enableCors(corsOptions);
   }
 }
 
