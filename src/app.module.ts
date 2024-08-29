@@ -12,7 +12,7 @@ import { ProductsModule } from './modules/products/product.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { SearchModule } from './modules/search/search.module';
-import { Management } from './modules/management/entities/management.entity';
+import { ManagementModule } from './modules/management/management.module';
 
 @Module({
   imports: [
@@ -23,7 +23,7 @@ import { Management } from './modules/management/entities/management.entity';
     ShelterModule,
     DistribuitionPointsModule,
     ProductsModule,
-    Management,
+    ManagementModule,
     SearchModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'src', 'assets'),

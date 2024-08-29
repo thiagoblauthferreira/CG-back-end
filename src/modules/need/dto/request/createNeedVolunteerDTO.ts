@@ -1,7 +1,7 @@
 import { ApiHideProperty, ApiProperty } from "@nestjs/swagger";
 import { Priority } from "../../enums/enumPriority";
 import { Status } from "../../enums/enumsStatus";
-import { ArrayMinSize, IsDate, IsEmpty, IsInt, IsNotEmpty, IsString, MaxLength, MinLength } from "class-validator";
+import { ArrayMinSize, IsDate, IsEmpty, IsEnum, IsInt, IsNotEmpty, IsString, MaxLength, MinLength } from "class-validator";
 import { Type } from "class-transformer";
 
 
@@ -23,7 +23,7 @@ export class CreateVolunteerDTO {
 
   @ApiProperty()
   @IsString()
-  @MinLength(50, { message: 'A descrição deve ter no mínimo 50 caracteres.' })
+  @MinLength(20, { message: 'A descrição deve ter no mínimo 50 caracteres.' })
   @MaxLength(250, { message: 'A descrição não pode ultrapassar 250 caracteres.'})
   description: string;
 
@@ -37,14 +37,14 @@ export class CreateVolunteerDTO {
   @IsNotEmpty({ message: "É obrigatório informa informa o id do abrigo."})
   shelterId: string;
 
-  @ApiProperty()
-  @IsString()
+  @ApiProperty({ enum: Status, default: Status.CREATED })
+  @IsEnum(Status)
   @IsNotEmpty({ message: "É obrigatório informar o status inicial da necessidade."})
   status: Status;
 
-  @ApiProperty()
-  @IsString()
+  @ApiProperty({ enum: Priority, default: Priority.LOW })
   @IsNotEmpty({ message: "É obrigatório informar o a prioridade."})
+  @IsEnum(Priority)
   priority: Priority;
 
   @ApiProperty()

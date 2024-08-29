@@ -22,7 +22,7 @@ async function bootstrap() {
     .addTag('Hello World')
     .addTag('Distribution points')
     .addTag('Products')
-    .addTag('management')
+    .addTag('Management')
     .addTag('Search')
     .build();
   const document = SwaggerModule.createDocument(app, config);

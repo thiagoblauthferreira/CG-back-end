@@ -1,7 +1,6 @@
 import { Module, forwardRef } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ManagementService } from "./management.service";
-import { ManagementController } from "./management.controller";
 import { NeedModule } from "../need/need.module";
 import { NeedItem } from "../need/entities/needItems.entity";
 import { NeedVolunteers } from "../need/entities/needVolunteers.entity";
@@ -14,6 +13,7 @@ import { FindNeedsItem } from "./utils/findNeedItem";
 import { FindNeedsVolunteer } from "./utils/findNeedVolunteer";
 import { VerifyIfUserExits } from "../need/validator/user/verifyIfUserExits";
 import { VerifyIfShelterExits } from "../need/validator/shelter/verifyIfShelterExits";
+import { ManagementController } from "./management.controller";
 
 
 @Module({

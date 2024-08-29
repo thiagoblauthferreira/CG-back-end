@@ -6,7 +6,7 @@ import { ResponseNeedVolunteerUpdateDTO } from "./dto/response/responseUpdateVol
 import { NeedVolunteers } from "./entities/needVolunteers.entity";
 import { ResponseNeedVolunteerUpdateDTOToList } from "./dto/response/responseUpdateVolunteersToList";
 import { AcceptedNeedDTO } from "./dto/request/accepetdNeedDTO";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { AuthGuard } from "@nestjs/passport";
 import { CancelNeedDTO } from "./dto/request/cancelNeedDTO";
 
@@ -18,17 +18,20 @@ export class NeedVolunteerController {
 
     @Post('register')
     @UseGuards(AuthGuard('jwt'))
+    @ApiBearerAuth()
     async register(@Body() createVolunteerDTO: CreateVolunteerDTO) {
         return new ResponseNeedVolunteerDTO( await this.needVolunteerService.create(createVolunteerDTO));
     }
 
     @Put('update/:id')
     @UseGuards(AuthGuard('jwt'))
+    @ApiBearerAuth()
     async update(@Param('id') id:string, @Body() update: CreateVolunteerDTO) {
         return new ResponseNeedVolunteerUpdateDTO(await this.needVolunteerService.update(id, update))
     }
     @Delete('delete/:id')
     @UseGuards(AuthGuard('jwt'))
+    @ApiBearerAuth()
     async delete(@Param('id') id:string ) {
         const remove = await this.needVolunteerService.delete(id)
         if(remove){
@@ -39,6 +42,7 @@ export class NeedVolunteerController {
 
     @Get('need/:id')
     @UseGuards(AuthGuard('jwt'))
+    @ApiBearerAuth()
     async findById(@Param('id') id:string ) {
         return new ResponseNeedVolunteerUpdateDTO( await this.needVolunteerService.find(id))
     }
@@ -52,12 +56,14 @@ export class NeedVolunteerController {
 
     @Patch('need-accepted/:id')
     @UseGuards(AuthGuard('jwt'))
+    @ApiBearerAuth()
     async accepted(@Param('id') needId: string, @Body() acceptedNeedDTO: AcceptedNeedDTO) {
      return new ResponseNeedVolunteerUpdateDTO(await this.needVolunteerService.accepted(needId, acceptedNeedDTO.userId));
     }   
 
     @Patch('need-cancel/:id')
     @UseGuards(AuthGuard('jwt'))
+    @ApiBearerAuth()
     async cancel(@Param('id') needId: string, @Body() cancelNeedDTO: CancelNeedDTO) {
      return new ResponseNeedVolunteerUpdateDTO(await this.needVolunteerService.canceled(needId, cancelNeedDTO.userId));
     }   

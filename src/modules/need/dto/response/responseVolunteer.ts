@@ -15,7 +15,6 @@ export class ResponseNeedVolunteerDTO {
   shelter_id: string;
   shelter_name: string;
   shelter_phone: string;
-  shelter_address: ResponseAddressDTO;
   status: Status;
   priority: Priority;
   limitDate: Date;
@@ -32,8 +31,7 @@ export class ResponseNeedVolunteerDTO {
     this.description = needVolunteer.description,
     this.shelter_id = needVolunteer.shelter.id,
     this.shelter_name = needVolunteer.shelter.name,
-    this.shelter_phone = needVolunteer.shelter.phone
-    this.shelter_address = new ResponseAddressDTO(needVolunteer.shelter.address)   
+    this.shelter_phone = needVolunteer.shelter.phone   
     this.volunteers = needVolunteer.volunteers,
     this.status = needVolunteer.status,
     this.limitDate = needVolunteer.limitDate,

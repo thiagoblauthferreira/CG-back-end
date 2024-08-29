@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, InternalServerErrorException, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { CreateManagementDTO } from "./dto/request/createManagementDTO";
@@ -12,6 +12,7 @@ import { VerifyIfShelterExits } from "../need/validator/shelter/verifyIfShelterE
 import { createValidator } from "./validators/createValidators";
 import { geoResult } from "./utils/geoResult";
 import { needValidator } from "./validators/needValidator";
+import { UpdateManagementDTO } from "./dto/request/updateManagementDTO";
 
 @Injectable()
 export class ManagementService {
@@ -28,9 +29,7 @@ export class ManagementService {
   ){}
 
   async create(createManagementDTO: CreateManagementDTO): Promise<Management>{
-  try{
-   
-            
+  try{            
     const management = new Management();
     management.collectionDate = createManagementDTO.collectionDate;
 
@@ -54,26 +53,19 @@ export class ManagementService {
     
    } catch (error) {
      logger.error(error);
-     throw new InternalServerErrorException('Erro ao registrar.')
+     throw error
     }         
   }
   
-  async update(id: string, updates: Partial<CreateManagementDTO>): Promise<Management>{
+  async update(id: string, updates: Partial<UpdateManagementDTO>): Promise<Management>{
    
     const management = await this.findById(id);
+  
     if(!management){
       throw new BadRequestException('Demanda não encontrada.')
     }
-    if(updates.coordinatorId){
-      throw new UnauthorizedException('O coordenador não pode ser alterado.')
-    }
 
-    if(updates.shelterId){
-      throw new UnauthorizedException('O abrigo não pode ser alterado.')
-    }
-
-    if (updates.collectPoint) {
-  
+    if (updates.collectPoint) {  
       const address = new Address();
       Object.assign(address, updates.collectPoint);
       const newAddress = await this.addressRepository.create(address);  
@@ -89,7 +81,7 @@ export class ManagementService {
   try {
     const management = await this.managementRepository.findOne({
       where: { id: id },
-      relations: ['coordinator','collectPoint', 'needItem', 'needVolunteer', 'shelter', 'emailQueue']
+      relations: ['coordinator','collectPoint', 'needItem', 'needVolunteer', 'shelter']
     });
     if(!management){
       return null;
@@ -98,9 +90,11 @@ export class ManagementService {
     
   } catch (error) {
     logger.error(error);
-    throw new InternalServerErrorException('Erro ao registrar.')
+    throw error
   }
   }
+
+
   async findAll(): Promise<Management[]>{
     try{
    return await this.managementRepository.find({
@@ -111,19 +105,43 @@ export class ManagementService {
       throw new InternalServerErrorException('Erro ao realizar a pesquisa.')
     }
   }
-  async delete(id: string){
+
+  async findAllByUser(userId: string): Promise<Management[]>{
+    try{
+      return await this.managementRepository.find({
+        where: {
+          coordinator:{
+            id: userId
+          }
+        },
+        relations: ['coordinator', 'collectPoint', 'needItem', 'needVolunteer', 'shelter']
+      });
+    } catch (error) {
+      logger.error(error);
+      throw new InternalServerErrorException('Erro ao realizar a pesquisa.')
+    }
+  }
+
+  async delete(demandId: string, coordinatorId: string){
       try {
-        const demand = await this.findById(id);
-        if(!demand){       
-        await this.managementRepository.delete(id);
+        const demand = await this.findById(demandId);
+        if(!demand){
+          throw new BadRequestException("Demanda não encotrada.")
+        }
+
+        if(demand.coordinator.id != coordinatorId){
+          throw new ForbiddenException("Usuário sem permissão para remover.")
+        }
+
+        if(demand){ 
+        await this.managementRepository.delete(demandId);
         return { message: 'Demanda deletada com sucesso' };
         }
         throw new InternalServerErrorException('Erro ao registrar.')
         
-
       } catch (error) {
         logger.error(error);
-        throw new InternalServerErrorException('Erro ao registrar.')
+        throw error;
       }
   }
 
@@ -133,30 +151,27 @@ export class ManagementService {
     const management = await this.findById(managementId);
     if(!management){
       throw new BadRequestException('Demanda não encontrada.')
-    }
-    
+    }    
     const needItem = await this.findNeedItem.findNeedItemById(needId);
     await needValidator(needItem)
     const needVolunteer = await this.findNeedVolunteer.findVolunteerItemById(needId)
+    await needValidator(needVolunteer)
     if(needItem && needVolunteer){
       throw new BadRequestException("Necessidade não encontrada.")
     }
     
-    needValidator(needVolunteer)
-    if(management.needVolunteer.some(volunteer => volunteer.id === needVolunteer.id)){
+    if(!management.needVolunteer.some(volunteer => volunteer.id === needVolunteer.id)){
        management.needVolunteer.push(needVolunteer)  
        return await this.managementRepository.save(management)    
-    }
-
-    if(management.needItem.some(item => item.id === needItem.id)){
+    } else if(!management.needItem.some(item => item.id === String(needItem.id))){
        management.needItem.push(needItem)
        return await this.managementRepository.save(management)
-     }
+    } else {
      throw new ConflictException('Necessidade já cadastrada.')
-        
+    }
    }catch (error) {
     logger.error(error);
-    throw new InternalServerErrorException('Erro ao registrar.')
+    throw error;
   }
   }
 
@@ -181,11 +196,7 @@ export class ManagementService {
      return {message: 'Necessidade deletada com sucesso.'}
   }catch (error) {
     logger.error(error);
-    throw new InternalServerErrorException('Erro ao registrar.')
+    throw error;
   }
-
   }
-  
-  
-
 }
