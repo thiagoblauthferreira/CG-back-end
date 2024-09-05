@@ -52,8 +52,7 @@ export class CreateUserDto {
   @ApiProperty()
   @IsDateString()
   @IsOptional()
-  @Type(() => Date)
-  birthDate: Date;
+  birthDate: string;
 
   @ApiProperty()
   @IsBoolean()
