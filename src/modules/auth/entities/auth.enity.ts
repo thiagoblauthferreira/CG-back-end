@@ -43,7 +43,7 @@ export class User {
   phone: string;
 
   @Column()
-  birthDate: Date;
+  birthDate: string;
 
   @Column()
   isCoordinator: boolean;
