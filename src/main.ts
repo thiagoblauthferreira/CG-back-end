@@ -22,49 +22,45 @@ async function bootstrap() {
     .addTag('Hello World')
     .addTag('Distribution points')
     .addTag('Products')
-    .addTag('Search')
     .build();
   const document = SwaggerModule.createDocument(app, config);
 
   SwaggerModule.setup('api/document', app, document);
   appConfig(app);
 
-  if (EnvConfig.ENV !== "production") {
+  if (EnvConfig.ENV !== 'production') {
     await app.listen(8080);
   } else {
-      const certPath = './certificados/certificado.crt';
-      const keyPath = './certificados/chave-privada.pem';
+    const certPath = './certificados/certificado.crt';
+    const keyPath = './certificados/chave-privada.pem';
 
-      console.log(`Loading certificates from ${certPath} and ${keyPath}`);
-      const cert = fs.readFileSync(certPath);
-      const key = fs.readFileSync(keyPath);
+    const cert = fs.readFileSync(certPath);
+    const key = fs.readFileSync(keyPath);
 
-      const httpsOptions = {
-        cert: cert,
-        key: key,
-        passphrase: 'gloma',
-      };
+    const httpsOptions = {
+      cert: cert,
+      key: key,
+      passphrase: 'gloma',
+    };
 
-      const httpsServer = https.createServer(
-        httpsOptions,
-        app.getHttpAdapter().getInstance(),
-      );
+    const httpsServer = https.createServer(
+      httpsOptions,
+      app.getHttpAdapter().getInstance(),
+    );
 
-      await app.init();
+    await app.init();
 
-      httpsServer.listen(443, () => {
-      });
+    httpsServer.listen(443, () => {});
 
-      http.createServer((req, res) => {
-        res.writeHead(301, { Location: `https://${req.headers.host}${req.url}` });
+    http
+      .createServer((req, res) => {
+        res.writeHead(301, {
+          Location: `https://${req.headers.host}${req.url}`,
+        });
         res.end();
-      }).listen(80, () => {
-      });
-
-      app.enableCors(corsOptions);
-    
+      })
+      .listen(80, () => {});
   }
 }
 
 bootstrap();
-

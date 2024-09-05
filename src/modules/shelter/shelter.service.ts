@@ -4,12 +4,20 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import {
+  Brackets,
+  FindManyOptions,
+  FindOptionsWhere,
+  Like,
+  Repository,
+} from 'typeorm';
 import { Shelter } from './entities/shelter.entity';
 import { ShelterMessagesHelper } from './helpers/shelter.helper';
 import { UpdateShelterDto, CreateShelterDto } from './dto';
 import { User } from '../auth/entities/auth.enity';
 import { Address } from '../auth/entities/adress.enity';
+import { SearchShelter } from './dto/search-shelter';
+import { Paginate } from 'src/common/interface';
 
 interface IRelations {
   address?: boolean;
@@ -86,15 +94,37 @@ export class ShelterService {
     return shelter;
   }
 
-  async listAll() {
-    return await this.shelterRepository.find({
-      relations: { address: true, creator: true, coordinators: true },
-      select: {
-        coordinators: {
-          id: true,
-        },
-      },
-    });
+  public async listAll(query: SearchShelter): Promise<Paginate<Shelter>> {
+    const queryBuilder = this.shelterRepository
+      .createQueryBuilder('shelter')
+      .leftJoinAndSelect('shelter.address', 'address');
+
+    if (query.search) {
+      const formattedSearch = `%${query.search.toLowerCase().trim()}%`;
+      queryBuilder.andWhere(
+        new Brackets((qb) => {
+          qb.where('LOWER(dp.name) LIKE :search', { search: formattedSearch })
+            .orWhere('LOWER(dp.description) LIKE :search', {
+              search: formattedSearch,
+            })
+            .orWhere('LOWER(dp.phone) LIKE :search', {
+              search: formattedSearch,
+            });
+        }),
+      );
+    }
+
+    const limit = parseInt(query.limit as string, 10) || 10;
+    const offset = parseInt(query.offset as string, 10) || 0;
+
+    queryBuilder.skip(offset).take(limit);
+
+    const [data, total] = await queryBuilder.getManyAndCount();
+
+    return {
+      data,
+      total,
+    };
   }
 
   async remove(shelterId: string) {

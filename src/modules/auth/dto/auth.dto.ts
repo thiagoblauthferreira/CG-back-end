@@ -1,10 +1,22 @@
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsBoolean, IsDateString, IsEmail, IsEmpty, IsEnum, IsIn, IsOptional, IsString, MinLength } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsDateString,
+  IsEmail,
+  IsEmpty,
+  IsEnum,
+  IsIn,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
 import { CreateAddressDto } from './adress.dto';
+import { Type } from 'class-transformer';
 export enum Status {
   WAITING = 'waiting',
   APPROVED = 'approved',
-  REJECTED = 'rejected'
+  REJECTED = 'rejected',
 }
 export class CreateUserDto {
   @ApiHideProperty()
@@ -40,8 +52,9 @@ export class CreateUserDto {
   @ApiProperty()
   @IsDateString()
   @IsOptional()
+  @Type(() => Date)
   birthDate: Date;
-  
+
   @ApiProperty()
   @IsBoolean()
   @IsOptional()
@@ -87,4 +100,3 @@ export class CreateUserDto {
   @IsOptional()
   code: string;
 }
-

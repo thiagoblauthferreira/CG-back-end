@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DistribuitionPoints } from './entities/distribuition-point.entity';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { CreateDistribuitionPoin, UpdateDistribuitionPoin } from './dto';
 import { DistribuitionPointMessagesHelper } from './helpers/distribuition-point.helper';
 import { User } from '../auth/entities/auth.enity';
@@ -16,6 +16,8 @@ import { Products } from '../products/entities/product.entity';
 import { ProductService } from './../products/product.service';
 import { ProductMessagesHelper } from '../products/helpers/product.helper';
 import { CreateUserDto } from '../auth/dto/auth.dto';
+import { SearchDistribuitionPoin } from './dto/search-distribuition-point';
+import { Paginate } from 'src/common/interface';
 
 @Injectable()
 export class DistribuitionPointsService {
@@ -82,33 +84,49 @@ export class DistribuitionPointsService {
     return saveDistribuitionPoin;
   }
 
-  public async listAll() {
-    return this.distribuitionPointsRepository.find({
-      relations: {
-        address: true,
-        products: true,
-      },
-      select: {
-        products: {
-          id: true,
-        },
-      },
-    });
+  public async listAll(
+    query: SearchDistribuitionPoin,
+  ): Promise<Paginate<DistribuitionPoints>> {
+    const queryBuilder = this.distribuitionPointsRepository
+      .createQueryBuilder('dp')
+      .leftJoinAndSelect('dp.address', 'address');
+
+    if (query.search) {
+      const formattedSearch = `%${query.search.toLowerCase().trim()}%`;
+      queryBuilder.andWhere(
+        new Brackets((qb) => {
+          qb.where('LOWER(dp.name) LIKE :search', { search: formattedSearch })
+            .orWhere('LOWER(dp.description) LIKE :search', {
+              search: formattedSearch,
+            })
+            .orWhere('LOWER(dp.phone) LIKE :search', {
+              search: formattedSearch,
+            });
+        }),
+      );
+    }
+
+    const limit = parseInt(query.limit as string, 10) || 10;
+    const offset = parseInt(query.offset as string, 10) || 0;
+
+    queryBuilder.skip(offset).take(limit);
+
+    const [data, total] = await queryBuilder.getManyAndCount();
+
+    return {
+      data,
+      total,
+    };
   }
 
   public async findOne(
     id: string,
-    relations?: { address?: boolean; products?: boolean; creator?: boolean },
+    relations?: { address?: boolean; creator?: boolean },
   ) {
     const distribuitionPoint = await this.distribuitionPointsRepository.findOne(
       {
         where: { id },
         relations,
-        select: {
-          products: {
-            id: true,
-          },
-        },
       },
     );
 
@@ -132,48 +150,33 @@ export class DistribuitionPointsService {
     };
   }
 
-  public async listProducts(distribuitionPointId: string) {
-    await this.findOne(distribuitionPointId);
-    const products = await this.productsRepository.find({
-      where: { distribuitionPoint: { id: distribuitionPointId } },
-    });
-
-    return products;
-  }
-
   async addProduct(
     distribuitionPointId: string,
     productId: string,
     currentUser: CreateUserDto,
   ) {
-    const distribuitionPoint = await this.findOne(distribuitionPointId, {
-      products: true,
-    });
+    const distribuitionPoint = await this.findOne(distribuitionPointId);
 
     const product = await this.productService.findOne(productId, {
       creator: true,
+      distribuitionPoint: true,
     });
+
     if (!product) {
       throw new NotFoundException(ProductMessagesHelper.PRODUCT_NOT_FOUND);
     }
-    
     if (product.creator.id !== currentUser.id) {
       throw new ForbiddenException(
         DistribuitionPointMessagesHelper.ONLY_PRODUCT_CREATOR_CAN_ADD_OR_REMOVE,
       );
     }
-    const productExists = distribuitionPoint.products.find(
-      (product) => product.id === productId,
-    );
-    if (productExists) {
+    if (distribuitionPoint.id === product.distribuitionPoint.id) {
       throw new NotFoundException(
         ProductMessagesHelper.PRODUCT_ALREADY_ASSOCIATED,
       );
     }
 
-    distribuitionPoint.products.push(product);
-
-    await this.distribuitionPointsRepository.save(distribuitionPoint);
+    await this.productsRepository.save({ ...product, distribuitionPointId });
 
     return {
       message:
@@ -186,14 +189,14 @@ export class DistribuitionPointsService {
     productId: string,
     currentUser: CreateUserDto,
   ) {
-    const distribuitionPoint = await this.findOne(distribuitionPointId, {
-      products: true,
-    });
+    const distribuitionPoint = await this.findOne(distribuitionPointId);
 
     const product = await this.productService.findOne(productId, {
       creator: true,
+      distribuitionPoint: true,
     });
-    if (!product) {
+
+    if (!product || distribuitionPoint.id !== product.distribuitionPoint.id) {
       throw new NotFoundException(ProductMessagesHelper.PRODUCT_NOT_FOUND);
     }
     if (product.creator.id !== currentUser.id) {
@@ -201,18 +204,8 @@ export class DistribuitionPointsService {
         DistribuitionPointMessagesHelper.ONLY_PRODUCT_CREATOR_CAN_ADD_OR_REMOVE,
       );
     }
-    const productExists = distribuitionPoint.products.find(
-      (product) => product.id === productId,
-    );
-    if (!productExists) {
-      throw new NotFoundException(ProductMessagesHelper.PRODUCT_NOT_FOUND);
-    }
 
-    distribuitionPoint.products = distribuitionPoint.products.filter(
-      (productFilter) => productFilter.id !== product.id,
-    );
-
-    await this.distribuitionPointsRepository.save(distribuitionPoint);
+    await this.productsRepository.delete(productId);
 
     return {
       message:
