@@ -121,17 +121,12 @@ export class DistribuitionPointsService {
 
   public async findOne(
     id: string,
-    relations?: { address?: boolean; products?: boolean; creator?: boolean },
+    relations?: { address?: boolean; creator?: boolean },
   ) {
     const distribuitionPoint = await this.distribuitionPointsRepository.findOne(
       {
         where: { id },
         relations,
-        select: {
-          products: {
-            id: true,
-          },
-        },
       },
     );
 
@@ -160,34 +155,28 @@ export class DistribuitionPointsService {
     productId: string,
     currentUser: CreateUserDto,
   ) {
-    const distribuitionPoint = await this.findOne(distribuitionPointId, {
-      products: true,
-    });
+    const distribuitionPoint = await this.findOne(distribuitionPointId);
 
     const product = await this.productService.findOne(productId, {
       creator: true,
+      distribuitionPoint: true,
     });
+
     if (!product) {
       throw new NotFoundException(ProductMessagesHelper.PRODUCT_NOT_FOUND);
     }
-
     if (product.creator.id !== currentUser.id) {
       throw new ForbiddenException(
         DistribuitionPointMessagesHelper.ONLY_PRODUCT_CREATOR_CAN_ADD_OR_REMOVE,
       );
     }
-    const productExists = distribuitionPoint.products.find(
-      (product) => product.id === productId,
-    );
-    if (productExists) {
+    if (distribuitionPoint.id === product.distribuitionPoint.id) {
       throw new NotFoundException(
         ProductMessagesHelper.PRODUCT_ALREADY_ASSOCIATED,
       );
     }
 
-    distribuitionPoint.products.push(product);
-
-    await this.distribuitionPointsRepository.save(distribuitionPoint);
+    await this.productsRepository.save({ ...product, distribuitionPointId });
 
     return {
       message:
@@ -200,14 +189,14 @@ export class DistribuitionPointsService {
     productId: string,
     currentUser: CreateUserDto,
   ) {
-    const distribuitionPoint = await this.findOne(distribuitionPointId, {
-      products: true,
-    });
+    const distribuitionPoint = await this.findOne(distribuitionPointId);
 
     const product = await this.productService.findOne(productId, {
       creator: true,
+      distribuitionPoint: true,
     });
-    if (!product) {
+
+    if (!product || distribuitionPoint.id !== product.distribuitionPoint.id) {
       throw new NotFoundException(ProductMessagesHelper.PRODUCT_NOT_FOUND);
     }
     if (product.creator.id !== currentUser.id) {
@@ -215,18 +204,8 @@ export class DistribuitionPointsService {
         DistribuitionPointMessagesHelper.ONLY_PRODUCT_CREATOR_CAN_ADD_OR_REMOVE,
       );
     }
-    const productExists = distribuitionPoint.products.find(
-      (product) => product.id === productId,
-    );
-    if (!productExists) {
-      throw new NotFoundException(ProductMessagesHelper.PRODUCT_NOT_FOUND);
-    }
 
-    distribuitionPoint.products = distribuitionPoint.products.filter(
-      (productFilter) => productFilter.id !== product.id,
-    );
-
-    await this.distribuitionPointsRepository.save(distribuitionPoint);
+    await this.productsRepository.delete(productId);
 
     return {
       message:
