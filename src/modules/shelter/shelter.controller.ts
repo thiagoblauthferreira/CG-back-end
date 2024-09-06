@@ -14,7 +14,10 @@ import {
 import { CreateShelterDto } from './dto/create-shelter.dto';
 import { ShelterService } from './shelter.service';
 import { UpdateShelterDto } from './dto';
-import { ShelterCoordinatorDto } from './dto/coordinator.dto';
+import {
+  SearchCoordinatorDto,
+  ShelterCoordinatorDto,
+} from './dto/coordinator.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -56,12 +59,27 @@ export class ShelterController {
 
   @Get('/:shelterId')
   @UseGuards(AuthGuard('jwt'))
-  async finOne(@Param('shelterId') shelterId: string) {
-    return await this.shelterService.findOne(shelterId, {
-      address: true,
-      coordinators: true,
-      creator: true,
-    });
+  async findOne(
+    @CurrentUser() currentUser: CreateUserDto,
+    @Param('shelterId') shelterId: string,
+  ) {
+    return await this.shelterService.findOne(
+      shelterId,
+      {
+        address: true,
+        creator: true,
+      },
+      currentUser,
+    );
+  }
+
+  @Get('/:shelterId/coordinators')
+  @UseGuards(AuthGuard('jwt'))
+  async listCoordinatorsByShelter(
+    @Param('shelterId') shelterId: string,
+    @Query() query: SearchCoordinatorDto,
+  ) {
+    return await this.shelterService.listCoordinators(shelterId, query);
   }
 
   @Delete('/:shelterId')
@@ -72,7 +90,7 @@ export class ShelterController {
     return await this.shelterService.remove(shelterId);
   }
 
-  @Patch('/:shelterId/coordinator')
+  @Patch('/:shelterId/coordinators')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('coordinator', 'user')
   async addOrRemoveCoordinator(

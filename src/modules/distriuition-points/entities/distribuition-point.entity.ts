@@ -32,7 +32,7 @@ export class DistribuitionPoints {
   @JoinColumn()
   address: Address;
 
-  @ManyToOne(() => User, (user) => user.distribuitionPoints)
+  @ManyToOne(() => User, (user) => user.myDistribuitionPoints)
   @JoinColumn()
   creator: User;
 
