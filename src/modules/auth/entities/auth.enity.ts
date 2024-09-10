@@ -70,20 +70,20 @@ export class User {
   @Column({ nullable: true })
   code: string;
 
-  @ManyToOne(() => Shelter, (shelter) => shelter.coordinators, {
+  @ManyToMany(() => Shelter, (shelter) => shelter.coordinators, {
     nullable: true,
   })
-  shelter: Shelter;
+  shelters: Shelter[];
 
   @OneToMany(
     () => DistribuitionPoints,
     (distribuitionPoints) => distribuitionPoints.creator,
     { nullable: true },
   )
-  distribuitionPoints: DistribuitionPoints[];
+  myDistribuitionPoints: DistribuitionPoints[];
 
   @OneToMany(() => Shelter, (shelter) => shelter.creator, {
     nullable: true,
   })
-  shelters: Shelter[];
+  myShelters: Shelter[];
 }

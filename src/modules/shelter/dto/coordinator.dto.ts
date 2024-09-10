@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsString } from 'class-validator';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
 import { CoordinationActionType } from '../enums/shelter.enum';
+import { QueryRequest } from 'src/common/dto/query';
 
 export class ShelterCoordinatorDto {
   @ApiProperty()
@@ -11,4 +12,12 @@ export class ShelterCoordinatorDto {
   @ApiProperty()
   @IsString()
   coordinatorId: string;
+}
+
+
+export class SearchCoordinatorDto extends QueryRequest {
+  @ApiProperty()
+  @IsOptional()
+  @IsString()
+  search: string;
 }
