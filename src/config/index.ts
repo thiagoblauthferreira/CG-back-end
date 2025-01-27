@@ -7,7 +7,6 @@ export const EnvConfig = {
         USER_DB: process.env.USER_DB,
         PASSWORD_DB: process.env.PASSWORD_DB,
         NAME_DB: process.env.NAME_DB,
-        URL: process.env.URL_DATABASE,        
     },
     OPENCAGE: {
         API_KEY: process.env.OPENCAGE_API_KEY
