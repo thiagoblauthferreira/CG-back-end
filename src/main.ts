@@ -2,14 +2,12 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { corsOptions } from './config/cors.options';
-import * as fs from 'fs';
-import * as https from 'https';
 import * as http from 'http';
 import { appConfig } from './config/app.config';
 import { EnvConfig } from './config';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: corsOptions });
+  const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
 
   const config = new DocumentBuilder()
@@ -28,39 +26,8 @@ async function bootstrap() {
   SwaggerModule.setup('api/document', app, document);
   appConfig(app);
 
-  if (EnvConfig.ENV !== 'production') {
     await app.listen(8080);
-  } else {
-    const certPath = './certificados/certificado.crt';
-    const keyPath = './certificados/chave-privada.pem';
 
-    const cert = fs.readFileSync(certPath);
-    const key = fs.readFileSync(keyPath);
-
-    const httpsOptions = {
-      cert: cert,
-      key: key,
-      passphrase: 'gloma',
-    };
-
-    const httpsServer = https.createServer(
-      httpsOptions,
-      app.getHttpAdapter().getInstance(),
-    );
-
-    await app.init();
-
-    httpsServer.listen(443, () => {});
-
-    http
-      .createServer((req, res) => {
-        res.writeHead(301, {
-          Location: `https://${req.headers.host}${req.url}`,
-        });
-        res.end();
-      })
-      .listen(80, () => {});
-  }
 }
 
 bootstrap();
